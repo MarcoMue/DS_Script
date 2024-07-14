@@ -185,8 +185,10 @@ $.getScript(
                 const commandID = jQuery(this)
                   .find(".quickedit-out")
                   .data("id");
-
                 console.log(commandID);
+
+                const link = jQuery(this).find("a").first().attr("href");
+                console.log(link);
 
                 jQuery
                   .ajax({
