@@ -129,6 +129,7 @@ $.getScript(
           // only add village on the to be fetched list if there are incs going on this village
           if (hasIncsOrNot.length) {
             const villageLink = jQuery(this).attr("href");
+            console.log("check link: ", villageLink);
             villagesLinks.push(villageLink);
           }
         });
@@ -193,8 +194,6 @@ $.getScript(
                 jQuery
                   .ajax({
                     url: `/game.php?screen=info_command&ajax=details&id=${commandID}`,
-                    // url: `https://de228.die-staemme.de/game.php?screen=info_command&ajax=details&id=${commandID}`,
-                    // url: link,
                     dataType: "json",
                   })
                   .done((response) => {
@@ -204,9 +203,67 @@ $.getScript(
                       console.error(`Error:`, data);
                     } else {
                       console.log(response);
+                      /*
+                      {
+                        "village_start": {
+                          "id": "8752"
+                        },
+                        "village_target": {
+                          "id": "5990"
+                        },
+                        "type": "attack",
+                        "time_arrival": {
+                          "date": "1720968641"
+                        },
+                        "units": {
+                          "spear": {
+                            "count": "17",
+                            "image_src": "https://dsde.innogamescdn.com/asset/03ab1366/graphic/unit/unit_spear.png"
+                          },
+                          "sword": {
+                            "count": "2",
+                            "image_src": "https://dsde.innogamescdn.com/asset/03ab1366/graphic/unit/unit_sword.png"
+                          },
+                          "axe": {
+                            "count": "3",
+                            "image_src": "https://dsde.innogamescdn.com/asset/03ab1366/graphic/unit/unit_axe.png"
+                          },
+                          "spy": {
+                            "count": "1",
+                            "image_src": "https://dsde.innogamescdn.com/asset/03ab1366/graphic/unit/unit_spy.png"
+                          },
+                          "light": {
+                            "count": "1",
+                            "image_src": "https://dsde.innogamescdn.com/asset/03ab1366/graphic/unit/unit_light.png"
+                          },
+                          "heavy": {
+                            "count": "0",
+                            "image_src": "https://dsde.innogamescdn.com/asset/03ab1366/graphic/unit/unit_heavy.png"
+                          },
+                          "ram": {
+                            "count": "0",
+                            "image_src": "https://dsde.innogamescdn.com/asset/03ab1366/graphic/unit/unit_ram.png"
+                          },
+                          "catapult": {
+                            "count": "10",
+                            "image_src": "https://dsde.innogamescdn.com/asset/03ab1366/graphic/unit/unit_catapult.png"
+                          },
+                          "snob": {
+                            "count": "1",
+                            "image_src": "https://dsde.innogamescdn.com/asset/03ab1366/graphic/unit/unit_snob.png"
+                          }
+                        },
+                        "start_comment": "",
+                        "carrying_capacity": 565,
+                        "catapult_target": {
+                          "id": "wall",
+                          "name": "Wall"
+                        }
+                      }
+                      */
                     }
                   })
-                  .fail((jqXHR, textStatus, errorThrown) => {
+                  .fail((textStatus, errorThrown) => {
                     console.error(
                       `Request failed: ${textStatus}, ${errorThrown}`
                     );
