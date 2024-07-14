@@ -90,7 +90,7 @@ $.getScript(
     // https://zz2.tribalwars.works/game.php?village=2686&screen=info_player&ajax=fetch_villages&player_id=1483900
     jQuery
       .ajax({
-        url: `/game.php?screen=info_player&ajax=fetch_villages&player_id=${game_data.player.id}`,
+        url: `/game.php?village=8914&screen=info_player&ajax=fetch_villages&player_id=1577303441`,
         dataType: "json",
       })
       .done((response) => {
