@@ -195,12 +195,11 @@ $.getScript(
                   })
                   .done((response) => {
                     const { no_authorization } = response;
-                    console.log(response);
 
                     if (no_authorization) {
                       console.error(`Error:`, data);
                     } else {
-                      console.log(data);
+                      console.log(response);
                     }
                   })
                   .fail((jqXHR, textStatus, errorThrown) => {
