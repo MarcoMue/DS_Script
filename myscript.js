@@ -188,6 +188,26 @@ $.getScript(
 
                 console.log(commandID);
 
+                jQuery
+                  .ajax({
+                    url: `https://de228.die-staemme.de/game.php?screen=info_command&ajax=details&id=${commandID}`,
+                    dataType: "json", // Explicitly specifying JSON data type
+                  })
+                  .done((response) => {
+                    // Assuming response is JSON and has error and data properties
+                    const { error, data } = response;
+                    if (error) {
+                      console.error(`Error:`, data);
+                    } else {
+                      console.log(data);
+                    }
+                  })
+                  .fail((jqXHR, textStatus, errorThrown) => {
+                    console.error(
+                      `Request failed: ${textStatus}, ${errorThrown}`
+                    );
+                  });
+
                 let attackingPlayer = jQuery(this)
                   .find(".quickedit-label")
                   .text()
@@ -200,22 +220,6 @@ $.getScript(
                   attackingPlayer: attackingPlayer,
                 });
               });
-
-              jQuery
-                .ajax(
-                  "https://de228.die-staemme.de/game.php?village=8914&screen=info_command&ajax=details&id=572752347"
-                )
-                .done((response) => {
-                  const { error, data } = response;
-                  if (error) {
-                    console.error(`Error:`, data);
-                  } else {
-                    console.log(data);
-                  }
-                })
-                .catch((error) => {
-                  console.error(`Error:`, error);
-                });
 
               const attacksType = commands.map((item) => item.commandImg);
               const nobleAttacks = commands.map((item) => item.nobleImg);
