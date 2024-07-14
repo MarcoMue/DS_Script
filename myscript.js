@@ -184,7 +184,9 @@ $.getScript(
 
                 const commandID = jQuery(this)
                   .find(".quickedit-out")
-                  .data("command-id");
+                  .data("id");
+
+                console.log(commandID);
 
                 let attackingPlayer = jQuery(this)
                   .find(".quickedit-label")
