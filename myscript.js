@@ -87,6 +87,25 @@ $.getScript(
     const scriptInfo = twSDK.scriptInfo();
     const isValidScreen = twSDK.checkValidLocation("screen");
 
+    // https://zz2.tribalwars.works/game.php?village=2686&screen=info_player&ajax=fetch_villages&player_id=1483900
+    jQuery
+      .ajax({
+        url: `/game.php?screen=info_player&ajax=fetch_villages&player_id=${game_data.player.id}`,
+        dataType: "json",
+      })
+      .done((response) => {
+        const { no_authorization } = response;
+
+        if (no_authorization) {
+          console.error(`Error:`, data);
+        } else {
+          console.log(response);
+        }
+      })
+      .fail((textStatus, errorThrown) => {
+        console.error(`Request failed: ${textStatus}, ${errorThrown}`);
+      });
+
     // Entry point
     if (isValidScreen) {
       try {
@@ -104,26 +123,6 @@ $.getScript(
     // Inititialize script logic
     function initGetIncsForPlayer() {
       // get all player villages
-
-      // https://zz2.tribalwars.works/game.php?village=2686&screen=info_player&ajax=fetch_villages&player_id=1483900
-      jQuery
-        .ajax({
-          url: `/game.php?screen=info_player&ajax=fetch_villages&player_id=${game_data.player.id}`,
-          dataType: "json",
-        })
-        .done((response) => {
-          const { no_authorization } = response;
-
-          if (no_authorization) {
-            console.error(`Error:`, data);
-          } else {
-            console.log(response);
-          }
-        })
-        .fail((textStatus, errorThrown) => {
-          console.error(`Request failed: ${textStatus}, ${errorThrown}`);
-        });
-
       if (jQuery("#villages_list tr:last a").attr("href") === "#") {
         jQuery("#villages_list tr:last a").trigger("click");
       }
