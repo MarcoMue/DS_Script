@@ -192,8 +192,8 @@ $.getScript(
 
                 jQuery
                   .ajax({
-                    // url: `https://de228.die-staemme.de/game.php?screen=info_command&ajax=details&id=${commandID}`,
-                    url: link,
+                    url: `https://de228.die-staemme.de/game.php?screen=info_command&ajax=details&id=${commandID}`,
+                    // url: link,
                     dataType: "json",
                   })
                   .done((response) => {
