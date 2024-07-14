@@ -191,12 +191,13 @@ $.getScript(
                 jQuery
                   .ajax({
                     url: `https://de228.die-staemme.de/game.php?screen=info_command&ajax=details&id=${commandID}`,
-                    dataType: "json", // Explicitly specifying JSON data type
+                    dataType: "json",
                   })
                   .done((response) => {
-                    // Assuming response is JSON and has error and data properties
-                    const { error, data } = response;
-                    if (error) {
+                    const { no_authorization } = response;
+                    console.log(response);
+
+                    if (no_authorization) {
                       console.error(`Error:`, data);
                     } else {
                       console.log(data);
