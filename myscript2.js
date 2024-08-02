@@ -98,4 +98,19 @@ var scriptConfig = {
       document.getElementById("of").checked = true;
     }
   }
+
+  function createUnitOption() {
+    unitsList = game_data.units;
+    menu = "";
+    for (i = 0; i < unitsList.length; i++) {
+      menu =
+        menu +
+        '<option value="' +
+        unitsList[i] +
+        '">' +
+        unitsList[i] +
+        "</option>";
+    }
+    return menu;
+  }
 })();
