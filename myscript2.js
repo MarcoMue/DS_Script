@@ -1,3 +1,5 @@
+if (typeof DEBUG !== "boolean") DEBUG = false;
+
 // User Input
 // Script Config
 var scriptConfig = {
@@ -75,6 +77,8 @@ var scriptConfig = {
 
 (function () {
   console.log("IIFE called.");
+
+  openUI();
 
   function openUI() {
     html =
