@@ -113,4 +113,30 @@ var scriptConfig = {
     }
     return menu;
   }
+
+  function createFilterTable() {
+    filters = {};
+    if (localStorage.troopCounterFilter) {
+      filters = JSON.parse(localStorage.troopCounterFilter);
+    }
+    rows = "";
+    for (filter in filters) {
+      for (i = 0; i < filters[filter].length; i++) {
+        rows =
+          rows +
+          "<tr><td>" +
+          filter +
+          "</td><td>" +
+          filters[filter][i][0] +
+          "</td><td>" +
+          filters[filter][i][1] +
+          '</td><td><input type="image" src="https://dsit.innogamescdn.com/asset/cbd6f76/graphic/delete.png" onclick="deleteFilter(\'' +
+          filter +
+          "','" +
+          i.toString() +
+          "')\"></input></td></tr>";
+      }
+    }
+    return rows;
+  }
 })();
