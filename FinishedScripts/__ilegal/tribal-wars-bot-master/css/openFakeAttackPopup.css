@@ -1,0 +1,8 @@
+td[valign='top'] table.vis th {
+  white-space: nowrap;
+}
+
+table#fake-attack-units img {
+  width: 18px;
+  height: 18px;
+}

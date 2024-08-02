@@ -1,0 +1,104 @@
+body {
+  background: url("https://dstr.innogamescdn.com/asset/8edf6f3/graphic/start2/background.jpg") #c9b997;
+  position: relative;
+  width: 450px;
+  height: 414px;
+  margin: 0;
+  padding: 10px;
+}
+
+.header {
+  margin: 0;
+  color: #ea0000ee;
+  transition: color 1s;
+}
+
+p.description {
+  margin: 5px 5px 5px 0;
+  font-size: 9.8px;
+}
+
+p.description.note {
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.old-version {
+  position: relative;
+  width: 145px;
+  min-width: 145px;
+}
+
+.old-version img {
+  width: 100%;
+  -webkit-filter: blur(1px);
+  filter: blur(1px);
+}
+
+.old-version .old-version-message {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: tomato;
+  font-weight: bold;
+  text-shadow: 0 0 0 black;
+  font-size: 17px;
+  transform: rotateZ(-45deg);
+}
+
+.whats-new h4 {
+  font-weight: bold;
+}
+
+.whats-new ul {
+  padding: 3px 8px 0 3px;
+  max-height: 230px;
+  overflow-y: scroll;
+  list-style: none;
+}
+
+.whats-new ul li {
+  margin-bottom: 18px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 50%);
+  padding: 3px;
+}
+
+.menu-ss {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.fake-attack-release {
+  justify-content: space-between;
+}
+
+.fake-attack-release img {
+  margin-top: 10px;
+  width: 100%;
+}
+
+/* width */
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px #fff;
+  border-radius: 5px;
+}
+
+/* Handle */
+
+::-webkit-scrollbar-thumb {
+  background: #683a32;
+  border-radius: 5px;
+}

@@ -1,3 +1,10 @@
+ScriptAPI.register(
+  "TimeTool",
+  true,
+  "Bottenkraker",
+  "nl.tribalwars@coma.innogames.de"
+);
+
 var timeColor = typeof timeColor !== "undefined" ? timeColor : "green";
 var waitingColor =
   typeof waitingColor !== "undefined" ? waitingColor : "#ff9933";
@@ -134,6 +141,31 @@ var timeBarWidth = typeof timeBarWidth !== "undefined" ? timeBarWidth : false;
     3600 *
     1000;
 
+  function playSound() {
+    return new Promise((resolve, reject) => {
+      const audioElement = new Audio(
+        "https://dsnl.innogamescdn.com/asset/66d23af3/graphic//sound/chat.ogg"
+      );
+
+      audioElement.onended = () => {
+        resolve(); // Resolve the promise when the sound playback is completed
+      };
+
+      audioElement.onerror = (error) => {
+        reject(error); // Reject the promise if there's an error during playback
+      };
+
+      // Mute the audio for autoplay
+      audioElement.muted = true;
+
+      // Play the audio
+      audioElement.play().then(() => {
+        // Once the audio is playing, unmute it
+        audioElement.muted = false;
+      });
+    });
+  }
+
   const checkEndTimeWarning = async () => {
     if (
       new URLSearchParams(document.referrer).get("endTimeWarning") === "1" &&
@@ -141,13 +173,12 @@ var timeBarWidth = typeof timeBarWidth !== "undefined" ? timeBarWidth : false;
     ) {
       const endTime = $("#timer2").data("endtime") * 1000;
 
-      if (endTime - new Date().getTime() < 5000) {
-        TribalWars.playSound("chat");
+      if (endTime - getServerDateTime() < 5000) {
+        await playSound();
         ranEndTimeSound = true;
       }
     }
   };
-
   const handleTimers = () => {
     Timing.tickHandlers.timers.handleTimerEnd = function () {
       $(this).text("Too Late!");
@@ -283,13 +314,12 @@ var timeBarWidth = typeof timeBarWidth !== "undefined" ? timeBarWidth : false;
 
           function commandClick() {
             $(".command-row").click(function () {
-              const indexElement = $(this)
+              const index = $(this)
                 .closest("table")
                 .find(
                   'th:not(:contains("Actuele Aankomst")):contains("Aankomst"):first, th:contains("Arrival"):first'
-                );
-              const index = indexElement?.length ? $(indexElement).index() : 1;
-
+                )
+                .index();
               $(this).closest("tbody").find("td").css("background-color", "");
               $(this).find("td").css("background-color", "white");
               parent.fillSnipeTool($(this).find("td")[index].textContent);
