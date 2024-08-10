@@ -134,13 +134,13 @@ var scriptConfig = {
       .addEventListener("click", loadPlanner);
     document.getElementById("run").addEventListener("click", readData);
 
-    if (localStorage.troopCounterMode) {
-      document.getElementById(
-        localStorage.troopCounterMode === "members_troops" ? "of" : "in"
-      ).checked = true;
-    } else {
-      document.getElementById("of").checked = true;
-    }
+    // if (localStorage.troopCounterMode) {
+    //   document.getElementById(
+    //     localStorage.troopCounterMode === "members_troops" ? "of" : "in"
+    //   ).checked = true;
+    // } else {
+    //   document.getElementById("of").checked = true;
+    // }
   }
 
   function loadPlanner() {
