@@ -81,22 +81,71 @@ var scriptConfig = {
   openUI();
 
   function openUI() {
-    html =
-      '<head></head><body><h1>Tribe troop counter</h1><form><fieldset><legend>Settings</legend><p><input type="radio" name="mode" id="of" value="Read troops of the village" onchange="setMode(\'members_troops\')">Read troops of the village</input></p><p><input type="radio" name="mode" id="in" value="Read defenses in the village" onchange="setMode(\'members_defense\')">Read defenses in the village</input></p></fieldset><fieldset><legend>Filters</legend><select id="variable"><option value="x">x</option><option value="y">y</option>' +
-      createUnitOption() +
-      '</select><select id="kind"><option value=">">></option><option value="<"><</option></select><input type="text" id="value"></input><input type="button" class="btn evt-confirm-btn btn-confirm-yes" onclick="addFilter()" value="Save filter"></input><p><table><tr><th>Variable filtered</th><th>Operatore</th><th>Value</th><th></th></tr>' +
-      createFilterTable() +
-      '</form></p></fieldset><div><p><input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="run" onclick="readData()" value="Read data"></input></p></div></body>';
+    const html = `
+      <head></head>
+      <body>
+        <h1>All Incs</h1>
+        <form>
+          <fieldset>
+            <legend>Settings</legend>
+            <p>
+              <input type="radio" name="mode" id="of" value="Read troops of the village">
+              Read troops of the village
+            </p>
+            <p>
+              <input type="radio" name="mode" id="in" value="Read defenses in the village">
+              Read defenses in the village
+            </p>
+          </fieldset>
+          <fieldset>
+            <legend>Filters</legend>
+            <input type="text" id="value">
+            <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="loadPlannerBtn" value="Load Planner">
+            <p>
+              <table>
+                <tr>
+                  <th>Variable filtered</th>
+                  <th>Operator</th>
+                  <th>Value</th>
+                  <th></th>
+                </tr>
+                ${createFilterTable()}
+              </table>
+            </p>
+          </fieldset>
+          <div>
+            <p>
+              <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="run" value="Read data">
+            </p>
+          </div>
+        </form>
+      </body>
+    `;
     Dialog.show("Troop counter", html);
+
+    document
+      .getElementById("of")
+      .addEventListener("change", () => setMode("members_troops"));
+    document
+      .getElementById("in")
+      .addEventListener("change", () => setMode("members_defense"));
+    document
+      .getElementById("loadPlannerBtn")
+      .addEventListener("click", loadPlanner);
+    document.getElementById("run").addEventListener("click", readData);
+
     if (localStorage.troopCounterMode) {
-      if (localStorage.troopCounterMode == "members_troops") {
-        document.getElementById("of").checked = true;
-      } else {
-        document.getElementById("in").checked = true;
-      }
+      document.getElementById(
+        localStorage.troopCounterMode === "members_troops" ? "of" : "in"
+      ).checked = true;
     } else {
       document.getElementById("of").checked = true;
     }
+  }
+
+  function loadPlanner() {
+    let value = document.getElementById("value").value;
+    console.log("Value: ", value);
   }
 
   function createUnitOption() {
@@ -138,5 +187,127 @@ var scriptConfig = {
       }
     }
     return rows;
+  }
+
+  function readData() {
+    if (game_data.mode == "members") {
+      var html =
+        '<label> Reading...     </label><progress id="bar" max="1" value="0">  </progress>';
+      Dialog.show("Progress bar", html);
+      filtres = {};
+      if (localStorage.troopCounterFilter) {
+        filtres = JSON.parse(localStorage.troopCounterFilter);
+      }
+      table = document.getElementsByClassName("vis");
+      nMembers = table[2].rows.length;
+      playerInfoList = [];
+      for (i = 1; i < nMembers - 1; i++) {
+        let playerId = table[2].rows[i].innerHTML.split("[")[1].split("]")[0];
+        let villageAmount = table[2].rows[i].innerHTML
+          .split('<td class="lit-item">')[4]
+          .split("</td>")[0];
+        playerInfoList.push({
+          playerId: playerId,
+          villageAmount: villageAmount,
+        });
+      }
+      mode = localStorage.troopCounterMode;
+      data = "Coords,Player,";
+      unitsList = game_data.units;
+      for (k = 0; k < unitsList.length; k++) {
+        data = data + unitsList[k] + ",";
+      }
+      players = getPlayerDict();
+      data = data + "\n";
+      i = 0;
+      let pageNumber = 1;
+      (function loop() {
+        page = $.ajax({
+          url:
+            "https://" +
+            window.location.host +
+            "/game.php?screen=ally&mode=" +
+            mode +
+            "&player_id=" +
+            playerInfoList[i].playerId +
+            "&page=" +
+            pageNumber,
+          async: false,
+          function(result) {
+            return result.responseText;
+          },
+        });
+        document.getElementById("bar").value = i / playerInfoList.length;
+
+        let temp = page.responseText.split("vis w100");
+
+        if (temp.length === 2 || temp.length === 4) {
+          rows = page.responseText
+            .split("vis w100")
+            [temp.length - 1].split("<tr>");
+          step = 1;
+          if (mode == "members_defense") {
+            step = 2;
+          }
+          for (j = 2; j + step < rows.length; j = j + step) {
+            villageData = {};
+
+            let coords = rows[j].match(/\d{1,3}\|\d{1,3}/g)[0].split("|");
+            villageData["x"] = coords[0];
+            villageData["y"] = coords[1];
+            units = rows[j].split(/<td class="">|<td class="hidden">/g);
+            for (k = 1; k < units.length; k++) {
+              villageData[unitsList[k - 1]] = units[k]
+                .split("</td>")[0]
+                .replace(/ /g, "")
+                .replace(/\n/g, "")
+                .replace(/<spanclass="grey">\.<\/span>/g, "");
+            }
+            filtered = true; //filtered==true ok, ==false hide
+            for (key in filtres) {
+              for (k = 0; k < filtres[key].length; k++) {
+                if (filtres[key][k][0] === ">") {
+                  if (
+                    parseInt(villageData[key]) < parseInt(filtres[key][k][1])
+                  ) {
+                    filtered = false;
+                  }
+                } else if (filtres[key][k][0] === "<") {
+                  if (
+                    parseInt(villageData[key]) > parseInt(filtres[key][k][1])
+                  ) {
+                    filtered = false;
+                  }
+                }
+              }
+            }
+            if (filtered) {
+              data = data + villageData["x"] + "|" + villageData["y"] + ",";
+              data = data + players[playerInfoList[i].playerId] + ",";
+              for (k = 0; k < unitsList.length; k++) {
+                data = data + villageData[unitsList[k]] + ",";
+              }
+              data = data + "\n";
+            }
+          }
+        }
+        i++;
+
+        if (temp.length === 4) {
+          if (playerInfoList[i].villageAmount / 1000 > pageNumber) {
+            i--;
+            pageNumber++;
+          } else {
+            pageNumber = 1;
+          }
+        }
+
+        if (i < playerInfoList.length) {
+          setTimeout(loop, 200);
+        } else {
+          showData(data, mode);
+        }
+      })();
+    }
   }
 })();

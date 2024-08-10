@@ -1,0 +1,65 @@
+<div class="popup_box show" id="popup_box_Troop counter" style="width: 378px">
+  <a
+    class="popup_box_close tooltip-delayed"
+    href="#"
+    data-title="Schließen :: Tastaturkürzel: <strong>Esc</strong>"
+    >&nbsp;</a
+  >
+  <div class="popup_box_content">
+    <h1>Tribe troop counter</h1>
+    <form>
+      <fieldset>
+        <legend>Settings</legend>
+        <p>
+          <input
+            type="radio"
+            name="mode"
+            id="of"
+            value="Read troops of the village"
+            onchange="setMode('members_troops')"
+          />Read troops of the village
+        </p>
+        <p>
+          <input
+            type="radio"
+            name="mode"
+            id="in"
+            value="Read defenses in the village"
+            onchange="setMode('members_defense')"
+          />Read defenses in the village
+        </p>
+      </fieldset>
+      
+      <fieldset>
+        <legend>Filters</legend>
+        <input type="text" id="value" /><input
+          type="button"
+          class="btn evt-confirm-btn btn-confirm-yes"
+          onclick="addFilter()"
+          value="Save filter"
+        />
+        <div>
+          <p>
+            <input
+              type="button"
+              class="btn evt-confirm-btn btn-confirm-yes"
+              id="run"
+              onclick="readData()"
+              value="Read data"
+            />
+          </p>
+        </div>
+        <table>
+          <tbody>
+            <tr>
+              <th>Variable filtered</th>
+              <th>Operatore</th>
+              <th>Value</th>
+              <th></th>
+            </tr>
+          </tbody>
+        </table>
+      </fieldset>
+    </form>
+  </div>
+</div>
