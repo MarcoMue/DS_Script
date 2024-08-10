@@ -144,7 +144,7 @@ var scriptConfig = {
 
   function loadWBCode() {
     let wbString =
-      "8467&6073&ram&1721075400000&36&false&true&spear=MA==/sword=MA==/axe=MA==/archer=/spy=MTA=/light=MTA=/marcher=/heavy=MA==/ram=MA==/catapult=MzA=/knight=/snob=MA==/militia=MA==";
+      "7609&5878&snob&1721923202000&11&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==\n7043&5878&ram&1721923201000&8&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==\n8543&5878&snob&1721923201000&11&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==\n8735&5878&snob&1721923201000&11&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==\n9899&5878&ram&1721923200000&8&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==\n6487&5878&snob&1721923200000&11&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==";
 
     let data = document.getElementById("urlvalue").value;
 
