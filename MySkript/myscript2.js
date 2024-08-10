@@ -324,8 +324,10 @@ var scriptConfig = {
   function convertWBPlanToArray(plan) {
     console.log("convertWBPlanToArray called.");
 
-    let planArray = plan.split("\n").filter((str) => str.trim() !== "");
-    let planObjects = [];
+    let planArray = plan
+      .split("\n")
+      .map((str) => str.trim())
+      .filter((str) => str !== "");
 
     for (let i = 0; i < planArray.length; i++) {
       let planParts = planArray[i].split("&");
