@@ -6,16 +6,12 @@ const DEBUG = true;
 let y = convertWBPlanToArray(data);
 
 // Assuming x and y are arrays of objects
-if (x.length !== y.length) {
-  console.error("Arrays x and y have different lengths");
-} else {
-  for (let i = 0; i < x.length; i++) {
-    const xItem = x[i];
-    const yItem = y[i];
+for (let i = 0; i < x.length; i++) {
+  const xItem = x[i];
+  const yItem = y[i];
 
-    console.log(xItem.originVillageId);
-    console.log(yItem.originVillageId);
-  }
+  console.log(xItem.originVillageId);
+  console.log(yItem.originVillageId);
 }
 
 debugger;
