@@ -145,13 +145,12 @@ var scriptConfig = {
     let data = document.getElementById("urlvalue").value;
 
     let result = null;
-    if (wbString) {
-      console.log("static");
-      result = convertWBPlanToArray(wbString);
-    }
+    // if (wbString) {
+    //   console.log("static");
+    //   result = convertWBPlanToArray(wbString);
+    // }
 
     if (data) {
-      console.log("data");
       result = convertWBPlanToArray(data);
     }
 
@@ -163,6 +162,7 @@ var scriptConfig = {
       }
 
       const rowData = result.shift(); // Get the first element and remove it from the array
+      console.log("rowData: ", rowData);
 
       const newRow = `
             <tr>
@@ -176,7 +176,7 @@ var scriptConfig = {
     }
 
     // Set an interval to add a new row every second
-    const intervalId = setInterval(addRow, 1000);
+    const intervalId = setInterval(addRow, 250);
 
     // Event delegation to handle row removal
     $(document).on("click", ".removeRow", function () {
