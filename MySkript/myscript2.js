@@ -329,6 +329,8 @@ var scriptConfig = {
       .map((str) => str.trim())
       .filter((str) => str !== "");
 
+    let planObjects = [];
+
     for (let i = 0; i < planArray.length; i++) {
       let planParts = planArray[i].split("&");
       let units = planParts[7].split("/").reduce((obj, str) => {
