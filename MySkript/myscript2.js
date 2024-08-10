@@ -150,7 +150,7 @@ var scriptConfig = {
       "https://ds-ultimate.de/tools/attackPlanner/386478/exportWB/IDytordGKVq9gFR7uLprxHXBZu1yPNJBslKAGdb5";
 
     let value = document.getElementById("urlvalue").value;
-    console.log("Value: ", urlvalue);
+    console.log("Value: ", value);
   }
 
   function createUnitOption() {
