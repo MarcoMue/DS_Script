@@ -166,9 +166,9 @@ var scriptConfig = {
 
       const newRow = `
             <tr>
-              <td>${result[0].commandId}</td>
-              <td>${result[0].originVillageId}</td>
-              <td>${result[0].targetVillageId}</td>
+              <td>${rowData.commandId}</td>
+              <td>${rowData.originVillageId}</td>
+              <td>${rowData.targetVillageId}</td>
               <td><button class="removeRow">Remove</button></td>
             </tr>
           `;
