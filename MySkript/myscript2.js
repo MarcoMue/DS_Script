@@ -143,6 +143,26 @@ var scriptConfig = {
     // }
   }
 
+  function checkCORS(url) {
+    return fetch(url, { method: "HEAD" })
+      .then((response) => {
+        const corsHeader = response.headers.get("Access-Control-Allow-Origin");
+        if (corsHeader) {
+          console.log(
+            `CORS is enabled for ${url}. Access-Control-Allow-Origin: ${corsHeader}`
+          );
+          return true;
+        } else {
+          console.log(`CORS is not enabled for ${url}.`);
+          return false;
+        }
+      })
+      .catch((error) => {
+        console.error(`Error checking CORS for ${url}:`, error);
+        return false;
+      });
+  }
+
   function extractSegments(url) {
     // split url and get parts of it
     // the number after .../attackPlanner/ is the id
@@ -181,7 +201,16 @@ var scriptConfig = {
     if (plannerId && editKey) {
       const apiUrl = `https://ds-ultimate.de/tools/attackPlanner/${plannerId}/${exportType}/${editKey}`;
 
-      fetch(apiUrl)
+      checkCORS(apiUrl)
+        .then((corsEnabled) => {
+          if (corsEnabled) {
+            return fetch(apiUrl);
+          } else {
+            // Use a proxy if CORS is not enabled
+            const proxyUrl = `https://cors-anywhere.herokuapp.com/${apiUrl}`;
+            return fetch(proxyUrl);
+          }
+        })
         .then((response) => {
           if (!response.ok) {
             throw new Error(
