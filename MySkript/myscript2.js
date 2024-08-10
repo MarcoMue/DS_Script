@@ -155,13 +155,13 @@ var scriptConfig = {
     const match = url.match(regex);
 
     if (match) {
-      const beforeSegment = match[1]; // The number after /attackPlanner/
-      const afterSegment = match[3]; // The part after 'edit' or 'show'
+      const plannerId = match[1]; // The number after /attackPlanner/
+      const editKey = match[3]; // The part after 'edit' or 'show'
 
-      if (DEBUG) console.debug("Before segment: ", beforeSegment);
-      if (DEBUG) console.debug("After segment: ", afterSegment);
+      if (DEBUG) console.debug("Before segment: ", plannerId);
+      if (DEBUG) console.debug("After segment: ", editKey);
 
-      return { beforeSegment, afterSegment };
+      return { plannerId, editKey };
     } else {
       if (DEBUG) console.error("URL does not match the regex: ", url);
       return null;
@@ -170,11 +170,39 @@ var scriptConfig = {
 
   function loadPlanner() {
     let fullUrl =
-      "https://ds-ultimate.de/tools/attackPlanner/383616/exportWB/RH9Ic3TnknX62IPEeROWIZLKj4zKlMUTTqEHcZDY";
+      "https://ds-ultimate.de/tools/attackPlanner/383616/edit/RH9Ic3TnknX62IPEeROWIZLKj4zKlMUTTqEHcZDY";
     let url2 =
-      "https://ds-ultimate.de/tools/attackPlanner/386478/exportWB/IDytordGKVq9gFR7uLprxHXBZu1yPNJBslKAGdb5";
+      "https://ds-ultimate.de/tools/attackPlanner/386478/edit/IDytordGKVq9gFR7uLprxHXBZu1yPNJBslKAGdb5";
 
     let url = document.getElementById("urlvalue").value;
+    let { plannerId, editKey } = extractSegments(url);
+    const exportType = "exportWB";
+
+    if (plannerId && editKey) {
+      const apiUrl = `https://ds-ultimate.de/tools/attackPlanner/${plannerId}/${exportType}/${editKey}`;
+
+      fetch(apiUrl)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(
+              "Network response was not ok " + response.statusText
+            );
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log("Fetched JSON data: ", data);
+          // Process the JSON data here
+        })
+        .catch((error) => {
+          console.error(
+            "There was a problem with the fetch operation: ",
+            error
+          );
+        });
+    } else {
+      console.error("Invalid URL segments");
+    }
 
     // TODO: validate url
     console.log("URL: ", extractSegments(url));
