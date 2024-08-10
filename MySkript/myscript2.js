@@ -143,16 +143,23 @@ var scriptConfig = {
   }
 
   function loadWBCode() {
-    let wbString =
-      "7609&5878&snob&1721923202000&11&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==\n7043&5878&ram&1721923201000&8&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==\n8543&5878&snob&1721923201000&11&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==\n8735&5878&snob&1721923201000&11&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==\n9899&5878&ram&1721923200000&8&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==\n6487&5878&snob&1721923200000&11&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==";
+    let wbString = `
+    6686&1961&snob&1721768099000&8&false&true&spear=/sword=/axe=MTYwMA==/archer=/spy=/light=ODAw/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==
+    9849&1961&snob&1721768100000&8&false&true&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==
+    8543&1961&snob&1721768098000&8&false&false&spear=/sword=/axe=MTYwMA==/archer=/spy=/light=ODAw/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==
+    8735&1961&snob&1721768099000&8&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==
+    9899&1961&ram&1721768097000&8&false&true&spear=/sword=/axe=MTYwMA==/archer=/spy=/light=ODAw/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==
+  `;
 
     let data = document.getElementById("urlvalue").value;
 
     if (wbString) {
+      console.log("static");
       convertWBPlanToArray(wbString);
     }
 
     if (data) {
+      console.log("data");
       convertWBPlanToArray(data);
     }
   }
