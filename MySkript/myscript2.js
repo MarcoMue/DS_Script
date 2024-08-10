@@ -131,7 +131,7 @@ var scriptConfig = {
       .addEventListener("change", () => setMode("members_defense"));
     document
       .getElementById("loadPlannerBtn")
-      .addEventListener("click", loadPlanner);
+      .addEventListener("click", loadWBCode);
     document.getElementById("run").addEventListener("click", readData);
 
     // if (localStorage.troopCounterMode) {
@@ -141,26 +141,6 @@ var scriptConfig = {
     // } else {
     //   document.getElementById("of").checked = true;
     // }
-  }
-
-  function checkCORS(url) {
-    return fetch(url, { method: "HEAD" })
-      .then((response) => {
-        const corsHeader = response.headers.get("Access-Control-Allow-Origin");
-        if (corsHeader) {
-          console.log(
-            `CORS is enabled for ${url}. Access-Control-Allow-Origin: ${corsHeader}`
-          );
-          return true;
-        } else {
-          console.log(`CORS is not enabled for ${url}.`);
-          return false;
-        }
-      })
-      .catch((error) => {
-        console.error(`Error checking CORS for ${url}:`, error);
-        return false;
-      });
   }
 
   function extractSegments(url) {
@@ -188,55 +168,15 @@ var scriptConfig = {
     }
   }
 
-  function loadPlanner() {
-    let fullUrl =
-      "https://ds-ultimate.de/tools/attackPlanner/383616/edit/RH9Ic3TnknX62IPEeROWIZLKj4zKlMUTTqEHcZDY";
-    let url2 =
-      "https://ds-ultimate.de/tools/attackPlanner/386478/edit/IDytordGKVq9gFR7uLprxHXBZu1yPNJBslKAGdb5";
+  function loadWBCode() {
+    let wbString =
+      "8467&6073&ram&1721075400000&36&false&true&spear=MA==/sword=MA==/axe=MA==/archer=/spy=MTA=/light=MTA=/marcher=/heavy=MA==/ram=MA==/catapult=MzA=/knight=/snob=MA==/militia=MA==";
 
-    let url = document.getElementById("urlvalue").value;
-    let { plannerId, editKey } = extractSegments(url);
-    const exportType = "exportWB";
+    let data = document.getElementById("urlvalue").value;
 
-    if (plannerId && editKey) {
-      const apiUrl = `https://ds-ultimate.de/tools/attackPlanner/${plannerId}/${exportType}/${editKey}`;
-
-      checkCORS(apiUrl)
-        .then((corsEnabled) => {
-          if (corsEnabled) {
-            return fetch(apiUrl);
-          } else {
-            // Use a proxy if CORS is not enabled
-            const proxyUrl = `https://cors-anywhere.herokuapp.com/${apiUrl}`;
-            return fetch(proxyUrl);
-          }
-        })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(
-              "Network response was not ok " + response.statusText
-            );
-          }
-          return response.json();
-        })
-        .then((data) => {
-          console.log("Fetched JSON data: ", data);
-          // Process the JSON data here
-        })
-        .catch((error) => {
-          console.error(
-            "There was a problem with the fetch operation: ",
-            error
-          );
-        });
-    } else {
-      console.error("Invalid URL segments");
+    if (data) {
+      convertWBPlanToArray(data);
     }
-
-    // TODO: validate url
-    console.log("URL: ", extractSegments(url));
-    console.log("URL: ", extractSegments(fullUrl));
-    console.log("URL: ", extractSegments(url2));
   }
 
   function createUnitOption() {
@@ -402,5 +342,56 @@ var scriptConfig = {
         }
       })();
     }
+  }
+
+  function parseBool(input) {
+    if (typeof input === "string") {
+      return input.toLowerCase() === "true";
+    } else if (typeof input === "boolean") {
+      return input;
+    } else {
+      console.error(
+        `${scriptInfo}: Invalid input: needs to be a string or boolean.`
+      );
+      return false;
+    }
+  }
+
+  function convertWBPlanToArray(plan) {
+    let planArray = plan.split("\n").filter((str) => str.trim() !== "");
+    let planObjects = [];
+
+    for (let i = 0; i < planArray.length; i++) {
+      let planParts = planArray[i].split("&");
+      let units = planParts[7].split("/").reduce((obj, str) => {
+        if (!str) {
+          return obj;
+        }
+        const [unit, value] = str.split("=");
+        if (unit === undefined || value === undefined) {
+          return obj;
+        }
+        obj[unit] = parseInt(atob(value));
+        return obj;
+      }, {});
+
+      let planObject = {
+        commandId: i.toString(),
+        originVillageId: parseInt(planParts[0]),
+        targetVillageId: parseInt(planParts[1]),
+        slowestUnit: planParts[2],
+        arrivalTimestamp: parseInt(planParts[3]),
+        type: parseInt(planParts[4]),
+        drawIn: parseBool(planParts[5]),
+        sent: parseBool(planParts[6]),
+        units: units,
+      };
+
+      planObjects.push(planObject);
+      if (DEBUG) console.debug(`Plan object ${i} created: `, planObject);
+    }
+
+    if (DEBUG) console.debug(`Plan objects created: `, planObjects);
+    return planObjects;
   }
 })();
