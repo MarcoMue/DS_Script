@@ -143,14 +143,43 @@ var scriptConfig = {
     // }
   }
 
+  function extractSegments(url) {
+    // split url and get parts of it
+    // the number after .../attackPlanner/ is the id
+    // and the last part is the readkey
+
+    if (DEBUG) console.debug("URL: ", url);
+
+    // Regular expression to match the parts before and after 'edit' or 'show'
+    const regex = /\/attackPlanner\/(\d+)\/(edit|show)\/(.+)/;
+    const match = url.match(regex);
+
+    if (match) {
+      const beforeSegment = match[1]; // The number after /attackPlanner/
+      const afterSegment = match[3]; // The part after 'edit' or 'show'
+
+      if (DEBUG) console.debug("Before segment: ", beforeSegment);
+      if (DEBUG) console.debug("After segment: ", afterSegment);
+
+      return { beforeSegment, afterSegment };
+    } else {
+      if (DEBUG) console.error("URL does not match the regex: ", url);
+      return null;
+    }
+  }
+
   function loadPlanner() {
     let fullUrl =
       "https://ds-ultimate.de/tools/attackPlanner/383616/exportWB/RH9Ic3TnknX62IPEeROWIZLKj4zKlMUTTqEHcZDY";
     let url2 =
       "https://ds-ultimate.de/tools/attackPlanner/386478/exportWB/IDytordGKVq9gFR7uLprxHXBZu1yPNJBslKAGdb5";
 
-    let value = document.getElementById("urlvalue").value;
-    console.log("Value: ", value);
+    let url = document.getElementById("urlvalue").value;
+
+    // TODO: validate url
+    console.log("URL: ", extractSegments(url));
+    console.log("URL: ", extractSegments(fullUrl));
+    console.log("URL: ", extractSegments(url2));
   }
 
   function createUnitOption() {
