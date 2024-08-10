@@ -101,7 +101,7 @@ var scriptConfig = {
             <input type="text" id="urlvalue">
             <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="loadPlannerBtn" value="Load Planner">
             <p>
-              <table>
+              <table id="myTable">
                 <tr>
                   <th>Variable filtered</th>
                   <th>Operator</th>
