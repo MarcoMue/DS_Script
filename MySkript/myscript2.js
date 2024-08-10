@@ -108,7 +108,6 @@ var scriptConfig = {
                   <th>Value</th>
                   <th></th>
                 </tr>
-                ${createFilterTable()}
               </table>
             </p>
           </fieldset>
@@ -132,14 +131,6 @@ var scriptConfig = {
       .getElementById("loadPlannerBtn")
       .addEventListener("click", loadWBCode);
     document.getElementById("run").addEventListener("click", readData);
-
-    // if (localStorage.troopCounterMode) {
-    //   document.getElementById(
-    //     localStorage.troopCounterMode === "members_troops" ? "of" : "in"
-    //   ).checked = true;
-    // } else {
-    //   document.getElementById("of").checked = true;
-    // }
   }
 
   function loadWBCode() {
@@ -153,41 +144,44 @@ var scriptConfig = {
 
     let data = document.getElementById("urlvalue").value;
 
+    let result = null;
     if (wbString) {
       console.log("static");
-      convertWBPlanToArray(wbString);
+      result = convertWBPlanToArray(wbString);
     }
 
     if (data) {
       console.log("data");
-      convertWBPlanToArray(data);
+      result = convertWBPlanToArray(data);
     }
-  }
 
-  function createFilterTable() {
-    filters = {};
-    if (localStorage.troopCounterFilter) {
-      filters = JSON.parse(localStorage.troopCounterFilter);
-    }
-    rows = "";
-    for (filter in filters) {
-      for (i = 0; i < filters[filter].length; i++) {
-        rows =
-          rows +
-          "<tr><td>" +
-          filter +
-          "</td><td>" +
-          filters[filter][i][0] +
-          "</td><td>" +
-          filters[filter][i][1] +
-          '</td><td><input type="image" src="https://dsit.innogamescdn.com/asset/cbd6f76/graphic/delete.png" onclick="deleteFilter(\'' +
-          filter +
-          "','" +
-          i.toString() +
-          "')\"></input></td></tr>";
+    // Function to add a new row to the table
+    function addRow() {
+      if (result.length === 0) {
+        clearInterval(intervalId);
+        return;
       }
+
+      const rowData = result.shift(); // Get the first element and remove it from the array
+
+      const newRow = `
+            <tr>
+              <td>${data[0].commandId}</td>
+              <td>${data[0].originVillageId}</td>
+              <td>${data[0].targetVillageId}</td>
+              <td><button class="removeRow">Remove</button></td>
+            </tr>
+          `;
+      $("#myTable").append(newRow);
     }
-    return rows;
+
+    // Set an interval to add a new row every second
+    const intervalId = setInterval(addRow, 1000);
+
+    // Event delegation to handle row removal
+    $(document).on("click", ".removeRow", function () {
+      $(this).closest("tr").remove();
+    });
   }
 
   function readData() {
