@@ -143,55 +143,19 @@ var scriptConfig = {
     // }
   }
 
-  function extractSegments(url) {
-    // split url and get parts of it
-    // the number after .../attackPlanner/ is the id
-    // and the last part is the readkey
-
-    if (DEBUG) console.debug("URL: ", url);
-
-    // Regular expression to match the parts before and after 'edit' or 'show'
-    const regex = /\/attackPlanner\/(\d+)\/(edit|show)\/(.+)/;
-    const match = url.match(regex);
-
-    if (match) {
-      const plannerId = match[1]; // The number after /attackPlanner/
-      const editKey = match[3]; // The part after 'edit' or 'show'
-
-      if (DEBUG) console.debug("Before segment: ", plannerId);
-      if (DEBUG) console.debug("After segment: ", editKey);
-
-      return { plannerId, editKey };
-    } else {
-      if (DEBUG) console.error("URL does not match the regex: ", url);
-      return null;
-    }
-  }
-
   function loadWBCode() {
     let wbString =
       "8467&6073&ram&1721075400000&36&false&true&spear=MA==/sword=MA==/axe=MA==/archer=/spy=MTA=/light=MTA=/marcher=/heavy=MA==/ram=MA==/catapult=MzA=/knight=/snob=MA==/militia=MA==";
 
     let data = document.getElementById("urlvalue").value;
 
+    if (wbString) {
+      convertWBPlanToArray(wbString);
+    }
+
     if (data) {
       convertWBPlanToArray(data);
     }
-  }
-
-  function createUnitOption() {
-    unitsList = game_data.units;
-    menu = "";
-    for (i = 0; i < unitsList.length; i++) {
-      menu =
-        menu +
-        '<option value="' +
-        unitsList[i] +
-        '">' +
-        unitsList[i] +
-        "</option>";
-    }
-    return menu;
   }
 
   function createFilterTable() {
@@ -358,6 +322,8 @@ var scriptConfig = {
   }
 
   function convertWBPlanToArray(plan) {
+    console.log("convertWBPlanToArray called.");
+
     let planArray = plan.split("\n").filter((str) => str.trim() !== "");
     let planObjects = [];
 
