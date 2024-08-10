@@ -99,7 +99,7 @@ var scriptConfig = {
           </fieldset>
           <fieldset>
             <legend>Filters</legend>
-            <input type="text" id="value">
+            <input type="text" id="urlvalue">
             <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="loadPlannerBtn" value="Load Planner">
             <p>
               <table>
@@ -144,8 +144,13 @@ var scriptConfig = {
   }
 
   function loadPlanner() {
-    let value = document.getElementById("value").value;
-    console.log("Value: ", value);
+    let fullUrl =
+      "https://ds-ultimate.de/tools/attackPlanner/383616/exportWB/RH9Ic3TnknX62IPEeROWIZLKj4zKlMUTTqEHcZDY";
+    let url2 =
+      "https://ds-ultimate.de/tools/attackPlanner/386478/exportWB/IDytordGKVq9gFR7uLprxHXBZu1yPNJBslKAGdb5";
+
+    let value = document.getElementById("urlvalue").value;
+    console.log("Value: ", urlvalue);
   }
 
   function createUnitOption() {
@@ -190,6 +195,8 @@ var scriptConfig = {
   }
 
   function readData() {
+    console.log("readData");
+
     if (game_data.mode == "members") {
       var html =
         '<label> Reading...     </label><progress id="bar" max="1" value="0">  </progress>';
