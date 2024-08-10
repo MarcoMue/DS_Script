@@ -77,7 +77,7 @@ var scriptConfig = {
 
 (function () {
   console.log("IIFE called.");
-  DEBUG = true;
+  console.log("myvar: ", myvar);
 
   openUI();
 

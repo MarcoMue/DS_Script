@@ -1,0 +1,4 @@
+javascript: (() => {
+  const myvar = true;
+  $.getScript("https://marcomue.github.io/DS_Script/MySkript/myscript2.js");
+})();
