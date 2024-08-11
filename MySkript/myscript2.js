@@ -250,6 +250,7 @@ var scriptConfig = {
                   .width() -
                 10 +
                 "px";
+          // <form id="command-data-form" action="/game.php?village=6963&amp;screen=place&amp;action=command" method="post" onsubmit="this.submit.disabled=true;" style="min-width: 800px">
           $('form[action*="action=command"]')
             .find("table")
             .first()
@@ -261,53 +262,53 @@ var scriptConfig = {
             .after(
               $cc.find("table").parent().html() +
                 '<br><div style="clear:both;"></div>'
-            )
-            .next()
-            .css({
-              float: "right",
-              width: w,
-              display: "block",
-              "max-height": $('form[action*="action=command"]')
-                .find("table")
-                .first()
-                .height(),
-              overflow: "auto",
-            })
-            .find("tr.command-row")
-            .on("click", function () {
-              var $this = $(this),
-                duration = $('form[action*="action=command"]')
-                  .find("table")
-                  .find('td:contains("Duur:")')
-                  .next()
-                  .text()
-                  .trim()
-                  .split(":"),
-                sendTime =
-                  parseInt($this.find("span.timer").data("endtime")) -
-                  (parseInt(duration[0]) * 3600 +
-                    parseInt(duration[1]) * 60 +
-                    parseInt(duration[2]));
-              $this.closest("table").find("td").css("background-color", "");
-              $this.find("td").css("background-color", "#FFF68F");
-              $(".sendTime").html(
-                formatTimes(sendTime) +
-                  ' (<span class="sendTimer" data-endtime="' +
-                  sendTime +
-                  '"></span>)'
-              );
-              Timing.tickHandlers.timers.initTimers("sendTimer");
-              document.title = formatTimes(sendTime);
-            })
-            .filter(function () {
-              return (
-                $('img[src*="/return_"], img[src*="/back.png"]', this).length >
-                0
-              );
-            })
-            .remove();
-          $(".widget-command-timer").addClass("timer");
-          Timing.tickHandlers.timers.initTimers("widget-command-timer");
+            );
+          //   .next()
+          //   .css({
+          //     float: "right",
+          //     width: w,
+          //     display: "block",
+          //     "max-height": $('form[action*="action=command"]')
+          //       .find("table")
+          //       .first()
+          //       .height(),
+          //     overflow: "auto",
+          //   })
+          //   .find("tr.command-row")
+          //   .on("click", function () {
+          //     var $this = $(this),
+          //       duration = $('form[action*="action=command"]')
+          //         .find("table")
+          //         .find('td:contains("Duur:")')
+          //         .next()
+          //         .text()
+          //         .trim()
+          //         .split(":"),
+          //       sendTime =
+          //         parseInt($this.find("span.timer").data("endtime")) -
+          //         (parseInt(duration[0]) * 3600 +
+          //           parseInt(duration[1]) * 60 +
+          //           parseInt(duration[2]));
+          //     $this.closest("table").find("td").css("background-color", "");
+          //     $this.find("td").css("background-color", "#FFF68F");
+          //     $(".sendTime").html(
+          //       formatTimes(sendTime) +
+          //         ' (<span class="sendTimer" data-endtime="' +
+          //         sendTime +
+          //         '"></span>)'
+          //     );
+          //     Timing.tickHandlers.timers.initTimers("sendTimer");
+          //     document.title = formatTimes(sendTime);
+          //   })
+          //   .filter(function () {
+          //     return (
+          //       $('img[src*="/return_"], img[src*="/back.png"]', this).length >
+          //       0
+          //     );
+          //   })
+          //   .remove();
+          // $(".widget-command-timer").addClass("timer");
+          // Timing.tickHandlers.timers.initTimers("widget-command-timer");
         } else {
           UI.ErrorMessage("No commands found");
         }
