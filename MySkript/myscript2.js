@@ -198,18 +198,14 @@ var scriptConfig = {
     // 6087&5307&snob&1723270500000&11&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==
     // 7587&9038&spy&1723339738123&24&false&false&spear=MQ==/sword=Mg==/axe=Mw==/archer=/spy=NA==/light=NQ==/marcher=/heavy=Ng==/ram=Nw==/catapult=OA==/knight=/snob=OQ==/militia=MA==
 
-    let planArray = plan
-      .split("\n")
-      .map((str) => str.trim())
-      .filter((str) => str !== "");
-
-    let planArray2 = plan.split("\n").filter((str) => str.trim() !== "");
-    console.log("planArray2: ", planArray2);
-
-    let planArray3 = plan
+    const pattern = /==(?=[^\/])/g;
+    // Using the pattern to split and keep the delimiter
+    const planArray = plan
       .replace(/\s+/g, "") // Remove all spaces
-      .split(/(==(?=[^/]))/); // Split at '==' not followed by '/' and keep the delimiter
-    console.log("planArray3: ", planArray3);
+      .split(pattern)
+      .map((part, index, array) =>
+        index < array.length - 1 ? part + "==" : part
+      );
 
     let planObjects = [];
 
