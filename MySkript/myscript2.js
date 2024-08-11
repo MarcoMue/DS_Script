@@ -240,16 +240,6 @@ var scriptConfig = {
       function (html) {
         var $cc = $(html).find(".commands-container");
         if ($cc.length > 0) {
-          var w =
-            game_data.screen == "map"
-              ? "100%"
-              : $("#content_value").width() -
-                $('form[action*="action=command"]')
-                  .find("table")
-                  .first()
-                  .width() -
-                10 +
-                "px";
           // <form id="command-data-form" action="/game.php?village=6963&amp;screen=place&amp;action=command" method="post" onsubmit="this.submit.disabled=true;" style="min-width: 800px">
           $('form[action*="action=command"]')
             .find("table")
