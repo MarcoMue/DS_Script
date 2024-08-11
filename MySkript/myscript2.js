@@ -76,6 +76,8 @@ let scriptConfig = {
   enableCountApi: true,
 };
 let intervalId;
+let results = null;
+let commands = [];
 
 (function () {
   console.log("IIFE called.");
@@ -135,27 +137,27 @@ let intervalId;
     document.getElementById("run").addEventListener("click", readData);
   }
 
-  function addRow(results) {
+  function addRow(row) {
     if (results.length === 0) {
       clearInterval(intervalId);
       return;
     }
 
-    const rowData = results.shift(); // Get the first element and remove it from the array
-    const newRow = `
-          <tr>
-            <td>${rowData.commandId}</td>
-            <td>${rowData.originVillageId}</td>
-            <td>${rowData.targetVillageId}</td>
-            <td><button class="removeRow">Remove</button></td>
-          </tr>
-        `;
-    $("#myTable").append(newRow);
+    // const rowData = results.shift(); // Get the first element and remove it from the array
+    // const newRow = `
+    //       <tr>
+    //         <td>${rowData.commandId}</td>
+    //         <td>${rowData.originVillageId}</td>
+    //         <td>${rowData.targetVillageId}</td>
+    //         <td><button class="removeRow">Remove</button></td>
+    //       </tr>
+    //       `;
+
+    $("#myTable").append(row);
   }
 
   function loadWBCode() {
     let data = document.getElementById("urlvalue").value;
-    let results = null;
 
     if (data) {
       results = convertWBPlanToArray(data);
@@ -262,6 +264,15 @@ let intervalId;
               items.push(commandID);
             });
 
+          $cc
+            .find("table")
+            .first()
+            .find(".command-row")
+            .each(function () {
+              commands.push($(this));
+              addRow($(this));
+            });
+
           let timerId = setInterval(function () {
             // Step 3: Fetch and process the item
             if (items.length > 0) {
@@ -278,6 +289,8 @@ let intervalId;
                     console.error(`Error:`, data);
                   } else {
                     console.log(response);
+                    results.push(response);
+                    // addRow(response);
                   }
                 })
                 .fail((textStatus, errorThrown) => {
