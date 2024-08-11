@@ -257,7 +257,7 @@ var scriptConfig = {
             .css("float", "left")
             .find("tr")
             .last()
-            .after('<tr><td>Verstuur:</td><td class="sendTime">-</td>')
+            // .after('<tr><td>Verstuur:</td><td class="sendTime">-</td>')
             .closest("table")
             .after(
               $cc.find("table").parent().html() +
