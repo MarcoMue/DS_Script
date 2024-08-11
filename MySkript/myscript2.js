@@ -90,10 +90,9 @@ let commands = [];
   openUI();
 
   function openUI() {
-    const html = `
-      <head></head>
-      <body>
+    const html = `   
         <h1>All Incs</h1>
+        <div>
         <form>
           <fieldset>
             <legend>Settings</legend>
@@ -127,7 +126,7 @@ let commands = [];
             </p>
           </div>
         </form>
-      </body>
+      </div>
     `;
     // Dialog.show("Troop counter", html);
 
