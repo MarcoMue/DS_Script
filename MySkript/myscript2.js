@@ -188,10 +188,23 @@ var scriptConfig = {
   function convertWBPlanToArray(plan) {
     console.log("convertWBPlanToArray called.");
 
+    // 6963&12246&snob&1722632340000&8&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==
+    // 8031&12246&ram&1722632339000&8&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==
+    // 7587&12246&ram&1722632339000&8&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==
+    // 9658&12246&snob&1722632340000&8&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==
+    // 9123&12246&ram&1722632340000&8&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==
+    // 9038&12246&snob&1722632340000&8&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=Mg==/militia=MA==
+
+    // 6087&5307&snob&1723270500000&11&false&false&spear=/sword=/axe=/archer=/spy=/light=/marcher=/heavy=/ram=/catapult=/knight=/snob=/militia=MA==
+    // 7587&9038&spy&1723339738123&24&false&false&spear=MQ==/sword=Mg==/axe=Mw==/archer=/spy=NA==/light=NQ==/marcher=/heavy=Ng==/ram=Nw==/catapult=OA==/knight=/snob=OQ==/militia=MA==
+
     let planArray = plan
       .split("\n")
       .map((str) => str.trim())
       .filter((str) => str !== "");
+
+    let planArray2 = plan.split("\n").filter((str) => str.trim() !== "");
+    console.log("planArray2: ", planArray2);
 
     let planObjects = [];
 
