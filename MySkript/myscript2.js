@@ -76,7 +76,7 @@ let scriptConfig = {
   enableCountApi: true,
 };
 let intervalId;
-let results = null;
+let results = [];
 let commands = [];
 
 (function () {
@@ -138,10 +138,10 @@ let commands = [];
   }
 
   function addRow(row) {
-    if (results.length === 0) {
-      clearInterval(intervalId);
-      return;
-    }
+    // if (results.length === 0) {
+    //   clearInterval(intervalId);
+    //   return;
+    // }
 
     // const rowData = results.shift(); // Get the first element and remove it from the array
     // const newRow = `
@@ -165,7 +165,7 @@ let commands = [];
     }
 
     // Set an interval to add a new row every second
-    intervalId = setInterval(addRow, 250);
+    // intervalId = setInterval(addRow, 250);
 
     // Event delegation to handle row removal
     $(document).on("click", ".removeRow", function () {
