@@ -248,6 +248,16 @@ var scriptConfig = {
             .find("tr")
             .last()
             .after($cc.find("table").parent().html());
+
+          var dataId = $cc
+            .find("table")
+            .first()
+            .find(".quickedit-out")
+            .each(function () {
+              console.log($(this).attr("data-id"));
+            });
+
+          console.log(dataId);
         } else {
           UI.ErrorMessage("No commands found");
         }
