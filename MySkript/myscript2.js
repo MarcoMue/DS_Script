@@ -206,6 +206,12 @@ var scriptConfig = {
     let planArray2 = plan.split("\n").filter((str) => str.trim() !== "");
     console.log("planArray2: ", planArray2);
 
+    let planArray3 = plan
+      .replace(/\s+/g, "") // Remove all spaces
+      .split(/==(?=[^/])/); // Split at '==' not followed by '/'
+
+    console.log("planArray3: ", planArray3);
+
     let planObjects = [];
 
     for (let i = 0; i < planArray.length; i++) {
