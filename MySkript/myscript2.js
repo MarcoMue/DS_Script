@@ -233,6 +233,7 @@ var scriptConfig = {
 
   function readData() {
     console.log("readData called.");
+    var items = []; // Example items
 
     $.get(
       // $(".village_anchor").first().find("a").first().attr("href"),
@@ -249,15 +250,47 @@ var scriptConfig = {
             .last()
             .after($cc.find("table").parent().html());
 
-          var dataId = $cc
+          $cc
             .find("table")
             .first()
             .find(".quickedit-out")
             .each(function () {
-              console.log($(this).attr("data-id"));
+              // console.log($(this).attr("data-id"));
+              let commandID = $(this).attr("data-id");
+              console.log(commandID);
+              items.push(commandID);
             });
 
-          console.log(dataId);
+          var intervalId = setInterval(function () {
+            // Step 3: Fetch and process the item
+            if (items.length > 0) {
+              var item = items.shift(); // Fetch the first item
+              console.log("Processing:", item); // Process the item (example: log it)
+              jQuery
+                .ajax({
+                  url: `/game.php?screen=info_command&ajax=details&id=${commandID}`,
+                  dataType: "json",
+                })
+                .done((response) => {
+                  const { no_authorization } = response;
+
+                  if (no_authorization) {
+                    console.error(`Error:`, data);
+                  } else {
+                    console.log(response);
+                  }
+                })
+                .fail((textStatus, errorThrown) => {
+                  console.error(
+                    `Request failed: ${textStatus}, ${errorThrown}`
+                  );
+                });
+            } else {
+              // Step 4: Clear the interval when the array is empty
+              clearInterval(intervalId);
+              console.log("All items processed.");
+            }
+          }, 400);
         } else {
           UI.ErrorMessage("No commands found");
         }
