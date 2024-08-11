@@ -3,7 +3,7 @@ DEBUG = true;
 
 // User Input
 // Script Config
-var scriptConfig = {
+let scriptConfig = {
   scriptData: {
     prefix: "getIncsForPlayer",
     name: "Get Incs for Player",
@@ -75,6 +75,7 @@ var scriptConfig = {
   isDebug: DEBUG,
   enableCountApi: true,
 };
+let intervalId;
 
 (function () {
   console.log("IIFE called.");
@@ -104,7 +105,7 @@ var scriptConfig = {
             <p>
               <table id="myTable">
                 <tr>
-                  <th>Variable filtered</th>
+                  <th>letiable filtered</th>
                   <th>Operator</th>
                   <th>Value</th>
                   <th></th>
@@ -134,35 +135,35 @@ var scriptConfig = {
     document.getElementById("run").addEventListener("click", readData);
   }
 
+  function addRow(results) {
+    if (results.length === 0) {
+      clearInterval(intervalId);
+      return;
+    }
+
+    const rowData = results.shift(); // Get the first element and remove it from the array
+    const newRow = `
+          <tr>
+            <td>${rowData.commandId}</td>
+            <td>${rowData.originVillageId}</td>
+            <td>${rowData.targetVillageId}</td>
+            <td><button class="removeRow">Remove</button></td>
+          </tr>
+        `;
+    $("#myTable").append(newRow);
+  }
+
   function loadWBCode() {
     let data = document.getElementById("urlvalue").value;
     let results = null;
 
     if (data) {
       results = convertWBPlanToArray(data);
-    }
-
-    // Function to add a new row to the table
-    function addRow() {
-      if (results.length === 0) {
-        clearInterval(intervalId);
-        return;
-      }
-
-      const rowData = results.shift(); // Get the first element and remove it from the array
-      const newRow = `
-            <tr>
-              <td>${rowData.commandId}</td>
-              <td>${rowData.originVillageId}</td>
-              <td>${rowData.targetVillageId}</td>
-              <td><button class="removeRow">Remove</button></td>
-            </tr>
-          `;
-      $("#myTable").append(newRow);
+      addRow(results);
     }
 
     // Set an interval to add a new row every second
-    const intervalId = setInterval(addRow, 250);
+    intervalId = setInterval(addRow, 250);
 
     // Event delegation to handle row removal
     $(document).on("click", ".removeRow", function () {
@@ -233,13 +234,13 @@ var scriptConfig = {
 
   function readData() {
     console.log("readData called.");
-    var items = []; // Example items
+    let items = []; // Example items
 
     $.get(
       // $(".village_anchor").first().find("a").first().attr("href"),
       "/game.php?village=6087&screen=info_village&id=7346",
       function (html) {
-        var $cc = $(html).find(".commands-container");
+        let $cc = $(html).find(".commands-container");
         if ($cc.length > 0) {
           // <form id="command-data-form" action="/game.php?village=6963&amp;screen=place&amp;action=command" method="post" onsubmit="this.submit.disabled=true;" style="min-width: 800px">
           // $('form[action*="action=command"]')
@@ -261,10 +262,10 @@ var scriptConfig = {
               items.push(commandID);
             });
 
-          var intervalId = setInterval(function () {
+          let timerId = setInterval(function () {
             // Step 3: Fetch and process the item
             if (items.length > 0) {
-              var item = items.shift(); // Fetch the first item
+              let item = items.shift(); // Fetch the first item
               console.log("Processing:", item); // Process the item (example: log it)
               jQuery
                 .ajax({
@@ -286,7 +287,7 @@ var scriptConfig = {
                 });
             } else {
               // Step 4: Clear the interval when the array is empty
-              clearInterval(intervalId);
+              clearInterval(timerId);
               console.log("All items processed.");
             }
           }, 400);
