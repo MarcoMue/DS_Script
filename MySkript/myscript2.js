@@ -247,10 +247,7 @@ var scriptConfig = {
             .css("float", "left")
             .find("tr")
             .last()
-            .after(
-              $cc.find("table").parent().html() +
-                '<br><div style="clear:both;"></div>'
-            );
+            .after($cc.find("table").parent().html());
         } else {
           UI.ErrorMessage("No commands found");
         }
