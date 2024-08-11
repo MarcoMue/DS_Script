@@ -1,6 +1,12 @@
 if (typeof DEBUG !== "boolean") DEBUG = false;
 DEBUG = true;
 
+// TODO fix timer
+// TODO expand Table
+// TODO add more Player Info
+// TODO add more Village Info
+// TODO fix Icon Tooltip
+
 // User Input
 // Script Config
 let scriptConfig = {
@@ -123,7 +129,11 @@ let commands = [];
         </form>
       </body>
     `;
-    Dialog.show("Troop counter", html);
+    // Dialog.show("Troop counter", html);
+
+    $("#contentContainer").eq(0).prepend(html);
+    $("#mobileContent").eq(0).prepend(html);
+    Timing.tickHandlers.timers.init();
 
     document
       .getElementById("of")
