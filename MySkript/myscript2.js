@@ -268,12 +268,11 @@ var scriptConfig = {
               console.log("Processing:", item); // Process the item (example: log it)
               jQuery
                 .ajax({
-                  url: `/game.php?screen=info_command&ajax=details&id=${commandID}`,
+                  url: `/game.php?screen=info_command&ajax=details&id=${item}`,
                   dataType: "json",
                 })
                 .done((response) => {
                   const { no_authorization } = response;
-
                   if (no_authorization) {
                     console.error(`Error:`, data);
                   } else {
