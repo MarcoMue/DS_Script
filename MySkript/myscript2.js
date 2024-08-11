@@ -208,8 +208,7 @@ var scriptConfig = {
 
     let planArray3 = plan
       .replace(/\s+/g, "") // Remove all spaces
-      .split(/==(?=[^/])/); // Split at '==' not followed by '/'
-
+      .split(/(==(?=[^/]))/); // Split at '==' not followed by '/' and keep the delimiter
     console.log("planArray3: ", planArray3);
 
     let planObjects = [];
