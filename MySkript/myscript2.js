@@ -753,13 +753,12 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
         pagesToFetch,
         function (index, data) {
           twSDK.updateProgressBar(index, pagesToFetch.length);
-
           console.log("Fetching data for village:", pagesToFetch[index]);
           // console.log("Index:", index);
           // console.log("Data:", data);
 
-          const htmlDoc = jQuery.parseHTML(data);
-          let $cc = jQuery(htmlDoc).find(".commands-container");
+          // const htmlDoc = jQuery.parseHTML(data);
+          let $cc = jQuery(data).find(".commands-container");
           if ($cc.length > 0) {
             $cc
               .find("table")
@@ -831,6 +830,7 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
           //   .detach()
           //   .appendTo("#incomings_table tbody:last-child");
         },
+
         function () {
           // initIncomingsOverview();
           UI.SuccessMessage("All villages fetched!");
