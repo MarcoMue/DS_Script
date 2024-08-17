@@ -82,6 +82,8 @@ let scriptConfig = {
   enableCountApi: true,
 };
 
+let scriptInfo = `${scriptConfig.scriptData.prefix} ${scriptConfig.scriptData.name} ${scriptConfig.scriptData.version}`;
+
 window.twSDK = {
   // variables
   scriptData: {},
@@ -118,7 +120,6 @@ let villiges = [""];
 
 (function () {
   console.log("IIFE called.");
-  fetchWorldData();
   openUI();
 
   function openUI() {
@@ -278,6 +279,7 @@ let villiges = [""];
   function readData() {
     console.log("readData called.");
     let items = []; // Example items
+    fetchWorldData();
 
     $.get(
       // $(".village_anchor").first().find("a").first().attr("href"),
