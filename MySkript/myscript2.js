@@ -594,6 +594,11 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
             <input type="radio" name="mode" id="in" value="Read defenses in the village">
             Read defenses in the village
           </p>
+          <p>
+            <input type="checkbox" name="troop_details" id="troop_details" value="Enable Troop Details">
+            <label for="troop_details">Enable Troop Details</label>
+          </p>
+
         </fieldset>
         <fieldset>
           <legend>Filters</legend>
@@ -636,6 +641,7 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
       .addEventListener("click", loadWBCode);
     document.getElementById("run").addEventListener("click", readIncs);
     document.getElementById("update").addEventListener("click", updateDB);
+    // document.getElementById('troop_details').addEventListener('click', readCheckboxValue);
   }
 
   function addRowToTable(row) {
@@ -744,9 +750,7 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
     if (pagesToFetch.length) {
       twSDK.startProgressBar(pagesToFetch.length);
       await twSDK.getAll(
-        // urls:
         pagesToFetch,
-        // onLoad:
         function (index, data) {
           twSDK.updateProgressBar(index, pagesToFetch.length);
 
@@ -779,41 +783,46 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
             $(".widget-command-timer").addClass("timer");
             Timing.tickHandlers.timers.initTimers("widget-command-timer");
 
-            let timerId = setInterval(function () {
-              // Step 3: Fetch and process the item
-              if (items.length > 0) {
-                let item = items.shift(); // Fetch the first item
-                console.log("Processing:", item); // Process the item (example: log it)
-                jQuery
-                  .ajax({
-                    url: `/game.php?screen=info_command&ajax=details&id=${item}`,
-                    dataType: "json",
-                  })
-                  .done((response) => {
-                    const { no_authorization } = response;
-                    if (no_authorization) {
-                      console.error(`Error:`, data);
-                    } else {
-                      console.log(response);
-                      results.push(response);
-                    }
-                  })
-                  .fail((textStatus, errorThrown) => {
-                    console.error(
-                      `Request failed: ${textStatus}, ${errorThrown}`
-                    );
-                  });
-              } else {
-                // Step 4: Clear the interval when the array is empty
-                clearInterval(timerId);
-                console.log("All items processed.");
-              }
-            }, 400);
+            //#region read Troop Details
+            const troopDetailsCheckbox =
+              document.getElementById("troop_details");
+            const isChecked = troopDetailsCheckbox.checked;
+
+            if (isChecked) {
+              let timerId = setInterval(function () {
+                if (items.length > 0) {
+                  let item = items.shift(); // Fetch the first item
+                  console.log("Processing:", item); // Process the item (example: log it)
+                  jQuery
+                    .ajax({
+                      url: `/game.php?screen=info_command&ajax=details&id=${item}`,
+                      dataType: "json",
+                    })
+                    .done((response) => {
+                      const { no_authorization } = response;
+                      if (no_authorization) {
+                        console.error(`Error:`, data);
+                      } else {
+                        console.log(response);
+                        results.push(response);
+                      }
+                    })
+                    .fail((textStatus, errorThrown) => {
+                      console.error(
+                        `Request failed: ${textStatus}, ${errorThrown}`
+                      );
+                    });
+                } else {
+                  // Step 4: Clear the interval when the array is empty
+                  clearInterval(timerId);
+                  console.log("All items processed.");
+                }
+              }, 400);
+            }
+            //#endregion
           } else {
             UI.ErrorMessage("No commands found", $cc);
           }
-          console.log("jquery parsed html", htmlDoc);
-
           // const incomingRows = jQuery(htmlDoc).find(
           //   "#incomings_table tbody tr.nowrap"
           // );
@@ -822,12 +831,10 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
           //   .detach()
           //   .appendTo("#incomings_table tbody:last-child");
         },
-        // onDone:
         function () {
           // initIncomingsOverview();
           UI.SuccessMessage("All villages fetched!");
         },
-        // onError:
         function (error) {
           UI.ErrorMessage("Error fetching incomings page!");
           console.error(`${scriptInfo} Error:`, error);
@@ -837,78 +844,9 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
       // initIncomingsOverview();
       UI.ErrorMessage("No villages to fetch!");
     }
-
-    /*
-    $.get(
-      // $(".village_anchor").first().find("a").first().attr("href"),
-      "/game.php?screen=info_village&id=2087",
-      function (html) {
-        let $cc = $(html).find(".commands-container");
-        if ($cc.length > 0) {
-          $cc
-            .find("table")
-            .first()
-            .find(".quickedit-out")
-            .each(function () {
-              let commandID = $(this).attr("data-id");
-              console.log(commandID);
-              items.push(commandID);
-            });
-
-          $cc
-            .find("table")
-            .first()
-            .find(".command-row")
-            .each(function () {
-              commands.push($(this));
-              addRowToTable($(this));
-            });
-
-          $(".widget-command-timer").addClass("timer");
-          Timing.tickHandlers.timers.initTimers("widget-command-timer");
-
-          let timerId = setInterval(function () {
-            // Step 3: Fetch and process the item
-            if (items.length > 0) {
-              let item = items.shift(); // Fetch the first item
-              console.log("Processing:", item); // Process the item (example: log it)
-              jQuery
-                .ajax({
-                  url: `/game.php?screen=info_command&ajax=details&id=${item}`,
-                  dataType: "json",
-                })
-                .done((response) => {
-                  const { no_authorization } = response;
-                  if (no_authorization) {
-                    console.error(`Error:`, data);
-                  } else {
-                    console.log(response);
-                    results.push(response);
-                  }
-                })
-                .fail((textStatus, errorThrown) => {
-                  console.error(
-                    `Request failed: ${textStatus}, ${errorThrown}`
-                  );
-                });
-            } else {
-              // Step 4: Clear the interval when the array is empty
-              clearInterval(timerId);
-              console.log("All items processed.");
-            }
-          }, 400);
-        } else {
-          UI.ErrorMessage("No commands found", $cc);
-        }
-      }
-    );
-    */
   }
 
   async function updateDB() {
-    // const villages = await twSDK.worldDataAPI("village");
-    // console.log("Villages:", villages);
-
     const request = indexedDB.open("villagesDb", 1);
     request.onerror = function (event) {
       console.error("Database error:", event.target.errorCode);
