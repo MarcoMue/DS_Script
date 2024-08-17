@@ -315,12 +315,17 @@ window.twSDK = {
     async function saveToIndexedDbStorage(dbName, table, keyId, data) {
       const dbConnect = indexedDB.open(dbName);
 
-      dbConnect.onupgradeneeded = function () {
-        const db = dbConnect.result;
+      dbConnect.onupgradeneeded = function (event) {
+        const db = event.target.result;
+        // const db = dbConnect.result;
         if (keyId.length) {
           db.createObjectStore(table, {
             keyPath: keyId,
           });
+
+          console.log(data);
+          debugger;
+          objectStore.createIndex("name", "name", { unique: false });
         } else {
           db.createObjectStore(table, {
             autoIncrement: true,
