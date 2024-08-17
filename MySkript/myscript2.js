@@ -473,7 +473,7 @@ let villiges = [""];
           </fieldset>
           <fieldset>
             <legend>Filters</legend>
-            <input type="text" id="urlvalue">
+            <textarea id="urlvalue" rows="4" cols="50" />
             <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="loadPlannerBtn" value="Load Planner">
             <p>
               <table id="myTable">
@@ -652,6 +652,9 @@ let villiges = [""];
               commands.push($(this));
               addRow($(this));
             });
+
+          $(".widget-command-timer").addClass("timer");
+          Timing.tickHandlers.timers.initTimers("widget-command-timer");
 
           let timerId = setInterval(function () {
             // Step 3: Fetch and process the item
