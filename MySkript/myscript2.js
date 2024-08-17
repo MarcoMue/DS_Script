@@ -333,6 +333,8 @@ window.twSDK = {
         const store = transaction.objectStore(table);
         store.clear(); // clean store from items before adding new ones
 
+        console.log("Data to be saved:", data);
+
         data.forEach((item) => {
           store.put(item);
         });
@@ -790,5 +792,38 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
   async function updateDB() {
     const villages = await twSDK.worldDataAPI("village");
     console.log("Villages:", villages);
+
+    const request = indexedDB.open("villagesDb", 16831);
+    request.onerror = function (event) {
+      console.error("Database error:", event.target.errorCode);
+    };
+
+    request.onsuccess = function (event) {
+      const db = event.target.result;
+
+      // Open a transaction
+      const transaction = db.transaction(["villages"], "readonly");
+
+      // Access the object store
+      const objectStore = transaction.objectStore("villages");
+
+      // Specify the key you want to search for
+      const key = "villageId";
+
+      // Use the get method to retrieve the value associated with the key
+      const getRequest = objectStore.get(key);
+
+      getRequest.onerror = function (event) {
+        console.error("Get request error:", event.target.errorCode);
+      };
+
+      getRequest.onsuccess = function (event) {
+        if (getRequest.result) {
+          console.log("Value:", getRequest.result);
+        } else {
+          console.log("No matching record found");
+        }
+      };
+    };
   }
 })();
