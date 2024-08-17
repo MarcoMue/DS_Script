@@ -151,13 +151,17 @@ window.twSDK = {
   },
   getVillageIDByCoords: function (x, y) {
     const xy = parseInt(`${x}${y}`, 10);
+
     const village = TWMap.villages[xy];
+
     if (!village) {
       return NaN;
     }
     return village.id;
   },
   worldDataAPI: async function (entity) {
+    console.log("worldDataAPI called with entity:", entity);
+
     const TIME_INTERVAL = 60 * 60 * 1000; // fetch data every hour
     const LAST_UPDATED_TIME = localStorage.getItem(`${entity}_last_updated`);
 
@@ -435,6 +439,7 @@ window.twSDK = {
 
     return worldData[entity];
   },
+  // returns a list of all villages
   fetchWorldData: async function () {
     try {
       const villages = await twSDK.worldDataAPI("village");
@@ -518,10 +523,11 @@ window.twSDK = {
 let intervalId;
 let results = [];
 let commands = [];
-let villages = ["458|446", "485|457", "456|471", "435|443"];
+let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
 
-(function () {
+(async function () {
   console.log("IIFE called.");
+  const villages = await twSDK.worldDataAPI("village");
   openUI();
 
   function openUI() {
@@ -668,8 +674,7 @@ let villages = ["458|446", "485|457", "456|471", "435|443"];
   async function readIncs() {
     console.log("readIncs called.");
     let items = [];
-
-    let pagesToFetch = villages.map((village) => {
+    let pagesToFetch = targetVillages.map((village) => {
       return `/game.php?screen=info_village&id=${twSDK.getVillageIDByCoords(
         village.split("|")[0],
         village.split("|")[1]
@@ -691,7 +696,7 @@ let villages = ["458|446", "485|457", "456|471", "435|443"];
 
           const htmlDoc = jQuery.parseHTML(data);
 
-          console.log(htmlDoc);
+          console.log("jquery parsed html", htmlDoc);
 
           // const incomingRows = jQuery(htmlDoc).find(
           //   "#incomings_table tbody tr.nowrap"
@@ -782,7 +787,8 @@ let villages = ["458|446", "485|457", "456|471", "435|443"];
     );
   }
 
-  function updateDB() {
-    twSDK.fetchWorldData();
+  async function updateDB() {
+    const villages = await twSDK.worldDataAPI("village");
+    console.log("Villages:", villages);
   }
 })();
