@@ -808,7 +808,7 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
       const objectStore = transaction.objectStore("villages");
 
       // Specify the key you want to search for
-      const key = "16831";
+      const key = 16831;
 
       // Use the get method to retrieve the value associated with the key
       const getRequest = objectStore.get(key);
