@@ -322,9 +322,288 @@ let villiges = [""];
     );
   }
 
+  async function worldDataAPI(entity) {
+    const TIME_INTERVAL = 60 * 60 * 1000; // fetch data every hour
+    const LAST_UPDATED_TIME = localStorage.getItem(`${entity}_last_updated`);
+
+    // check if entity is allowed and can be fetched
+    const allowedEntities = ["village", "player", "ally", "conquer"];
+    if (!allowedEntities.includes(entity)) {
+      throw new Error(`Entity ${entity} does not exist!`);
+    }
+
+    // initial world data
+    const worldData = {};
+
+    const dbConfig = {
+      village: {
+        dbName: "villagesDb",
+        dbTable: "villages",
+        key: "villageId",
+        url: twSDK.worldDataVillages,
+      },
+      player: {
+        dbName: "playersDb",
+        dbTable: "players",
+        key: "playerId",
+        url: twSDK.worldDataPlayers,
+      },
+      ally: {
+        dbName: "tribesDb",
+        dbTable: "tribes",
+        key: "tribeId",
+        url: twSDK.worldDataTribes,
+      },
+      conquer: {
+        dbName: "conquerDb",
+        dbTable: "conquer",
+        key: "",
+        url: twSDK.worldDataConquests,
+      },
+    };
+
+    // Helpers: Fetch entity data and save to localStorage
+    const fetchDataAndSave = async () => {
+      const DATA_URL = dbConfig[entity].url;
+
+      try {
+        // fetch data
+        const response = await jQuery.ajax(DATA_URL);
+        const data = twSDK.csvToArray(response);
+        let responseData = [];
+
+        // prepare data to be saved in db
+        switch (entity) {
+          case "village":
+            responseData = data
+              .filter((item) => {
+                if (item[0] != "") {
+                  return item;
+                }
+              })
+              .map((item) => {
+                return {
+                  villageId: parseInt(item[0]),
+                  villageName: twSDK.cleanString(item[1]),
+                  villageX: item[2],
+                  villageY: item[3],
+                  playerId: parseInt(item[4]),
+                  villagePoints: parseInt(item[5]),
+                  villageType: parseInt(item[6]),
+                };
+              });
+            break;
+          case "player":
+            responseData = data
+              .filter((item) => {
+                if (item[0] != "") {
+                  return item;
+                }
+              })
+              .map((item) => {
+                return {
+                  playerId: parseInt(item[0]),
+                  playerName: twSDK.cleanString(item[1]),
+                  tribeId: parseInt(item[2]),
+                  villages: parseInt(item[3]),
+                  points: parseInt(item[4]),
+                  rank: parseInt(item[5]),
+                };
+              });
+            break;
+          case "ally":
+            responseData = data
+              .filter((item) => {
+                if (item[0] != "") {
+                  return item;
+                }
+              })
+              .map((item) => {
+                return {
+                  tribeId: parseInt(item[0]),
+                  tribeName: twSDK.cleanString(item[1]),
+                  tribeTag: twSDK.cleanString(item[2]),
+                  players: parseInt(item[3]),
+                  villages: parseInt(item[4]),
+                  points: parseInt(item[5]),
+                  allPoints: parseInt(item[6]),
+                  rank: parseInt(item[7]),
+                };
+              });
+            break;
+          case "conquer":
+            responseData = data
+              .filter((item) => {
+                if (item[0] != "") {
+                  return item;
+                }
+              })
+              .map((item) => {
+                return {
+                  villageId: parseInt(item[0]),
+                  unixTimestamp: parseInt(item[1]),
+                  newPlayerId: parseInt(item[2]),
+                  newPlayerId: parseInt(item[3]),
+                  oldTribeId: parseInt(item[4]),
+                  newTribeId: parseInt(item[5]),
+                  villagePoints: parseInt(item[6]),
+                };
+              });
+            break;
+          default:
+            return [];
+        }
+
+        // save data in db
+        saveToIndexedDbStorage(
+          dbConfig[entity].dbName,
+          dbConfig[entity].dbTable,
+          dbConfig[entity].key,
+          responseData
+        );
+
+        // update last updated localStorage item
+        localStorage.setItem(`${entity}_last_updated`, Date.parse(new Date()));
+
+        return responseData;
+      } catch (error) {
+        throw Error(`Error fetching ${DATA_URL}`);
+      }
+    };
+
+    // Helpers: Save to IndexedDb storage
+    async function saveToIndexedDbStorage(dbName, table, keyId, data) {
+      const dbConnect = indexedDB.open(dbName);
+
+      dbConnect.onupgradeneeded = function () {
+        const db = dbConnect.result;
+        if (keyId.length) {
+          db.createObjectStore(table, {
+            keyPath: keyId,
+          });
+        } else {
+          db.createObjectStore(table, {
+            autoIncrement: true,
+          });
+        }
+      };
+
+      dbConnect.onsuccess = function () {
+        const db = dbConnect.result;
+        const transaction = db.transaction(table, "readwrite");
+        const store = transaction.objectStore(table);
+        store.clear(); // clean store from items before adding new ones
+
+        data.forEach((item) => {
+          store.put(item);
+        });
+
+        UI.SuccessMessage("Database updated!");
+      };
+    }
+
+    // Helpers: Read all villages from indexedDB
+    function getAllData(dbName, table) {
+      return new Promise((resolve, reject) => {
+        const dbConnect = indexedDB.open(dbName);
+
+        dbConnect.onsuccess = () => {
+          const db = dbConnect.result;
+
+          const dbQuery = db
+            .transaction(table, "readwrite")
+            .objectStore(table)
+            .getAll();
+
+          dbQuery.onsuccess = (event) => {
+            resolve(event.target.result);
+          };
+
+          dbQuery.onerror = (event) => {
+            reject(event.target.error);
+          };
+        };
+
+        dbConnect.onerror = (event) => {
+          reject(event.target.error);
+        };
+      });
+    }
+
+    // Helpers: Transform an array of objects into an array of arrays
+    function objectToArray(arrayOfObjects, entity) {
+      switch (entity) {
+        case "village":
+          return arrayOfObjects.map((item) => [
+            item.villageId,
+            item.villageName,
+            item.villageX,
+            item.villageY,
+            item.playerId,
+            item.villagePoints,
+            item.villageType,
+          ]);
+        case "player":
+          return arrayOfObjects.map((item) => [
+            item.playerId,
+            item.playerName,
+            item.tribeId,
+            item.villages,
+            item.points,
+            item.rank,
+          ]);
+        case "ally":
+          return arrayOfObjects.map((item) => [
+            item.tribeId,
+            item.tribeName,
+            item.tribeTag,
+            item.players,
+            item.villages,
+            item.points,
+            item.allPoints,
+            item.rank,
+          ]);
+        case "conquer":
+          return arrayOfObjects.map((item) => [
+            item.villageId,
+            item.unixTimestamp,
+            item.newPlayerId,
+            item.newPlayerId,
+            item.oldTribeId,
+            item.newTribeId,
+            item.villagePoints,
+          ]);
+        default:
+          return [];
+      }
+    }
+
+    // decide what to do based on current time and last updated entity time
+    if (LAST_UPDATED_TIME !== null) {
+      if (
+        Date.parse(new Date()) >=
+        parseInt(LAST_UPDATED_TIME) + TIME_INTERVAL
+      ) {
+        worldData[entity] = await fetchDataAndSave();
+      } else {
+        worldData[entity] = await getAllData(
+          dbConfig[entity].dbName,
+          dbConfig[entity].dbTable
+        );
+      }
+    } else {
+      worldData[entity] = await fetchDataAndSave();
+    }
+
+    // transform the data so at the end an array of array is returned
+    worldData[entity] = objectToArray(worldData[entity], entity);
+
+    return worldData[entity];
+  }
+
   async function fetchWorldData() {
     try {
-      const villages = await twSDK.worldDataAPI("village");
+      const villages = await worldDataAPI("village");
       return { villages };
     } catch (error) {
       UI.ErrorMessage(error);
