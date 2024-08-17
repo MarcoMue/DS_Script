@@ -86,6 +86,12 @@ let scriptInfo = `${scriptConfig.scriptData.prefix} ${scriptConfig.scriptData.na
 
 window.twSDK = {
   // variables
+  database: {
+    db: null,
+    DB_NAME: "mdn-demo-indexeddb-epublications",
+    DB_VERSION: 1,
+    DB_STORE_NAME: "publications",
+  },
   scriptData: {},
   translations: {},
   allowedMarkets: [],
@@ -313,10 +319,10 @@ window.twSDK = {
 
     // Helpers: Save to IndexedDb storage
     async function saveToIndexedDbStorage(dbName, table, keyId, data) {
-      const dbConnect = indexedDB.open(dbName);
+      const req = indexedDB.open(dbName);
 
-      dbConnect.onupgradeneeded = function (event) {
-        const db = event.target.result;
+      req.onupgradeneeded = function (event) {
+        const db = this.result;
         // const db = dbConnect.result;
         if (keyId.length) {
           db.createObjectStore(table, {
@@ -339,8 +345,8 @@ window.twSDK = {
         }
       };
 
-      dbConnect.onsuccess = function () {
-        const db = dbConnect.result;
+      req.onsuccess = function () {
+        const db = this.result;
         const transaction = db.transaction(table, "readwrite");
         const store = transaction.objectStore(table);
         store.clear(); // clean store from items before adding new ones
@@ -353,15 +359,19 @@ window.twSDK = {
 
         UI.SuccessMessage("Database updated!");
       };
+
+      req.onerror = function (event) {
+        console.error("saveToIndexedDbStorage:", event.target.errorCode);
+      };
     }
 
     // Helpers: Read all villages from indexedDB
     function getAllData(dbName, table) {
       return new Promise((resolve, reject) => {
-        const dbConnect = indexedDB.open(dbName);
+        const req = indexedDB.open(dbName);
 
-        dbConnect.onsuccess = () => {
-          const db = dbConnect.result;
+        req.onsuccess = () => {
+          const db = req.result;
 
           const dbQuery = db
             .transaction(table, "readwrite")
@@ -377,7 +387,7 @@ window.twSDK = {
           };
         };
 
-        dbConnect.onerror = (event) => {
+        req.onerror = (event) => {
           reject(event.target.error);
         };
       });
@@ -453,16 +463,6 @@ window.twSDK = {
 
     return worldData[entity];
   },
-  // returns a list of all villages
-  fetchWorldData: async function () {
-    try {
-      const villages = await twSDK.worldDataAPI("village");
-      return { villages };
-    } catch (error) {
-      UI.ErrorMessage(error);
-      console.error(`${scriptInfo} Error:`, error);
-    }
-  },
   startProgressBar: function (total) {
     const width = jQuery("#content_value")[0].clientWidth;
     const preloaderContent = `
@@ -533,23 +533,31 @@ window.twSDK = {
     }
   },
   findVillageInDB: function (x, y) {
-    const db = indexedDB.open("villagesDb");
-    const objectStore = db.transaction("villages").objectStore("villages");
+    const req = indexedDB.open("villagesDb");
 
-    objectStore.openCursor().onsuccess = (event) => {
-      const cursor = event.target.result;
-      if (cursor) {
-        if (cursor.value.villageX === x && cursor.value.villageY === y) {
-          console.log(
-            `ID for Village ${cursor.key} is ${cursor.value.villageId}`
-          );
-          return cursor.value;
+    req.onsuccess = function () {
+      const db = req.result;
+      const objectStore = db.transaction("villages").objectStore("villages");
+
+      objectStore.openCursor().onsuccess = (event) => {
+        const cursor = event.target.result;
+        if (cursor) {
+          if (cursor.value.villageX === x && cursor.value.villageY === y) {
+            console.log(
+              `ID for Village ${cursor.key} is ${cursor.value.villageId}`
+            );
+            return cursor.value;
+          }
+          cursor.continue();
+        } else {
+          console.log("No more entries!");
+          return null;
         }
-        cursor.continue();
-      } else {
-        console.log("No more entries!");
-        return null;
-      }
+      };
+    };
+
+    req.onerror = function (event) {
+      console.error("findVillageInDB:", event.target.errorCode);
     };
   },
 };
