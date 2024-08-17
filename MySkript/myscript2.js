@@ -104,6 +104,7 @@ window.twSDK = {
   coordsRegex: /\d{1,3}\|\d{1,3}/g,
   dateTimeMatch:
     /(?:[A-Z][a-z]{2}\s+\d{1,2},\s*\d{0,4}\s+|today\s+at\s+|tomorrow\s+at\s+)\d{1,2}:\d{2}:\d{2}:?\.?\d{0,3}/,
+  // https://forum.die-staemme.de/index.php?threads/weltdaten-und-configs.183996/#post-4378479
   worldInfoInterface: "/interface.php?func=get_config",
   unitInfoInterface: "/interface.php?func=get_unit_info",
   buildingInfoInterface: "/interface.php?func=get_building_info",
@@ -790,8 +791,8 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
   }
 
   async function updateDB() {
-    const villages = await twSDK.worldDataAPI("village");
-    console.log("Villages:", villages);
+    // const villages = await twSDK.worldDataAPI("village");
+    // console.log("Villages:", villages);
 
     const request = indexedDB.open("villagesDb", 1);
     request.onerror = function (event) {
@@ -800,18 +801,22 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
 
     request.onsuccess = function (event) {
       const db = event.target.result;
-
-      // Open a transaction
       const transaction = db.transaction(["villages"], "readonly");
-
-      // Access the object store
       const objectStore = transaction.objectStore("villages");
-
-      // Specify the key you want to search for
       const key = 16831;
-
-      // Use the get method to retrieve the value associated with the key
       const getRequest = objectStore.get(key);
+
+      const customers = [];
+
+      objectStore.openCursor().onsuccess = (event) => {
+        const cursor = event.target.result;
+        if (cursor) {
+          customers.push(cursor.value);
+          cursor.continue();
+        } else {
+          console.log(`Got all customers: ${customers}`);
+        }
+      };
 
       getRequest.onerror = function (event) {
         console.error("Get request error:", event.target.errorCode);
