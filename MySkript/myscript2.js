@@ -722,7 +722,7 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
         village.split("|")[1]
       );
 
-      console.log("Found Village ID:", v.villageId);
+      console.log("Found Village:", v);
 
       if (v !== null) {
         return `/game.php?screen=info_village&id=${v.villageId}`;
