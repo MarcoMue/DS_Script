@@ -473,7 +473,7 @@ let villiges = [""];
           </fieldset>
           <fieldset>
             <legend>Filters</legend>
-            <textarea id="urlvalue" rows="4" cols="50"></textarea>
+            <textarea id="urlvalue" rows="4" cols="50">Add Villages here: 123|456, spaces and tabs are ignored </textarea>
             <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="loadPlannerBtn" value="Load Planner">
             <p>
               <table id="myTable">
