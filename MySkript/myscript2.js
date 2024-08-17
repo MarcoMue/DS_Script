@@ -463,6 +463,16 @@ window.twSDK = {
       jQuery("#contentContainer").eq(0).prepend(preloaderContent);
     }
   },
+  updateProgress: function (elementToUpate, itemsLength, index) {
+    jQuery(elementToUpate).text(`${index}/${itemsLength}`);
+  },
+  updateProgressBar: function (index, total) {
+    jQuery("#progress").css("width", `${((index + 1) / total) * 100}%`);
+    jQuery(".count").text(`${index + 1}/${total}`);
+    if (index + 1 == total) {
+      jQuery("#progressbar").fadeOut(1000);
+    }
+  },
   getAll: function (
     urls, // array of URLs
     onLoad, // called when any URL is loaded, params (index, data)
