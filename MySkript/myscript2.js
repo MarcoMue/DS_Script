@@ -84,9 +84,11 @@ let scriptConfig = {
 let intervalId;
 let results = [];
 let commands = [];
+let villiges = [""];
 
 (function () {
   console.log("IIFE called.");
+  fetchWorldData();
   openUI();
 
   function openUI() {
@@ -112,10 +114,10 @@ let commands = [];
             <p>
               <table id="myTable">
                 <tr>
-                  <th>letiable filtered</th>
-                  <th>Operator</th>
-                  <th>Value</th>
-                  <th></th>
+                  <th>First</th>
+                  <th>Two</th>
+                  <th>Three</th>
+                  <th>Last</th>
                 </tr>
               </table>
             </p>
@@ -249,7 +251,7 @@ let commands = [];
 
     $.get(
       // $(".village_anchor").first().find("a").first().attr("href"),
-      "/game.php?village=6087&screen=info_village&id=7346",
+      "/game.php?screen=info_village&id=2087",
       function (html) {
         let $cc = $(html).find(".commands-container");
         if ($cc.length > 0) {
@@ -318,5 +320,15 @@ let commands = [];
         }
       }
     );
+  }
+
+  async function fetchWorldData() {
+    try {
+      const villages = await twSDK.worldDataAPI("village");
+      return { villages };
+    } catch (error) {
+      UI.ErrorMessage(error);
+      console.error(`${scriptInfo} Error:`, error);
+    }
   }
 })();
