@@ -444,12 +444,71 @@ window.twSDK = {
       console.error(`${scriptInfo} Error:`, error);
     }
   },
+  startProgressBar: function (total) {
+    const width = jQuery("#content_value")[0].clientWidth;
+    const preloaderContent = `
+        <div id="progressbar" class="progress-bar" style="margin-bottom:12px;">
+            <span class="count label">0/${total}</span>
+            <div id="progress">
+                <span class="count label" style="width: ${width}px;">
+                    0/${total}
+                </span>
+            </div>
+        </div>
+    `;
+
+    if (this.isMobile) {
+      jQuery("#content_value").eq(0).prepend(preloaderContent);
+    } else {
+      jQuery("#contentContainer").eq(0).prepend(preloaderContent);
+    }
+  },
+  getAll: function (
+    urls, // array of URLs
+    onLoad, // called when any URL is loaded, params (index, data)
+    onDone, // called when all URLs successfully loaded, no params
+    onError // called when a URL load fails or if onLoad throws an exception, params (error)
+  ) {
+    var numDone = 0;
+    var lastRequestTime = 0;
+    var minWaitTime = this.delayBetweenRequests; // ms between requests
+    loadNext();
+    function loadNext() {
+      if (numDone == urls.length) {
+        onDone();
+        return;
+      }
+
+      let now = Date.now();
+      let timeElapsed = now - lastRequestTime;
+      if (timeElapsed < minWaitTime) {
+        let timeRemaining = minWaitTime - timeElapsed;
+        setTimeout(loadNext, timeRemaining);
+        return;
+      }
+      lastRequestTime = now;
+      jQuery
+        .get(urls[numDone])
+        .done((data) => {
+          try {
+            onLoad(numDone, data);
+            ++numDone;
+            loadNext();
+          } catch (e) {
+            onError(e);
+          }
+        })
+        .fail((xhr) => {
+          onError(xhr);
+        });
+    }
+  },
 };
 
 let intervalId;
 let results = [];
 let commands = [];
-let villiges = [""];
+let villages = ["458|446", "485|457", "456|471", "435|443"];
 
 (function () {
   console.log("IIFE called.");
@@ -457,48 +516,45 @@ let villiges = [""];
 
   function openUI() {
     const html = `   
-        <h1>All Incs</h1>
+    <h1>All Incs</h1>
+    <div>
+      <form>
+        <fieldset>
+          <legend>Settings</legend>
+          <p>
+            <input type="radio" name="mode" id="of" value="Read troops of the village">
+            Read troops of the village
+          </p>
+          <p>
+            <input type="radio" name="mode" id="in" value="Read defenses in the village">
+            Read defenses in the village
+          </p>
+        </fieldset>
+        <fieldset>
+          <legend>Filters</legend>
+          <textarea id="urlvalue" rows="4" cols="50">Add Villages here: 123|456, spaces and tabs are ignored  </textarea>
+          <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="loadPlannerBtn" value="Load Planner">
+          <p>
+            <table id="myTable">
+              <tr>
+                <th>First</th>
+                <th>Two</th>
+                <th>Three</th>
+                <th>Last</th>
+              </tr>
+            </table>
+          </p>
+        </fieldset>
         <div>
-        <form>
-          <fieldset>
-            <legend>Settings</legend>
-            <p>
-              <input type="radio" name="mode" id="of" value="Read troops of the village">
-              Read troops of the village
-            </p>
-            <p>
-              <input type="radio" name="mode" id="in" value="Read defenses in the village">
-              Read defenses in the village
-            </p>
-          </fieldset>
-          <fieldset>
-            <legend>Filters</legend>
-            <textarea id="urlvalue" rows="4" cols="50">Add Villages here: 123|456, spaces and tabs are ignored </textarea>
-            <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="loadPlannerBtn" value="Load Planner">
-            <p>
-              <table id="myTable">
-                <tr>
-                  <th>First</th>
-                  <th>Two</th>
-                  <th>Three</th>
-                  <th>Last</th>
-                </tr>
-              </table>
-            </p>
-          </fieldset>
-          <div>
-            <p>
-              <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="run" value="Read data">
-            </p>
-            <p>
-              <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="update" value="Load DB Data">
-            </p>
-
-          </div>
-        </form>
-      </div>
-    `;
-    // Dialog.show("Troop counter", html);
+          <p>
+            <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="run" value="Read data">
+          </p>
+          <p>
+            <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="update" value="Load DB Data">
+          </p>
+        </div>
+      </form>
+    </div>`;
 
     $("#contentContainer").eq(0).prepend(html);
     $("#mobileContent").eq(0).prepend(html);
@@ -513,26 +569,11 @@ let villiges = [""];
     document
       .getElementById("loadPlannerBtn")
       .addEventListener("click", loadWBCode);
-    document.getElementById("run").addEventListener("click", readData);
+    document.getElementById("run").addEventListener("click", readIncs);
     document.getElementById("update").addEventListener("click", updateDB);
   }
 
-  function addRow(row) {
-    // if (results.length === 0) {
-    //   clearInterval(intervalId);
-    //   return;
-    // }
-
-    // const rowData = results.shift(); // Get the first element and remove it from the array
-    // const newRow = `
-    //       <tr>
-    //         <td>${rowData.commandId}</td>
-    //         <td>${rowData.originVillageId}</td>
-    //         <td>${rowData.targetVillageId}</td>
-    //         <td><button class="removeRow">Remove</button></td>
-    //       </tr>
-    //       `;
-
+  function addRowToTable(row) {
     $("#myTable").append(row);
   }
 
@@ -541,7 +582,7 @@ let villiges = [""];
 
     if (data) {
       results = convertWBPlanToArray(data);
-      addRow(results);
+      addRowToTable(results);
     }
 
     // Set an interval to add a new row every second
@@ -614,9 +655,41 @@ let villiges = [""];
     return planObjects;
   }
 
-  function readData() {
-    console.log("readData called.");
-    let items = []; // Example items
+  async function readIncs() {
+    console.log("readIncs called.");
+    let items = [];
+
+    if (villages.length) {
+      twSDK.startProgressBar(villages.length);
+      await twSDK.getAll(
+        // urls:
+        pagesToFetch,
+        // onLoad:
+        function (index, data) {
+          twSDK.updateProgressBar(index, villages.length);
+
+          const htmlDoc = jQuery.parseHTML(data);
+          const incomingRows = jQuery(htmlDoc).find(
+            "#incomings_table tbody tr.nowrap"
+          );
+          jQuery("#incomings_table tbody:last-child").append(incomingRows);
+          jQuery('#incomings_table tbody tr:not(".nowrap"):eq(1)')
+            .detach()
+            .appendTo("#incomings_table tbody:last-child");
+        },
+        // onDone:
+        function () {
+          initIncomingsOverview();
+        },
+        // onError:
+        function (error) {
+          UI.ErrorMessage("Error fetching incomings page!");
+          console.error(`${scriptInfo} Error:`, error);
+        }
+      );
+    } else {
+      initIncomingsOverview();
+    }
 
     $.get(
       // $(".village_anchor").first().find("a").first().attr("href"),
@@ -624,21 +697,11 @@ let villiges = [""];
       function (html) {
         let $cc = $(html).find(".commands-container");
         if ($cc.length > 0) {
-          // <form id="command-data-form" action="/game.php?village=6963&amp;screen=place&amp;action=command" method="post" onsubmit="this.submit.disabled=true;" style="min-width: 800px">
-          // $('form[action*="action=command"]')
-          //   .find("table")
-          //   .first()
-          //   .css("float", "left")
-          //   .find("tr")
-          //   .last()
-          //   .after($cc.find("table").parent().html());
-
           $cc
             .find("table")
             .first()
             .find(".quickedit-out")
             .each(function () {
-              // console.log($(this).attr("data-id"));
               let commandID = $(this).attr("data-id");
               console.log(commandID);
               items.push(commandID);
@@ -650,7 +713,7 @@ let villiges = [""];
             .find(".command-row")
             .each(function () {
               commands.push($(this));
-              addRow($(this));
+              addRowToTable($(this));
             });
 
           $(".widget-command-timer").addClass("timer");
@@ -673,7 +736,6 @@ let villiges = [""];
                   } else {
                     console.log(response);
                     results.push(response);
-                    // addRow(response);
                   }
                 })
                 .fail((textStatus, errorThrown) => {
