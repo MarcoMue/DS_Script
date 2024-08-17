@@ -793,7 +793,7 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
     const villages = await twSDK.worldDataAPI("village");
     console.log("Villages:", villages);
 
-    const request = indexedDB.open("villagesDb", 16831);
+    const request = indexedDB.open("villagesDb", 1);
     request.onerror = function (event) {
       console.error("Database error:", event.target.errorCode);
     };
@@ -808,7 +808,7 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
       const objectStore = transaction.objectStore("villages");
 
       // Specify the key you want to search for
-      const key = "villageId";
+      const key = "16831";
 
       // Use the get method to retrieve the value associated with the key
       const getRequest = objectStore.get(key);
