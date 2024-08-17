@@ -748,14 +748,70 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
         pagesToFetch,
         // onLoad:
         function (index, data) {
-          twSDK.updateProgressBar(index, villages.length);
+          twSDK.updateProgressBar(index, pagesToFetch.length);
 
-          console.log("Fetching data for village:", villages[index]);
-          console.log("Index:", index);
-          console.log("Data:", data);
+          console.log("Fetching data for village:", pagesToFetch[index]);
+          // console.log("Index:", index);
+          // console.log("Data:", data);
 
           const htmlDoc = jQuery.parseHTML(data);
+          let $cc = jQuery(htmlDoc).find(".commands-container");
+          if ($cc.length > 0) {
+            $cc
+              .find("table")
+              .first()
+              .find(".quickedit-out")
+              .each(function () {
+                let commandID = $(this).attr("data-id");
+                console.log(commandID);
+                items.push(commandID);
+              });
 
+            $cc
+              .find("table")
+              .first()
+              .find(".command-row")
+              .each(function () {
+                commands.push($(this));
+                addRowToTable($(this));
+              });
+
+            $(".widget-command-timer").addClass("timer");
+            Timing.tickHandlers.timers.initTimers("widget-command-timer");
+
+            let timerId = setInterval(function () {
+              // Step 3: Fetch and process the item
+              if (items.length > 0) {
+                let item = items.shift(); // Fetch the first item
+                console.log("Processing:", item); // Process the item (example: log it)
+                jQuery
+                  .ajax({
+                    url: `/game.php?screen=info_command&ajax=details&id=${item}`,
+                    dataType: "json",
+                  })
+                  .done((response) => {
+                    const { no_authorization } = response;
+                    if (no_authorization) {
+                      console.error(`Error:`, data);
+                    } else {
+                      console.log(response);
+                      results.push(response);
+                    }
+                  })
+                  .fail((textStatus, errorThrown) => {
+                    console.error(
+                      `Request failed: ${textStatus}, ${errorThrown}`
+                    );
+                  });
+              } else {
+                // Step 4: Clear the interval when the array is empty
+                clearInterval(timerId);
+                console.log("All items processed.");
+              }
+            }, 400);
+          } else {
+            UI.ErrorMessage("No commands found", $cc);
+          }
           console.log("jquery parsed html", htmlDoc);
 
           // const incomingRows = jQuery(htmlDoc).find(
@@ -782,6 +838,7 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
       UI.ErrorMessage("No villages to fetch!");
     }
 
+    /*
     $.get(
       // $(".village_anchor").first().find("a").first().attr("href"),
       "/game.php?screen=info_village&id=2087",
@@ -845,6 +902,7 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
         }
       }
     );
+    */
   }
 
   async function updateDB() {
