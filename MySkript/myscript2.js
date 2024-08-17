@@ -111,6 +111,44 @@ window.twSDK = {
   worldDataPlayers: "/map/player.txt",
   worldDataTribes: "/map/ally.txt",
   worldDataConquests: "/map/conquer_extended.txt",
+
+  csvToArray: function (strData, strDelimiter = ",") {
+    var objPattern = new RegExp(
+      "(\\" +
+        strDelimiter +
+        "|\\r?\\n|\\r|^)" +
+        '(?:"([^"]*(?:""[^"]*)*)"|' +
+        '([^"\\' +
+        strDelimiter +
+        "\\r\\n]*))",
+      "gi"
+    );
+    var arrData = [[]];
+    var arrMatches = null;
+    while ((arrMatches = objPattern.exec(strData))) {
+      var strMatchedDelimiter = arrMatches[1];
+      if (strMatchedDelimiter.length && strMatchedDelimiter !== strDelimiter) {
+        arrData.push([]);
+      }
+      var strMatchedValue;
+
+      if (arrMatches[2]) {
+        strMatchedValue = arrMatches[2].replace(new RegExp('""', "g"), '"');
+      } else {
+        strMatchedValue = arrMatches[3];
+      }
+      arrData[arrData.length - 1].push(strMatchedValue);
+    }
+    return arrData;
+  },
+  cleanString: function (string) {
+    try {
+      return decodeURIComponent(string).replace(/\+/g, " ");
+    } catch (error) {
+      console.error(error, string);
+      return string;
+    }
+  },
 };
 
 let intervalId;
