@@ -323,9 +323,15 @@ window.twSDK = {
             keyPath: keyId,
           });
 
-          console.log(data);
-          debugger;
-          objectStore.createIndex("name", "name", { unique: false });
+          // TODO: add indexes for each entity
+          // playerId: 0
+          // villageId: 1
+          // villageName: "Barbarendorf"
+          // villagePoints: 433
+          // villageType: 0
+          // villageX: "506"
+          // villageY: "478"
+          // objectStore.createIndex("name", "name", { unique: false });
         } else {
           db.createObjectStore(table, {
             autoIncrement: true,
@@ -526,6 +532,25 @@ window.twSDK = {
         });
     }
   },
+  findVillageInDB: function (x, y) {
+    const objectStore = db.transaction("villages").objectStore("villages");
+
+    objectStore.openCursor().onsuccess = (event) => {
+      const cursor = event.target.result;
+      if (cursor) {
+        if (cursor.value.villageX === x && cursor.value.villageY === y) {
+          console.log(
+            `ID for Village ${cursor.key} is ${cursor.value.villageId}`
+          );
+          return cursor.value;
+        }
+        cursor.continue();
+      } else {
+        console.log("No more entries!");
+        return null;
+      }
+    };
+  },
 };
 
 let intervalId;
@@ -683,10 +708,16 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
     console.log("readIncs called.");
     let items = [];
     let pagesToFetch = targetVillages.map((village) => {
-      return `/game.php?screen=info_village&id=${twSDK.getVillageIDByCoords(
+      let v = twSDK.findVillageInDB(
         village.split("|")[0],
         village.split("|")[1]
-      )}`;
+      );
+
+      console.log("Found Village ID:", v.villageId);
+
+      if (v !== null) {
+        return `/game.php?screen=info_village&id=${v.villageId}`;
+      }
     });
 
     if (pagesToFetch.length) {
@@ -810,18 +841,6 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
       const objectStore = transaction.objectStore("villages");
       const key = 16831;
       const getRequest = objectStore.get(key);
-
-      const customers = [];
-
-      objectStore.openCursor().onsuccess = (event) => {
-        const cursor = event.target.result;
-        if (cursor) {
-          customers.push(cursor.value);
-          cursor.continue();
-        } else {
-          console.log(`Got all customers: ${customers}`);
-        }
-      };
 
       getRequest.onerror = function (event) {
         console.error("Get request error:", event.target.errorCode);
