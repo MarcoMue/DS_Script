@@ -473,7 +473,7 @@ let villiges = [""];
           </fieldset>
           <fieldset>
             <legend>Filters</legend>
-            <textarea id="urlvalue" rows="4" cols="50" />
+            <textarea id="urlvalue" rows="4" cols="50"></textarea>
             <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="loadPlannerBtn" value="Load Planner">
             <p>
               <table id="myTable">
