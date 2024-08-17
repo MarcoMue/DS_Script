@@ -533,6 +533,7 @@ window.twSDK = {
     }
   },
   findVillageInDB: function (x, y) {
+    const db = indexedDB.open("villagesDb");
     const objectStore = db.transaction("villages").objectStore("villages");
 
     objectStore.openCursor().onsuccess = (event) => {
