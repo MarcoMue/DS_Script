@@ -533,32 +533,39 @@ window.twSDK = {
     }
   },
   findVillageInDB: function (x, y) {
-    const req = indexedDB.open("villagesDb");
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open("villagesDb");
 
-    req.onsuccess = function () {
-      const db = req.result;
-      const objectStore = db.transaction("villages").objectStore("villages");
-
-      objectStore.openCursor().onsuccess = (event) => {
-        const cursor = event.target.result;
-        if (cursor) {
-          if (cursor.value.villageX === x && cursor.value.villageY === y) {
-            console.log(
-              `ID for Village ${cursor.key} is ${cursor.value.villageId}`
-            );
-            return cursor.value;
-          }
-          cursor.continue();
-        } else {
-          console.log("No more entries!");
-          return null;
-        }
+      req.onerror = function (event) {
+        console.error("findVillageInDB:", event.target.errorCode);
+        reject(event.target.errorCode);
       };
-    };
 
-    req.onerror = function (event) {
-      console.error("findVillageInDB:", event.target.errorCode);
-    };
+      req.onsuccess = function () {
+        const db = req.result;
+
+        const transaction = db.transaction(["villages"], "readonly");
+        const objectStore = transaction.objectStore("villages");
+        const cursorRequest = objectStore.openCursor();
+
+        cursorRequest.onsuccess = function (event) {
+          const cursor = event.target.result;
+          if (cursor) {
+            if (cursor.value.villageX === x && cursor.value.villageY === y) {
+              console.log(
+                `ID for Village ${x}|${y} is ${cursor.value.villageId}`
+              );
+              resolve(cursor.value); // Resolve the promise with the found value
+            } else {
+              cursor.continue();
+            }
+          } else {
+            console.log("No more entries!");
+            resolve(null); // Resolve the promise with null if no match is found
+          }
+        };
+      };
+    });
   },
 };
 
@@ -717,16 +724,21 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
     console.log("readIncs called.");
     let items = [];
     let pagesToFetch = targetVillages.map((village) => {
-      let v = twSDK.findVillageInDB(
-        village.split("|")[0],
-        village.split("|")[1]
-      );
-
-      console.log("Found Village:", v);
-
-      if (v !== null) {
-        return `/game.php?screen=info_village&id=${v.villageId}`;
-      }
+      twSDK
+        .findVillageInDB(village.split("|")[0], village.split("|")[1])
+        .then((village) => {
+          if (village) {
+            console.log("Found village:", village);
+            if (village?.villageId) {
+              return `/game.php?screen=info_village&id=${village.villageId}`;
+            }
+          } else {
+            console.log("Village not found");
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     });
 
     if (pagesToFetch.length) {
