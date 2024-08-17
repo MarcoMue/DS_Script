@@ -659,8 +659,15 @@ let villages = ["458|446", "485|457", "456|471", "435|443"];
     console.log("readIncs called.");
     let items = [];
 
-    if (villages.length) {
-      twSDK.startProgressBar(villages.length);
+    let pagesToFetch = villages.map((village) => {
+      return `/game.php?screen=info_village&id=${twSDK.getVillageIDByCoords(
+        village.split("|")[0],
+        village.split("|")[1]
+      )}`;
+    });
+
+    if (pagesToFetch.length) {
+      twSDK.startProgressBar(pagesToFetch.length);
       await twSDK.getAll(
         // urls:
         pagesToFetch,
@@ -668,18 +675,26 @@ let villages = ["458|446", "485|457", "456|471", "435|443"];
         function (index, data) {
           twSDK.updateProgressBar(index, villages.length);
 
+          console.log("Fetching data for village:", villages[index]);
+          console.log("Index:", index);
+          console.log("Data:", data);
+
           const htmlDoc = jQuery.parseHTML(data);
-          const incomingRows = jQuery(htmlDoc).find(
-            "#incomings_table tbody tr.nowrap"
-          );
-          jQuery("#incomings_table tbody:last-child").append(incomingRows);
-          jQuery('#incomings_table tbody tr:not(".nowrap"):eq(1)')
-            .detach()
-            .appendTo("#incomings_table tbody:last-child");
+
+          console.log(htmlDoc);
+
+          // const incomingRows = jQuery(htmlDoc).find(
+          //   "#incomings_table tbody tr.nowrap"
+          // );
+          // jQuery("#incomings_table tbody:last-child").append(incomingRows);
+          // jQuery('#incomings_table tbody tr:not(".nowrap"):eq(1)')
+          //   .detach()
+          //   .appendTo("#incomings_table tbody:last-child");
         },
         // onDone:
         function () {
-          initIncomingsOverview();
+          // initIncomingsOverview();
+          UI.SuccessMessage("All villages fetched!");
         },
         // onError:
         function (error) {
@@ -688,7 +703,8 @@ let villages = ["458|446", "485|457", "456|471", "435|443"];
         }
       );
     } else {
-      initIncomingsOverview();
+      // initIncomingsOverview();
+      UI.ErrorMessage("No villages to fetch!");
     }
 
     $.get(
