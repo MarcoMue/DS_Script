@@ -81,6 +81,36 @@ let scriptConfig = {
   isDebug: DEBUG,
   enableCountApi: true,
 };
+
+window.twSDK = {
+  // variables
+  scriptData: {},
+  translations: {},
+  allowedMarkets: [],
+  allowedScreens: [],
+  allowedModes: [],
+  enableCountApi: true,
+  isDebug: false,
+  isMobile: jQuery("#mobileHeader").length > 0,
+  delayBetweenRequests: 200,
+  // helper variables
+  market: game_data.market,
+  units: game_data.units,
+  village: game_data.village,
+  buildings: game_data.village.buildings,
+  sitterId: game_data.player.sitter > 0 ? `&t=${game_data.player.id}` : "",
+  coordsRegex: /\d{1,3}\|\d{1,3}/g,
+  dateTimeMatch:
+    /(?:[A-Z][a-z]{2}\s+\d{1,2},\s*\d{0,4}\s+|today\s+at\s+|tomorrow\s+at\s+)\d{1,2}:\d{2}:\d{2}:?\.?\d{0,3}/,
+  worldInfoInterface: "/interface.php?func=get_config",
+  unitInfoInterface: "/interface.php?func=get_unit_info",
+  buildingInfoInterface: "/interface.php?func=get_building_info",
+  worldDataVillages: "/map/village.txt",
+  worldDataPlayers: "/map/player.txt",
+  worldDataTribes: "/map/ally.txt",
+  worldDataConquests: "/map/conquer_extended.txt",
+};
+
 let intervalId;
 let results = [];
 let commands = [];
