@@ -324,8 +324,9 @@ window.twSDK = {
 
       req.onupgradeneeded = function (event) {
         const db = this.result;
+        let objectStore;
         if (keyId.length) {
-          db.createObjectStore(table, {
+          objectStore = db.createObjectStore(table, {
             keyPath: keyId,
           });
 
