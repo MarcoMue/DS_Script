@@ -729,6 +729,140 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
   async function readIncs() {
     console.log("readIncs called.");
     let items = [];
+
+    async function fetchPages(targetVillages) {
+      let pages = await Promise.all(
+        targetVillages.map(async (village) => {
+          try {
+            const villageData = await twSDK.findVillageInDB(
+              village.split("|")[0],
+              village.split("|")[1]
+            );
+            if (villageData) {
+              console.log("Found village:", villageData);
+              if (villageData.villageId) {
+                return `/game.php?screen=info_village&id=${villageData.villageId}`;
+              }
+            } else {
+              console.log("Village not found");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+          }
+          return null;
+        })
+      );
+
+      // Filter out null values
+      pages = pages.filter((url) => url !== null);
+      return pages;
+    }
+
+    const pagesToFetch = await fetchPages(targetVillages);
+
+    if (pagesToFetch.length) {
+      twSDK.startProgressBar(pagesToFetch.length);
+      await twSDK.getAll(
+        pagesToFetch,
+        function (index, data) {
+          twSDK.updateProgressBar(index, pagesToFetch.length);
+          console.log("Fetching data for village:", pagesToFetch[index]);
+          // console.log("Index:", index);
+          // console.log("Data:", data);
+
+          // const htmlDoc = jQuery.parseHTML(data);
+          let $cc = jQuery(data).find(".commands-container");
+          if ($cc.length > 0) {
+            $cc
+              .find("table")
+              .first()
+              .find(".quickedit-out")
+              .each(function () {
+                let commandID = $(this).attr("data-id");
+                console.log(commandID);
+                items.push(commandID);
+              });
+
+            $cc
+              .find("table")
+              .first()
+              .find(".command-row")
+              .each(function () {
+                commands.push($(this));
+                addRowToTable($(this));
+              });
+
+            $(".widget-command-timer").addClass("timer");
+            Timing.tickHandlers.timers.initTimers("widget-command-timer");
+
+            //#region read Troop Details
+            const troopDetailsCheckbox =
+              document.getElementById("troop_details");
+            const isChecked = troopDetailsCheckbox.checked;
+
+            if (isChecked) {
+              let timerId = setInterval(function () {
+                if (items.length > 0) {
+                  let item = items.shift(); // Fetch the first item
+                  console.log("Processing:", item); // Process the item (example: log it)
+                  jQuery
+                    .ajax({
+                      url: `/game.php?screen=info_command&ajax=details&id=${item}`,
+                      dataType: "json",
+                    })
+                    .done((response) => {
+                      const { no_authorization } = response;
+                      if (no_authorization) {
+                        console.error(`Error:`, data);
+                      } else {
+                        console.log(response);
+                        results.push(response);
+                      }
+                    })
+                    .fail((textStatus, errorThrown) => {
+                      console.error(
+                        `Request failed: ${textStatus}, ${errorThrown}`
+                      );
+                    });
+                } else {
+                  // Step 4: Clear the interval when the array is empty
+                  clearInterval(timerId);
+                  console.log("All items processed.");
+                }
+              }, 400);
+            }
+            //#endregion
+          } else {
+            UI.ErrorMessage("No commands found", $cc);
+          }
+          // const incomingRows = jQuery(htmlDoc).find(
+          //   "#incomings_table tbody tr.nowrap"
+          // );
+          // jQuery("#incomings_table tbody:last-child").append(incomingRows);
+          // jQuery('#incomings_table tbody tr:not(".nowrap"):eq(1)')
+          //   .detach()
+          //   .appendTo("#incomings_table tbody:last-child");
+        },
+
+        function () {
+          // initIncomingsOverview();
+          UI.SuccessMessage("All villages fetched!");
+        },
+        function (error) {
+          UI.ErrorMessage("Error fetching incomings page!");
+          console.error(`${scriptInfo} Error:`, error);
+        }
+      );
+    } else {
+      // initIncomingsOverview();
+      UI.ErrorMessage("No villages to fetch!");
+    }
+  }
+
+  // TODO just a copy
+  async function readDetails() {
+    console.log("readDetails called.");
+    let items = [];
     let pagesToFetch = targetVillages.map((village) => {
       twSDK
         .findVillageInDB(village.split("|")[0], village.split("|")[1])
