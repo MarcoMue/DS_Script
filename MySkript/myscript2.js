@@ -187,12 +187,6 @@ window.twSDK = {
         key: "villageId",
         url: twSDK.worldDataVillages,
       },
-      village_reverse: {
-        dbName: "villagesDb",
-        dbTable: "villages_reverse",
-        key: "coords",
-        url: twSDK.worldDataVillages,
-      },
       player: {
         dbName: "playersDb",
         dbTable: "players",
@@ -245,12 +239,6 @@ window.twSDK = {
                 };
               });
 
-            saveToIndexedDbStorage(
-              dbConfig["village_reverse"].dbName,
-              dbConfig["village_reverse"].dbTable,
-              dbConfig["village_reverse"].key,
-              responseData
-            );
             break;
           case "player":
             responseData = data
@@ -336,7 +324,6 @@ window.twSDK = {
 
       req.onupgradeneeded = function (event) {
         const db = this.result;
-        // const db = dbConnect.result;
         if (keyId.length) {
           db.createObjectStore(table, {
             keyPath: keyId,
@@ -350,7 +337,7 @@ window.twSDK = {
           // villageType: 0
           // villageX: "506"
           // villageY: "478"
-          // objectStore.createIndex("name", "name", { unique: false });
+          objectStore.createIndex("coords", "coords", { unique: true });
         } else {
           db.createObjectStore(table, {
             autoIncrement: true,
@@ -363,8 +350,6 @@ window.twSDK = {
         const transaction = db.transaction(table, "readwrite");
         const store = transaction.objectStore(table);
         store.clear(); // clean store from items before adding new ones
-
-        console.log("Data to be saved:", data);
 
         data.forEach((item) => {
           store.put(item);
@@ -558,6 +543,12 @@ window.twSDK = {
         const db = req.result;
 
         const transaction = db.transaction(["villages"], "readonly");
+
+        const index = objectStore.index("name");
+        index.get("Donna").onsuccess = (event) => {
+          console.log(`Donna's SSN is ${event.target.result.ssn}`);
+        };
+
         const objectStore = transaction.objectStore("villages");
         const cursorRequest = objectStore.openCursor();
 
@@ -639,7 +630,7 @@ let targetVillages = [
 
 (async function () {
   console.log("IIFE called.");
-  const villages = await twSDK.worldDataAPI("village");
+  // const villages = await twSDK.worldDataAPI("village");
   openUI();
 
   function openUI() {
@@ -838,25 +829,36 @@ let targetVillages = [
     console.log("readIncs called.");
     let commandIDs = [];
 
-    const start1 = performance.now();
-    const villages = await twSDK.worldDataAPI("village");
+    const start = performance.now();
+    async function fetchPages(targetVillages) {
+      let pages = await Promise.all(
+        targetVillages.map(async (village) => {
+          try {
+            const villageData = await twSDK.findVillageInDB(
+              village.split("|")[0],
+              village.split("|")[1]
+            );
+            if (villageData) {
+              console.log("Found village:", villageData);
+              if (villageData.villageId) {
+                return `/game.php?screen=info_village&id=${villageData.villageId}`;
+              }
+            } else {
+              console.log("Village not found");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+          }
+          return null;
+        })
+      );
 
-    const pagesToFetch = targetVillages.map((v) => {
-      let x = v.split("|")[0];
-      let y = v.split("|")[1];
-
-      for (let index = 0; index < villages.length; index++) {
-        const element = villages[index];
-
-        if (element.villageX == x && element.villageY == y) {
-          console.log("Found village:", element);
-          return `/game.php?screen=info_village&id=${element.villageId}`;
-        }
-      }
-    });
-
-    const end1 = performance.now();
-    console.log(`loadWBCode took ${end1 - start1} milliseconds`);
+      pages = pages.filter((url) => url !== null);
+      return pages;
+    }
+    const pagesToFetch = await fetchPages(targetVillages);
+    const end = performance.now();
+    console.log(`loadWBCode took ${end - start} milliseconds`);
 
     if (pagesToFetch.length) {
       twSDK.startProgressBar(pagesToFetch.length);
@@ -964,6 +966,18 @@ let targetVillages = [
       const db = event.target.result;
       const transaction = db.transaction(["villages"], "readonly");
       const objectStore = transaction.objectStore("villages");
+
+      const myIndex = objectStore.index("coords");
+      myIndex.openCursor().onsuccess = (event) => {
+        const cursor = event.target.result;
+        if (cursor) {
+          console.log("Key:", cursor);
+          cursor.continue();
+        } else {
+          console.log("Entries all displayed.");
+        }
+      };
+
       const key = 16831;
       const getRequest = objectStore.get(key);
 
