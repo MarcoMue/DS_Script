@@ -540,8 +540,7 @@ window.twSDK = {
       };
 
       req.onsuccess = function () {
-        const db = req.result;
-
+        const db = this.result;
         const transaction = db.transaction(["villages"], "readonly");
 
         const index = objectStore.index("name");
@@ -957,6 +956,8 @@ let targetVillages = [
   }
 
   async function readDatabase() {
+    const villages = await twSDK.worldDataAPI("village");
+
     const request = indexedDB.open("villagesDb", 1);
     request.onerror = function (event) {
       console.error("Database error:", event.target.errorCode);
