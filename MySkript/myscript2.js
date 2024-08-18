@@ -545,8 +545,8 @@ window.twSDK = {
         const transaction = db.transaction(["villages"], "readonly");
 
         const index = objectStore.index("name");
-        index.get("Donna").onsuccess = (event) => {
-          console.log(`Donna's SSN is ${event.target.result.ssn}`);
+        index.get("coords").onsuccess = (event) => {
+          console.log(`Result is ${event.target.result}`);
         };
 
         const objectStore = transaction.objectStore("villages");
