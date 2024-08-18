@@ -580,125 +580,95 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
 
   function openUI() {
     const html = `   
-    <h1>All Incs</h1>
-    <div>
-      <form>
-        <fieldset>
-          <legend>Settings</legend>
-          <p>
-            <input type="radio" name="mode" id="of" value="Read troops of the village">
-            Read troops of the village
-          </p>
-          <p>
-            <input type="radio" name="mode" id="in" value="Read defenses in the village">
-            Read defenses in the village
-          </p>
-          <p>
-            <input type="checkbox" name="troop_details" id="troop_details" value="Enable Troop Details">
-            <label for="troop_details">Enable Troop Details</label>
-          </p>
-
-        </fieldset>
-        <fieldset>
-          <legend>Filters</legend>
-          <textarea id="urlvalue" rows="4" cols="50">Add Villages here: 123|456, spaces and tabs are ignored  </textarea>
-          <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="loadPlannerBtn" value="Load Planner">
-          <p>
+      <h1>All Incs</h1>
+      <div>
+        <form>
+          <fieldset>
+            <legend>Settings</legend>
+            <p>
+              <input type="radio" name="mode" id="of" value="Read troops of the village" />
+              Read troops of the village
+            </p>
+            <p>
+              <input type="radio" name="mode" id="in" value="Read defenses in the village" />
+              Read defenses in the village
+            </p>
+            <p>
+              <input type="checkbox" name="troop_details" id="troop_details" value="Enable Troop Details" />
+              <label for="troop_details">Enable Troop Details</label>
+            </p>
+          </fieldset>
+          <fieldset>
+            <legend>Filters</legend>
+            <textarea id="urlvalue" rows="4" cols="50">
+      Add Villages here: 123|456, spaces and tabs are ignored  </textarea>
+            <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="loadPlannerBtn" value="Load Planner" />
             <table id="myTable">
               <tr>
-              <th width="320">Dorf</th>
-
+                <th width="320">Dorf</th>
                 <th>First</th>
                 <th>Two</th>
                 <th>Three</th>
                 <th>Last</th>
                 <th style="text-align: center" width="auto">
-  <a href="#" class="unit_link" data-unit="spear"
-    ><img
-      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_spear.png"
-      class=""
-      data-title="Speerträger"
-  /></a>
-</th>
-<th style="text-align: center" width="auto">
-  <a href="#" class="unit_link" data-unit="sword"
-    ><img
-      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_sword.png"
-      class=""
-      data-title="Schwertkämpfer"
-  /></a>
-</th>
-<th style="text-align: center" width="auto">
-  <a href="#" class="unit_link" data-unit="axe"
-    ><img
-      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_axe.png"
-      class=""
-      data-title="Axtkämpfer"
-  /></a>
-</th>
-<th style="text-align: center" width="auto">
-  <a href="#" class="unit_link" data-unit="spy"
-    ><img
-      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_spy.png"
-      class=""
-      data-title="Späher"
-  /></a>
-</th>
-<th style="text-align: center" width="auto">
-  <a href="#" class="unit_link" data-unit="light"
-    ><img
-      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_light.png"
-      class=""
-      data-title="Leichte Kavallerie"
-  /></a>
-</th>
-<th style="text-align: center" width="auto">
-  <a href="#" class="unit_link" data-unit="heavy"
-    ><img
-      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_heavy.png"
-      class=""
-      data-title="Schwere Kavallerie"
-  /></a>
-</th>
-<th style="text-align: center" width="auto">
-  <a href="#" class="unit_link" data-unit="ram"
-    ><img
-      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_ram.png"
-      class=""
-      data-title="Rammbock"
-  /></a>
-</th>
-<th style="text-align: center" width="auto">
-  <a href="#" class="unit_link" data-unit="catapult"
-    ><img
-      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_catapult.png"
-      class=""
-      data-title="Katapult"
-  /></a>
-</th>
-<th style="text-align: center" width="auto">
-  <a href="#" class="unit_link" data-unit="snob"
-    ><img
-      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_snob.png"
-      class=""
-      data-title="Adelsgeschlecht"
-  /></a>
-</th>
-
+                  <a href="#" class="unit_link" data-unit="spear">
+                    <img src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_spear.png" class=""
+                      data-title="Speerträger" /></a>
+                </th>
+                <th style="text-align: center" width="auto">
+                  <a href="#" class="unit_link" data-unit="sword"><img
+                      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_sword.png" class=""
+                      data-title="Schwertkämpfer" /></a>
+                </th>
+                <th style="text-align: center" width="auto">
+                  <a href="#" class="unit_link" data-unit="axe"><img
+                      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_axe.png" class=""
+                      data-title="Axtkämpfer" /></a>
+                </th>
+                <th style="text-align: center" width="auto">
+                  <a href="#" class="unit_link" data-unit="spy"><img
+                      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_spy.png" class=""
+                      data-title="Späher" /></a>
+                </th>
+                <th style="text-align: center" width="auto">
+                  <a href="#" class="unit_link" data-unit="light"><img
+                      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_light.png" class=""
+                      data-title="Leichte Kavallerie" /></a>
+                </th>
+                <th style="text-align: center" width="auto">
+                  <a href="#" class="unit_link" data-unit="heavy"><img
+                      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_heavy.png" class=""
+                      data-title="Schwere Kavallerie" /></a>
+                </th>
+                <th style="text-align: center" width="auto">
+                  <a href="#" class="unit_link" data-unit="ram"><img
+                      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_ram.png" class=""
+                      data-title="Rammbock" /></a>
+                </th>
+                <th style="text-align: center" width="auto">
+                  <a href="#" class="unit_link" data-unit="catapult"><img
+                      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_catapult.png" class=""
+                      data-title="Katapult" /></a>
+                </th>
+                <th style="text-align: center" width="auto">
+                  <a href="#" class="unit_link" data-unit="snob"><img
+                      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_snob.png" class=""
+                      data-title="Adelsgeschlecht" /></a>
+                </th>
               </tr>
             </table>
-          </p>
-        </fieldset>
-        <div>
-          <p>
-            <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="run" value="Read data">
-          </p>
-          <p>
-            <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="update" value="Load DB Data">
-          </p>
-        </div>
-      </form>
-    </div>`;
+          </fieldset>
+          <div>
+            <p>
+              <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="run" value="Read data" />
+            </p>
+            <p>
+              <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="update" value="Load DB Data" />
+            </p>
+          </div>
+        </form>
+      </div>
+`;
 
     $("#contentContainer").eq(0).prepend(html);
     $("#mobileContent").eq(0).prepend(html);
@@ -827,7 +797,6 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
         })
       );
 
-      // Filter out null values
       pages = pages.filter((url) => url !== null);
       return pages;
     }
@@ -906,8 +875,6 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
               }, 400);
             }
             //#endregion
-          } else {
-            UI.ErrorMessage("No commands found", $cc);
           }
           // const incomingRows = jQuery(htmlDoc).find(
           //   "#incomings_table tbody tr.nowrap"
@@ -928,7 +895,6 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
         }
       );
     } else {
-      // initIncomingsOverview();
       UI.ErrorMessage("No villages to fetch!");
     }
   }
