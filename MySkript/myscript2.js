@@ -824,8 +824,27 @@ let targetVillages = [
     console.log("readIncs called.");
     let commandIDs = [];
 
-    const start = performance.now();
+    const start1 = performance.now();
+    const villages = await twSDK.worldDataAPI("village");
+    let xx = [];
+    targetVillages.forEach((v) => {
+      villages.forEach((allVill) => {
+        console.log("Checking village:", v, allVill);
 
+        if (
+          allVill.villageX == v.split("|")[0] &&
+          allVill.villageY == v.split("|")[1]
+        ) {
+          console.log("Found village:", v);
+          xx.push(v);
+        }
+      });
+    });
+
+    const end1 = performance.now();
+    console.log(`loadWBCode took ${end1 - start1} milliseconds`);
+
+    const start = performance.now();
     async function fetchPages(targetVillages) {
       let pages = await Promise.all(
         targetVillages.map(async (village) => {
@@ -852,29 +871,9 @@ let targetVillages = [
       pages = pages.filter((url) => url !== null);
       return pages;
     }
-
     const pagesToFetch = await fetchPages(targetVillages);
-
     const end = performance.now();
     console.log(`loadWBCode took ${end - start} milliseconds`);
-
-    const start1 = performance.now();
-    const villages = await twSDK.worldDataAPI("village");
-    let xx = [];
-    targetVillages.forEach((v) => {
-      villages.forEach((allVill) => {
-        if (
-          allVill.villageX == v.split("|")[0] &&
-          allVill.villageY == v.split("|")[1]
-        ) {
-          console.log("Found village:", v);
-          xx.push(v);
-        }
-      });
-    });
-
-    const end1 = performance.now();
-    console.log(`loadWBCode took ${end1 - start1} milliseconds`);
 
     if (pagesToFetch.length) {
       twSDK.startProgressBar(pagesToFetch.length);
