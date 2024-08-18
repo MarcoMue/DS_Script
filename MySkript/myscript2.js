@@ -187,6 +187,12 @@ window.twSDK = {
         key: "villageId",
         url: twSDK.worldDataVillages,
       },
+      village_reverse: {
+        dbName: "villagesDb",
+        dbTable: "villages_reverse",
+        key: "coords",
+        url: twSDK.worldDataVillages,
+      },
       player: {
         dbName: "playersDb",
         dbTable: "players",
@@ -232,11 +238,19 @@ window.twSDK = {
                   villageName: twSDK.cleanString(item[1]),
                   villageX: item[2],
                   villageY: item[3],
+                  coords: `${item[2]}|${item[3]}`,
                   playerId: parseInt(item[4]),
                   villagePoints: parseInt(item[5]),
                   villageType: parseInt(item[6]),
                 };
               });
+
+            saveToIndexedDbStorage(
+              dbConfig["village_reverse"].dbName,
+              dbConfig["village_reverse"].dbTable,
+              dbConfig["village_reverse"].key,
+              responseData
+            );
             break;
           case "player":
             responseData = data
@@ -576,51 +590,51 @@ let targetVillages = [
   "485|457",
   "456|471",
   "435|443",
-  // "434|434",
-  // "438|427",
-  // "438|426",
-  // "437|425",
-  // "427|433",
-  // "437|423",
-  // "436|423",
-  // "426|432",
-  // "434|424",
-  // "431|425",
-  // "432|423",
-  // "431|423",
-  // "425|430",
-  // "426|431",
-  // "437|426",
-  // "427|422",
-  // "431|426",
-  // "432|418",
-  // "434|420",
-  // "426|429",
-  // "424|424",
-  // "423|424",
-  // "427|423",
-  // "428|421",
-  // "421|428",
-  // "418|425",
-  // "423|423",
-  // "414|429",
-  // "416|426",
-  // "419|425",
-  // "422|421",
-  // "417|424",
-  // "451|401",
-  // "417|426",
-  // "419|419",
-  // "416|427",
-  // "417|419",
-  // "412|424",
-  // "415|421",
-  // "416|419",
-  // "417|420",
-  // "414|420",
-  // "423|427",
-  // "411|417",
-  // "427|417",
+  "434|434",
+  "438|427",
+  "438|426",
+  "437|425",
+  "427|433",
+  "437|423",
+  "436|423",
+  "426|432",
+  "434|424",
+  "431|425",
+  "432|423",
+  "431|423",
+  "425|430",
+  "426|431",
+  "437|426",
+  "427|422",
+  "431|426",
+  "432|418",
+  "434|420",
+  "426|429",
+  "424|424",
+  "423|424",
+  "427|423",
+  "428|421",
+  "421|428",
+  "418|425",
+  "423|423",
+  "414|429",
+  "416|426",
+  "419|425",
+  "422|421",
+  "417|424",
+  "451|401",
+  "417|426",
+  "419|419",
+  "416|427",
+  "417|419",
+  "412|424",
+  "415|421",
+  "416|419",
+  "417|420",
+  "414|420",
+  "423|427",
+  "411|417",
+  "427|417",
 ];
 
 (async function () {
@@ -826,54 +840,23 @@ let targetVillages = [
 
     const start1 = performance.now();
     const villages = await twSDK.worldDataAPI("village");
-    let xx = [];
-    targetVillages.forEach((v) => {
-      villages.forEach((allVill) => {
-        console.log("Checking village:", v, allVill);
 
-        if (
-          allVill.villageX == v.split("|")[0] &&
-          allVill.villageY == v.split("|")[1]
-        ) {
-          console.log("Found village:", v);
-          xx.push(v);
+    const pagesToFetch = targetVillages.map((v) => {
+      let x = v.split("|")[0];
+      let y = v.split("|")[1];
+
+      for (let index = 0; index < villages.length; index++) {
+        const element = villages[index];
+
+        if (element.villageX == x && element.villageY == y) {
+          console.log("Found village:", element);
+          return `/game.php?screen=info_village&id=${element.villageId}`;
         }
-      });
+      }
     });
 
     const end1 = performance.now();
     console.log(`loadWBCode took ${end1 - start1} milliseconds`);
-
-    const start = performance.now();
-    async function fetchPages(targetVillages) {
-      let pages = await Promise.all(
-        targetVillages.map(async (village) => {
-          try {
-            const villageData = await twSDK.findVillageInDB(
-              village.split("|")[0],
-              village.split("|")[1]
-            );
-            if (villageData) {
-              console.log("Found village:", villageData);
-              if (villageData.villageId) {
-                return `/game.php?screen=info_village&id=${villageData.villageId}`;
-              }
-            } else {
-              console.log("Village not found");
-            }
-          } catch (error) {
-            console.error("Error:", error);
-          }
-          return null;
-        })
-      );
-
-      pages = pages.filter((url) => url !== null);
-      return pages;
-    }
-    const pagesToFetch = await fetchPages(targetVillages);
-    const end = performance.now();
-    console.log(`loadWBCode took ${end - start} milliseconds`);
 
     if (pagesToFetch.length) {
       twSDK.startProgressBar(pagesToFetch.length);
