@@ -861,14 +861,16 @@ let targetVillages = [
     const start1 = performance.now();
     const villages = await twSDK.worldDataAPI("village");
     let xx = [];
-    villages.forEach((v) => {
-      if (
-        v.villageX == village.split("|")[0] &&
-        v.villageY == village.split("|")[1]
-      ) {
-        console.log("Found village:", v);
-        xx.push(v);
-      }
+    targetVillages.forEach((v) => {
+      villages.forEach((allVill) => {
+        if (
+          allVill.villageX == v.split("|")[0] &&
+          allVill.villageY == v.split("|")[1]
+        ) {
+          console.log("Found village:", v);
+          xx.push(v);
+        }
+      });
     });
 
     const end1 = performance.now();
