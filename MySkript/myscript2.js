@@ -824,6 +824,8 @@ let targetVillages = [
     console.log("readIncs called.");
     let commandIDs = [];
 
+    const start = performance.now();
+
     async function fetchPages(targetVillages) {
       let pages = await Promise.all(
         targetVillages.map(async (village) => {
@@ -852,6 +854,25 @@ let targetVillages = [
     }
 
     const pagesToFetch = await fetchPages(targetVillages);
+
+    const end = performance.now();
+    console.log(`loadWBCode took ${end - start} milliseconds`);
+
+    const start1 = performance.now();
+    const villages = await twSDK.worldDataAPI("village");
+    let xx = [];
+    villages.forEach((v) => {
+      if (
+        v.villageX == village.split("|")[0] &&
+        v.villageY == village.split("|")[1]
+      ) {
+        console.log("Found village:", v);
+        xx.push(v);
+      }
+    });
+
+    const end1 = performance.now();
+    console.log(`loadWBCode took ${end1 - start1} milliseconds`);
 
     if (pagesToFetch.length) {
       twSDK.startProgressBar(pagesToFetch.length);
