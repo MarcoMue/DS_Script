@@ -606,10 +606,85 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
           <p>
             <table id="myTable">
               <tr>
+              <th width="320">Dorf</th>
+
                 <th>First</th>
                 <th>Two</th>
                 <th>Three</th>
                 <th>Last</th>
+                <th style="text-align: center" width="auto">
+  <a href="#" class="unit_link" data-unit="spear"
+    ><img
+      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_spear.png"
+      class=""
+      data-title="Speerträger"
+  /></a>
+</th>
+<th style="text-align: center" width="auto">
+  <a href="#" class="unit_link" data-unit="sword"
+    ><img
+      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_sword.png"
+      class=""
+      data-title="Schwertkämpfer"
+  /></a>
+</th>
+<th style="text-align: center" width="auto">
+  <a href="#" class="unit_link" data-unit="axe"
+    ><img
+      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_axe.png"
+      class=""
+      data-title="Axtkämpfer"
+  /></a>
+</th>
+<th style="text-align: center" width="auto">
+  <a href="#" class="unit_link" data-unit="spy"
+    ><img
+      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_spy.png"
+      class=""
+      data-title="Späher"
+  /></a>
+</th>
+<th style="text-align: center" width="auto">
+  <a href="#" class="unit_link" data-unit="light"
+    ><img
+      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_light.png"
+      class=""
+      data-title="Leichte Kavallerie"
+  /></a>
+</th>
+<th style="text-align: center" width="auto">
+  <a href="#" class="unit_link" data-unit="heavy"
+    ><img
+      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_heavy.png"
+      class=""
+      data-title="Schwere Kavallerie"
+  /></a>
+</th>
+<th style="text-align: center" width="auto">
+  <a href="#" class="unit_link" data-unit="ram"
+    ><img
+      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_ram.png"
+      class=""
+      data-title="Rammbock"
+  /></a>
+</th>
+<th style="text-align: center" width="auto">
+  <a href="#" class="unit_link" data-unit="catapult"
+    ><img
+      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_catapult.png"
+      class=""
+      data-title="Katapult"
+  /></a>
+</th>
+<th style="text-align: center" width="auto">
+  <a href="#" class="unit_link" data-unit="snob"
+    ><img
+      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_snob.png"
+      class=""
+      data-title="Adelsgeschlecht"
+  /></a>
+</th>
+
               </tr>
             </table>
           </p>
@@ -639,7 +714,7 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
       .getElementById("loadPlannerBtn")
       .addEventListener("click", loadWBCode);
     document.getElementById("run").addEventListener("click", readIncs);
-    document.getElementById("update").addEventListener("click", updateDB);
+    document.getElementById("update").addEventListener("click", readDatabase);
     // document.getElementById('troop_details').addEventListener('click', readCheckboxValue);
   }
 
@@ -727,7 +802,7 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
 
   async function readIncs() {
     console.log("readIncs called.");
-    let items = [];
+    let commandIDs = [];
 
     async function fetchPages(targetVillages) {
       let pages = await Promise.all(
@@ -779,7 +854,7 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
               .each(function () {
                 let commandID = $(this).attr("data-id");
                 console.log(commandID);
-                items.push(commandID);
+                commandIDs.push(commandID);
               });
 
             $cc
@@ -801,9 +876,9 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
 
             if (isChecked) {
               let timerId = setInterval(function () {
-                if (items.length > 0) {
-                  let item = items.shift(); // Fetch the first item
-                  console.log("Processing:", item); // Process the item (example: log it)
+                if (commandIDs.length > 0) {
+                  let item = commandIDs.shift();
+                  console.log("Processing:", item);
                   jQuery
                     .ajax({
                       url: `/game.php?screen=info_command&ajax=details&id=${item}`,
@@ -858,7 +933,7 @@ let targetVillages = ["458|446", "485|457", "456|471", "435|443"];
     }
   }
 
-  async function updateDB() {
+  async function readDatabase() {
     const request = indexedDB.open("villagesDb", 1);
     request.onerror = function (event) {
       console.error("Database error:", event.target.errorCode);
