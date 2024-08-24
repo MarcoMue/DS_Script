@@ -1,10 +1,7 @@
 if (typeof DEBUG !== "boolean") DEBUG = false;
 DEBUG = true;
 
-// TODO expand Table
-// TODO add more Player Info
-// TODO add more Village Info
-// TODO fix Icon Tooltip
+// TODO init and load DB for villages and players / tribes
 
 // User Input
 // Script Config
@@ -658,7 +655,7 @@ let targetVillages = [
           <fieldset>
             <legend>Settings</legend>
               <div id="lastUpdatedContainer">
-                Last Updated: <span id="lastUpdatedDate"></span> (<span id="timeAgo"></span> ago)
+                DB Last Updated: <span id="lastUpdatedDate"></span> (<span id="timeAgo"></span> ago)
               </div>
             <p>
               <input type="radio" name="mode" id="of" value="Read troops of the village" />
@@ -764,29 +761,19 @@ let targetVillages = [
     document.getElementById("update").addEventListener("click", readDatabase);
     // document.getElementById('troop_details').addEventListener('click', readCheckboxValue);
 
-    showLastUpdated();
+    showLastUpdatedDb();
   }
 
-  function showLastUpdated() {
+  function showLastUpdatedDb() {
     const lastUpdatedDate = new Date(Number(window.twSDK.lastUpdated));
-    const testDate = new Date(Number("1724514999000"));
-
-    console.log("Last Updated Date:", lastUpdatedDate);
-    console.log("Test Date:", testDate);
-
     const now = new Date();
     const timeDifference = now - lastUpdatedDate;
-    console.log("Time Difference:", timeDifference);
-
     const formattedDate = lastUpdatedDate.toLocaleString();
-    console.log("Formatted Date:", formattedDate);
 
     const seconds = Math.floor(timeDifference / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
-
-    console.log("Time: ", days, hours, minutes, seconds);
 
     let timeAgo;
     if (days > 0) {
@@ -798,8 +785,6 @@ let targetVillages = [
     } else {
       timeAgo = `${seconds} second${seconds > 1 ? "s" : ""}`;
     }
-
-    console.log("Time Ago:", timeAgo);
 
     // Update the HTML
     document.getElementById("lastUpdatedDate").textContent = formattedDate;
