@@ -290,16 +290,25 @@ window.twSDK = {
             return [];
         }
 
-        // save data in db
-        saveToIndexedDbStorage(
-          dbConfig[entity].dbName,
-          dbConfig[entity].dbTable,
-          dbConfig[entity].key,
-          responseData
-        );
+        try {
+          // save data in db
+          saveToIndexedDbStorage(
+            dbConfig[entity].dbName,
+            dbConfig[entity].dbTable,
+            dbConfig[entity].key,
+            responseData
+          );
 
-        // update last updated localStorage item
-        localStorage.setItem(`${entity}_last_updated`, Date.parse(new Date()));
+          // update last updated localStorage item
+          localStorage.setItem(
+            `${entity}_last_updated`,
+            Date.parse(new Date())
+          );
+        } catch (error) {
+          // delete Database if an error occurs
+          console.error("Error saving data to indexedDB:", error);
+          // indexedDB.deleteDatabase(dbConfig[entity].dbName);
+        }
 
         return responseData;
       } catch (error) {
@@ -312,6 +321,7 @@ window.twSDK = {
       const req = indexedDB.open(dbName);
 
       req.onupgradeneeded = function (event) {
+        console.log("Creating database...");
         const db = this.result;
         let objectStore;
         if (keyId.length) {
@@ -925,8 +935,6 @@ let targetVillages = [];
     }
   }
 
-  async function readDatabase() {}
-
   async function openUI() {
     const html = `<div id="content"></div>`;
     $("#contentContainer").eq(0).prepend(html);
@@ -942,7 +950,6 @@ let targetVillages = [];
     //   .getElementById("in")
     //   .addEventListener("change", () => setMode("members_defense"));
     document.getElementById("run").addEventListener("click", readIncs);
-    document.getElementById("update").addEventListener("click", readDatabase);
     // document.getElementById('troop_details').addEventListener('click', readCheckboxValue);
 
     showLastUpdatedDb();
