@@ -575,57 +575,7 @@ window.twSDK = {
 let intervalId;
 let results = [];
 let commands = [];
-let targetVillages = [
-  "458|446",
-  "485|457",
-  "456|471",
-  "435|443",
-  "434|434",
-  "438|427",
-  "438|426",
-  "437|425",
-  "427|433",
-  "437|423",
-  "436|423",
-  "426|432",
-  "434|424",
-  "431|425",
-  "432|423",
-  "431|423",
-  "425|430",
-  "426|431",
-  "437|426",
-  "427|422",
-  "431|426",
-  "432|418",
-  "434|420",
-  "426|429",
-  "424|424",
-  "423|424",
-  "427|423",
-  "428|421",
-  "421|428",
-  "418|425",
-  "423|423",
-  "414|429",
-  "416|426",
-  "419|425",
-  "422|421",
-  "417|424",
-  "451|401",
-  "417|426",
-  "419|419",
-  "416|427",
-  "417|419",
-  "412|424",
-  "415|421",
-  "416|419",
-  "417|420",
-  "414|420",
-  "423|427",
-  "411|417",
-  "427|417",
-];
+let targetVillages = [];
 
 (async function () {
   console.log("IIFE called.");
@@ -674,7 +624,9 @@ let targetVillages = [
   }
 
   function addRowToTable(row) {
-    $("#myTable").append(row);
+    setInterval(function () {
+      $("#myTable").append(row);
+    }, 100);
   }
 
   function readWorkbenchExport() {
@@ -684,6 +636,7 @@ let targetVillages = [
 
     if (text.value !== "") {
       results = convertWBPlanToArray(text.value);
+      console.log("Results:", results);
       addRowToTable(results);
     }
 
@@ -775,12 +728,14 @@ let targetVillages = [
         const wbRadio = document.getElementById("wb");
 
         if (coordRadio.checked) {
-          readVillageCoords();
+          targetVillages = readVillageCoords();
         } else if (wbRadio.checked) {
           readWorkbenchExport();
         } else {
           alert("Please select a mode.");
         }
+        addVillagesToTable();
+        log;
       });
   }
 
