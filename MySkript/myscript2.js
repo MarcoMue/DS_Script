@@ -1,10 +1,8 @@
 if (typeof DEBUG !== "boolean") DEBUG = false;
-DEBUG = true;
-
 // TODO init and load DB for villages and players / tribes
+
 (async function () {
-  // User Input
-  // Script Config
+  console.log("IIFE called.");
   let scriptConfig = {
     baseScriptUrl: "https://marcomue.github.io/DS_Script/MySkript",
     scriptData: {
@@ -81,7 +79,7 @@ DEBUG = true;
     enableCountApi: true,
   };
   let scriptInfo = `${scriptConfig.scriptData.prefix} ${scriptConfig.scriptData.name} ${scriptConfig.scriptData.version}`;
-  window.twSDK = {
+  let twSDK = {
     // variables
     scriptData: {},
     translations: {},
@@ -639,7 +637,6 @@ DEBUG = true;
   let results = [];
   let commands = [];
   let targetVillages = [];
-  console.log("IIFE called.");
   await twSDK.worldDataAPI("village");
   // await twSDK.worldDataAPI("player");
   // await twSDK.worldDataAPI("tribe");
