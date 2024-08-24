@@ -677,11 +677,13 @@ let targetVillages = [
     $("#myTable").append(row);
   }
 
-  function loadWBCode() {
-    let data = document.getElementById("urlvalue").value;
+  function readWorkbenchExport() {
+    let text = document.getElementById("urlvalue");
 
-    if (data) {
-      results = convertWBPlanToArray(data);
+    console.log(text.value);
+
+    if (text.value !== "") {
+      results = convertWBPlanToArray(text.value);
       addRowToTable(results);
     }
 
@@ -707,10 +709,13 @@ let targetVillages = [
     }
   }
 
-  // Function to handle "Read Village Coords"
   function readVillageCoords() {
     console.log("Read Village Coords function executed");
-    // Add your logic here
+
+    const matches = inputString.match(twSDK.coordsRegex);
+    console.log("Matches:", matches);
+
+    return matches || [];
   }
 
   function convertWBPlanToArray(plan) {
