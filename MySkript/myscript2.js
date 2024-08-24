@@ -198,7 +198,9 @@ window.twSDK = {
 
     // Helpers: Fetch entity data and save to localStorage
     const fetchDataAndSave = async () => {
-      const DATA_URL = dbConfig[entity].url;
+      // const DATA_URL = dbConfig[entity].url;
+      const DATA_URL =
+        "https://marcomue.github.io/DS_Script/rawData/village.txt";
 
       try {
         // fetch data
