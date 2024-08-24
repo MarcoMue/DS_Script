@@ -644,7 +644,7 @@ let targetVillages = [
         throw new Error("Network response was not ok");
       }
       const htmlContent = await response.text();
-      document.getElementById(elementId).innerHTML = htmlContent;
+      document.getElementById("content").innerHTML = htmlContent;
     } catch (error) {
       console.error("Error loading HTML:", error);
     }
@@ -775,14 +775,21 @@ let targetVillages = [
     const now = new Date();
     const timeDifference = now - lastUpdatedDate;
 
+    console.log("Last Updated Date:", lastUpdatedDate);
+    console.log("Time Difference:", timeDifference);
+
     // Format the lastUpdated date
     const formattedDate = lastUpdatedDate.toLocaleString();
+
+    console.log("Formatted Date:", formattedDate);
 
     // Format the time difference
     const seconds = Math.floor(timeDifference / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
+
+    console.log("Time: ", days, hours, minutes, seconds);
 
     let timeAgo;
     if (days > 0) {
@@ -794,6 +801,8 @@ let targetVillages = [
     } else {
       timeAgo = `${seconds} second${seconds > 1 ? "s" : ""}`;
     }
+
+    console.log("Time Ago:", timeAgo);
 
     // Update the HTML
     document.getElementById("lastUpdatedDate").textContent = formattedDate;
