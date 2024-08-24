@@ -635,7 +635,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
   let targetVillages = [];
   await twSDK.worldDataAPI("village");
   await twSDK.worldDataAPI("player");
-  await twSDK.worldDataAPI("tribe");
+  await twSDK.worldDataAPI("ally");
   await twSDK.worldDataAPI("conquer");
   openUI();
 
