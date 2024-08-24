@@ -779,14 +779,16 @@ let targetVillages = [];
             let coords = twSDK._getVillageIDByCoords(result.targetVillageId);
             let id = twSDK._getVillageById(result.targetVillageId);
 
+            console.log("Coords:", coords);
+            console.log("ID:", id);
+
             targetVillages.push(coords);
           });
           addRowToTable(results);
         } else {
           alert("Please select a mode.");
         }
-        addVillagesToTable();
-        log;
+        // addVillagesToTable();
       });
   }
 
