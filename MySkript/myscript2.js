@@ -768,8 +768,8 @@ let targetVillages = [
   }
 
   function showLastUpdated() {
-    const lastUpdatedDate = new Date(window.twSDK.lastUpdated);
-    const testDate = new Date("1724514999000");
+    const lastUpdatedDate = new Date(Number(window.twSDK.lastUpdated));
+    const testDate = new Date(Number("1724514999000"));
 
     console.log("Last Updated Date:", lastUpdatedDate);
     console.log("Test Date:", testDate);
