@@ -114,35 +114,30 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         dbVersion: 1,
         dbTable: "villages",
         key: "villageId",
-        url: twSDK.worldDataVillages,
+        url: worldDataVillages,
       },
       player: {
         dbName: "playersDb",
         dbVersion: 1,
         dbTable: "players",
         key: "playerId",
-        url: twSDK.worldDataPlayers,
+        url: worldDataPlayers,
       },
       ally: {
         dbName: "tribesDb",
         dbVersion: 1,
         dbTable: "tribes",
         key: "tribeId",
-        url: twSDK.worldDataTribes,
+        url: worldDataTribes,
       },
       conquer: {
         dbName: "conquerDb",
         dbVersion: 1,
         dbTable: "conquer",
         key: "",
-        url: twSDK.worldDataConquests,
+        url: worldDataConquests,
       },
     },
-    testAccess: function () {
-      console.log("testAccess called.");
-      return true;
-    },
-
     csvToArray: function (strData, strDelimiter = ",") {
       var objPattern = new RegExp(
         "(\\" +
@@ -207,7 +202,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         try {
           // fetch data
           const response = await jQuery.ajax(DATA_URL);
-          const data = twSDK.csvToArray(response);
+          const data = csvToArray(response);
           let responseData = [];
 
           // prepare data to be saved in db
@@ -222,7 +217,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
                 .map((item) => {
                   return {
                     villageId: parseInt(item[0]),
-                    villageName: twSDK.cleanString(item[1]),
+                    villageName: cleanString(item[1]),
                     villageX: item[2],
                     villageY: item[3],
                     coords: `${item[2]}|${item[3]}`,
@@ -243,7 +238,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
                 .map((item) => {
                   return {
                     playerId: parseInt(item[0]),
-                    playerName: twSDK.cleanString(item[1]),
+                    playerName: cleanString(item[1]),
                     tribeId: parseInt(item[2]),
                     villages: parseInt(item[3]),
                     points: parseInt(item[4]),
@@ -261,8 +256,8 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
                 .map((item) => {
                   return {
                     tribeId: parseInt(item[0]),
-                    tribeName: twSDK.cleanString(item[1]),
-                    tribeTag: twSDK.cleanString(item[2]),
+                    tribeName: cleanString(item[1]),
+                    tribeTag: cleanString(item[2]),
                     players: parseInt(item[3]),
                     villages: parseInt(item[4]),
                     points: parseInt(item[5]),
@@ -541,7 +536,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       }
     },
     _getVillageIDByCoords: async function (x, y) {
-      const villages = await twSDK.worldDataAPI("village");
+      const villages = await worldDataAPI("village");
       const xy = parseInt(`${x}${y}`, 10);
 
       const village = villages[xy];
@@ -552,7 +547,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       return village.id;
     },
     _getVillageById: async function (villageId) {
-      const villages = await twSDK.worldDataAPI("village");
+      const villages = await worldDataAPI("village");
       const village = villages.find((v) => v.id === villageId);
       return village;
     },
@@ -634,6 +629,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       });
     },
   };
+
   let results = [];
   let commands = [];
   let targetVillages = [];
@@ -847,7 +843,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
 
     if (pagesToFetch.length) {
       twSDK.startProgressBar(pagesToFetch.length);
-      await twSDK.getAll(
+      twSDK.getAll(
         pagesToFetch,
         function (index, data) {
           twSDK.updateProgressBar(index, pagesToFetch.length);
