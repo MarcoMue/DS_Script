@@ -292,9 +292,9 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
           try {
             // save data in db
             saveToIndexedDbStorage(
-              dbConfig[entity].dbName,
-              dbConfig[entity].dbTable,
-              dbConfig[entity].key,
+              this.dbConfig[entity].dbName,
+              this.dbConfig[entity].dbTable,
+              this.dbConfig[entity].key,
               responseData
             );
 
@@ -454,8 +454,8 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
           worldData[entity] = await fetchDataAndSave();
         } else {
           worldData[entity] = await getAllData(
-            dbConfig[entity].dbName,
-            dbConfig[entity].dbTable
+            this.dbConfig[entity].dbName,
+            this.dbConfig[entity].dbTable
           );
         }
       } else {
@@ -595,8 +595,8 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
     getVillageById: async function (villageId) {
       return new Promise((resolve, reject) => {
         const dbRequest = indexedDB.open(
-          dbConfig.village.dbName,
-          dbConfig.village.dbVersion
+          this.dbConfig.village.dbName,
+          this.dbConfig.village.dbVersion
         );
 
         dbRequest.onerror = function (event) {
@@ -606,7 +606,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
 
         dbRequest.onsuccess = function (event) {
           const db = event.target.result;
-          let table = dbConfig.village.dbTable;
+          let table = this.dbConfig.village.dbTable;
 
           const transaction = db.transaction([table], "readonly");
           const objectStore = transaction.objectStore(table);
@@ -654,7 +654,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
   }
 
   function showLastUpdatedDb() {
-    const lastUpdatedDate = new Date(Number(window.twSDK.lastUpdated));
+    const lastUpdatedDate = new Date(Number(twSDK.lastUpdated));
     const now = new Date();
     const timeDifference = now - lastUpdatedDate;
     const formattedDate = lastUpdatedDate.toLocaleString();
