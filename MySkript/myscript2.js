@@ -79,37 +79,6 @@ let scriptConfig = {
   enableCountApi: true,
 };
 
-const dbConfig = {
-  village: {
-    dbName: "villagesDb",
-    dbVersion: 1,
-    dbTable: "villages",
-    key: "villageId",
-    url: twSDK.worldDataVillages,
-  },
-  player: {
-    dbName: "playersDb",
-    dbVersion: 1,
-    dbTable: "players",
-    key: "playerId",
-    url: twSDK.worldDataPlayers,
-  },
-  ally: {
-    dbName: "tribesDb",
-    dbVersion: 1,
-    dbTable: "tribes",
-    key: "tribeId",
-    url: twSDK.worldDataTribes,
-  },
-  conquer: {
-    dbName: "conquerDb",
-    dbVersion: 1,
-    dbTable: "conquer",
-    key: "",
-    url: twSDK.worldDataConquests,
-  },
-};
-
 let scriptInfo = `${scriptConfig.scriptData.prefix} ${scriptConfig.scriptData.name} ${scriptConfig.scriptData.version}`;
 
 window.twSDK = {
@@ -141,6 +110,40 @@ window.twSDK = {
   worldDataTribes: "/map/ally.txt",
   worldDataConquests: "/map/conquer_extended.txt",
   lastUpdated: localStorage.getItem("village_last_updated"),
+  dbConfig: {
+    village: {
+      dbName: "villagesDb",
+      dbVersion: 1,
+      dbTable: "villages",
+      key: "villageId",
+      url: twSDK.worldDataVillages,
+    },
+    player: {
+      dbName: "playersDb",
+      dbVersion: 1,
+      dbTable: "players",
+      key: "playerId",
+      url: twSDK.worldDataPlayers,
+    },
+    ally: {
+      dbName: "tribesDb",
+      dbVersion: 1,
+      dbTable: "tribes",
+      key: "tribeId",
+      url: twSDK.worldDataTribes,
+    },
+    conquer: {
+      dbName: "conquerDb",
+      dbVersion: 1,
+      dbTable: "conquer",
+      key: "",
+      url: twSDK.worldDataConquests,
+    },
+  },
+  testAccess: function () {
+    console.log("testAccess called.");
+    return true;
+  },
 
   csvToArray: function (strData, strDelimiter = ",") {
     var objPattern = new RegExp(
