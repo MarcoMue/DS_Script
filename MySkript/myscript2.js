@@ -79,16 +79,41 @@ let scriptConfig = {
   enableCountApi: true,
 };
 
+const dbConfig = {
+  village: {
+    dbName: "villagesDb",
+    dbVersion: 1,
+    dbTable: "villages",
+    key: "villageId",
+    url: twSDK.worldDataVillages,
+  },
+  player: {
+    dbName: "playersDb",
+    dbVersion: 1,
+    dbTable: "players",
+    key: "playerId",
+    url: twSDK.worldDataPlayers,
+  },
+  ally: {
+    dbName: "tribesDb",
+    dbVersion: 1,
+    dbTable: "tribes",
+    key: "tribeId",
+    url: twSDK.worldDataTribes,
+  },
+  conquer: {
+    dbName: "conquerDb",
+    dbVersion: 1,
+    dbTable: "conquer",
+    key: "",
+    url: twSDK.worldDataConquests,
+  },
+};
+
 let scriptInfo = `${scriptConfig.scriptData.prefix} ${scriptConfig.scriptData.name} ${scriptConfig.scriptData.version}`;
 
 window.twSDK = {
   // variables
-  database: {
-    db: null,
-    DB_NAME: "mdn-demo-indexeddb-epublications",
-    DB_VERSION: 1,
-    DB_STORE_NAME: "publications",
-  },
   scriptData: {},
   translations: {},
   allowedMarkets: [],
@@ -168,33 +193,6 @@ window.twSDK = {
 
     // initial world data
     const worldData = {};
-
-    const dbConfig = {
-      village: {
-        dbName: "villagesDb",
-        dbTable: "villages",
-        key: "villageId",
-        url: twSDK.worldDataVillages,
-      },
-      player: {
-        dbName: "playersDb",
-        dbTable: "players",
-        key: "playerId",
-        url: twSDK.worldDataPlayers,
-      },
-      ally: {
-        dbName: "tribesDb",
-        dbTable: "tribes",
-        key: "tribeId",
-        url: twSDK.worldDataTribes,
-      },
-      conquer: {
-        dbName: "conquerDb",
-        dbTable: "conquer",
-        key: "",
-        url: twSDK.worldDataConquests,
-      },
-    };
 
     // Helpers: Fetch entity data and save to localStorage
     const fetchDataAndSave = async () => {
@@ -337,15 +335,6 @@ window.twSDK = {
           objectStore = db.createObjectStore(table, {
             keyPath: keyId,
           });
-
-          // TODO: add indexes for each entity
-          // playerId: 0
-          // villageId: 1
-          // villageName: "Barbarendorf"
-          // villagePoints: 433
-          // villageType: 0
-          // villageX: "506"
-          // villageY: "478"
           objectStore.createIndex("coords", "coords", { unique: true });
         } else {
           db.createObjectStore(table, {
@@ -367,8 +356,6 @@ window.twSDK = {
         store.clear(); // clean store from items before adding new ones
 
         data.forEach((item) => {
-          console.log(item);
-
           store.put(item);
         });
 
@@ -473,12 +460,11 @@ window.twSDK = {
         );
       }
     } else {
+      worldData[entity] = await fetchDataAndSave();
     }
-    worldData[entity] = await fetchDataAndSave();
 
     // transform the data so at the end an array of array is returned
     worldData[entity] = objectToArray(worldData[entity], entity);
-
     return worldData[entity];
   },
   startProgressBar: function (total) {
@@ -567,83 +553,81 @@ window.twSDK = {
     return village;
   },
   // DB requests
-  getVillageByCoordinates: function (x, y) {
+  // Function to search for a record by coords using the index
+  getVillageByCoordinates: async function (x, y) {
     return new Promise((resolve, reject) => {
-      const req = indexedDB.open("villagesDb");
+      const dbRequest = indexedDB.open(
+        dbConfig.village.dbName,
+        dbConfig.village.dbVersion
+      );
 
-      req.onerror = function (event) {
-        console.error("findVillageInDB:", event.target.errorCode);
+      dbRequest.onerror = function (event) {
+        console.error("Database error:", event.target.errorCode);
         reject(event.target.errorCode);
       };
 
-      req.onsuccess = function () {
-        const db = this.result;
-        const transaction = db.transaction(["villages"], "readonly");
+      dbRequest.onsuccess = function (event) {
+        const db = event.target.result;
+        let table = dbConfig.village.dbTable;
 
-        const index = objectStore.index("name");
-        index.get("coords").onsuccess = (event) => {
-          console.log(`Result is ${event.target.result}`);
+        const transaction = db.transaction([table], "readonly");
+        const objectStore = transaction.objectStore(table);
+
+        const index = objectStore.index("coords");
+        const getRequest = index.get(`${x}|${y}`);
+
+        getRequest.onerror = function (event) {
+          console.error("Get request error:", event.target.errorCode);
+          reject(event.target.errorCode);
         };
 
-        const objectStore = transaction.objectStore("villages");
-        const cursorRequest = objectStore.openCursor();
-
-        cursorRequest.onsuccess = function (event) {
-          const cursor = event.target.result;
-          if (cursor) {
-            if (cursor.value.villageX === x && cursor.value.villageY === y) {
-              console.log(
-                `ID for Village ${x}|${y} is ${cursor.value.villageId}`
-              );
-              resolve(cursor.value); // Resolve the promise with the found value
-            } else {
-              cursor.continue();
-            }
+        getRequest.onsuccess = function (event) {
+          if (getRequest.result) {
+            console.log("Value:", getRequest.result);
+            resolve(getRequest.result);
           } else {
-            console.log("No more entries!");
-            resolve(null); // Resolve the promise with null if no match is found
+            console.log("No matching record found");
+            resolve(null);
           }
         };
       };
     });
   },
   getVillageById: function (villageId) {
-    const request = indexedDB.open("villagesDb", 1);
-    request.onerror = function (event) {
-      console.error("Database error:", event.target.errorCode);
-    };
+    return new Promise((resolve, reject) => {
+      const dbRequest = indexedDB.open(
+        dbConfig.village.dbName,
+        dbConfig.village.dbVersion
+      );
 
-    request.onsuccess = function (event) {
-      const db = event.target.result;
-      const transaction = db.transaction(["villages"], "readonly");
-      const objectStore = transaction.objectStore("villages");
-
-      const myIndex = objectStore.index("coords");
-      myIndex.openCursor().onsuccess = (event) => {
-        const cursor = event.target.result;
-        if (cursor) {
-          console.log("Key:", cursor);
-          cursor.continue();
-        } else {
-          console.log("Entries all displayed.");
-        }
+      dbRequest.onerror = function (event) {
+        console.error("Database error:", event.target.errorCode);
+        reject(event.target.errorCode);
       };
 
-      const key = villageId;
-      const getRequest = objectStore.get(key);
+      dbRequest.onsuccess = function (event) {
+        const db = event.target.result;
+        let table = dbConfig.village.dbTable;
 
-      getRequest.onerror = function (event) {
-        console.error("Get request error:", event.target.errorCode);
-      };
+        const transaction = db.transaction([table], "readonly");
+        const objectStore = transaction.objectStore(table);
+        const getRequest = objectStore.get(villageId);
 
-      getRequest.onsuccess = function (event) {
-        if (getRequest.result) {
-          console.log("Value:", getRequest.result);
-        } else {
-          console.log("No matching record found");
-        }
+        getRequest.onerror = function (event) {
+          console.error("Get request error:", event.target.errorCode);
+        };
+
+        getRequest.onsuccess = function (event) {
+          if (getRequest.result) {
+            console.log("Value:", getRequest.result);
+            resolve(getRequest.result);
+          } else {
+            console.log("No matching record found");
+            resolve(null);
+          }
+        };
       };
-    };
+    });
   },
 };
 
