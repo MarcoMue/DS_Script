@@ -775,9 +775,11 @@ let targetVillages = [];
           targetVillages = readVillageCoords();
         } else if (wbRadio.checked) {
           let results = readWorkbenchExport();
-          results.forEach((result) => {
-            let coords = twSDK._getVillageIDByCoords(result.targetVillageId);
-            let id = twSDK._getVillageById(result.targetVillageId);
+          results.forEach(async (result) => {
+            let coords = await twSDK._getVillageIDByCoords(
+              result.targetVillageId
+            );
+            let id = await twSDK._getVillageById(result.targetVillageId);
 
             console.log("Coords:", coords);
             console.log("ID:", id);
