@@ -323,7 +323,7 @@ window.twSDK = {
       const req = indexedDB.open(dbName);
 
       req.onupgradeneeded = function (event) {
-        console.log("Creating database...");
+        console.log("onupgradeneeded database...", event);
         const db = this.result;
         let objectStore;
         if (keyId.length) {
@@ -345,15 +345,23 @@ window.twSDK = {
             autoIncrement: true,
           });
         }
+
+        const indexNames = objectStore.indexNames;
+        for (let i = 0; i < indexNames.length; i++) {
+          console.log(indexNames[i]);
+        }
       };
 
-      req.onsuccess = function () {
+      req.onsuccess = function (event) {
+        console.log("onsuccess database...", event);
         const db = this.result;
         const transaction = db.transaction(table, "readwrite");
         const store = transaction.objectStore(table);
         store.clear(); // clean store from items before adding new ones
 
         data.forEach((item) => {
+          console.log(item);
+
           store.put(item);
         });
 
@@ -361,7 +369,10 @@ window.twSDK = {
       };
 
       req.onerror = function (event) {
-        console.error("saveToIndexedDbStorage:", event.target.errorCode);
+        console.error(
+          "onerror saveToIndexedDbStorage:",
+          event.target.errorCode
+        );
       };
     }
 
@@ -455,8 +466,8 @@ window.twSDK = {
         );
       }
     } else {
-      worldData[entity] = await fetchDataAndSave();
     }
+    worldData[entity] = await fetchDataAndSave();
 
     // transform the data so at the end an array of array is returned
     worldData[entity] = objectToArray(worldData[entity], entity);
@@ -534,8 +545,6 @@ window.twSDK = {
   },
   _getVillageIDByCoords: async function (x, y) {
     const villages = await twSDK.worldDataAPI("village");
-    console.log("Villages:", villages);
-
     const xy = parseInt(`${x}${y}`, 10);
 
     const village = villages[xy];
