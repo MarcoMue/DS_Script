@@ -633,7 +633,7 @@ let targetVillages = [
   console.log("IIFE called.");
   // const villages = await twSDK.worldDataAPI("village");
   openUI();
-  loadHTML("content.html", "content");
+  await loadHTML("content.html", "content");
 
   async function loadHTML(url) {
     let url = `https://marcomue.github.io/DS_Script/MySkript/${url}`;
