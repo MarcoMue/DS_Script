@@ -460,6 +460,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         }
       }
 
+      /*
       // decide what to do based on current time and last updated entity time
       if (LAST_UPDATED_TIME !== null) {
         if (
@@ -476,7 +477,13 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       } else {
         worldData[entity] = await fetchDataAndSave();
       }
+        */
 
+      worldData[entity] = await fetchDataAndSave();
+      worldData[entity] = await getAllData(
+        this.dbConfig[entity].dbName,
+        this.dbConfig[entity].dbTable
+      );
       // transform the data so at the end an array of array is returned
       worldData[entity] = objectToArray(worldData[entity], entity);
       return worldData[entity];
