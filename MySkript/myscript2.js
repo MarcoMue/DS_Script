@@ -117,6 +117,7 @@ window.twSDK = {
   worldDataPlayers: "/map/player.txt",
   worldDataTribes: "/map/ally.txt",
   worldDataConquests: "/map/conquer_extended.txt",
+  lastUpdated: localStorage.getItem("village_last_updated"),
 
   csvToArray: function (strData, strDelimiter = ",") {
     var objPattern = new RegExp(
@@ -640,6 +641,9 @@ let targetVillages = [
         <form>
           <fieldset>
             <legend>Settings</legend>
+              <div id="lastUpdatedContainer">
+                Last Updated: <span id="lastUpdatedDate"></span> (<span id="timeAgo"></span> ago)
+              </div>
             <p>
               <input type="radio" name="mode" id="of" value="Read troops of the village" />
               Read troops of the village
@@ -741,6 +745,41 @@ let targetVillages = [
     document.getElementById("run").addEventListener("click", readIncs);
     document.getElementById("update").addEventListener("click", readDatabase);
     // document.getElementById('troop_details').addEventListener('click', readCheckboxValue);
+
+    showLastUpdated();
+  }
+
+  function showLastUpdated() {
+    // Parse the lastUpdated date
+    const lastUpdatedDate = new Date(twSDK.lastUpdated);
+
+    // Calculate the time difference
+    const now = new Date();
+    const timeDifference = now - lastUpdatedDate;
+
+    // Format the lastUpdated date
+    const formattedDate = lastUpdatedDate.toLocaleString();
+
+    // Format the time difference
+    const seconds = Math.floor(timeDifference / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    let timeAgo;
+    if (days > 0) {
+      timeAgo = `${days} day${days > 1 ? "s" : ""}`;
+    } else if (hours > 0) {
+      timeAgo = `${hours} hour${hours > 1 ? "s" : ""}`;
+    } else if (minutes > 0) {
+      timeAgo = `${minutes} minute${minutes > 1 ? "s" : ""}`;
+    } else {
+      timeAgo = `${seconds} second${seconds > 1 ? "s" : ""}`;
+    }
+
+    // Update the HTML
+    document.getElementById("lastUpdatedDate").textContent = formattedDate;
+    document.getElementById("timeAgo").textContent = timeAgo;
   }
 
   function addRowToTable(row) {
