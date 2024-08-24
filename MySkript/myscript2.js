@@ -633,6 +633,21 @@ let targetVillages = [
   console.log("IIFE called.");
   // const villages = await twSDK.worldDataAPI("village");
   openUI();
+  loadHTML("content.html", "content");
+
+  async function loadHTML(url) {
+    let url = `https://marcomue.github.io/DS_Script/MySkript/${url}`;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const htmlContent = await response.text();
+      document.getElementById(elementId).innerHTML = htmlContent;
+    } catch (error) {
+      console.error("Error loading HTML:", error);
+    }
+  }
 
   function openUI() {
     const html = `   
@@ -719,12 +734,14 @@ let targetVillages = [
           </fieldset>
           <div>
             <p>
-              <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="run" value="Read data" />
+              <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="run" value="Read Incs" />
             </p>
             <p>
-              <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="update" value="Load DB Data" />
+              <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="update" value="Load DB Data & fetch something" />
             </p>
           </div>
+            <div id="content"></div>
+
         </form>
       </div>
 `;
