@@ -635,7 +635,6 @@ let targetVillages = [];
 
 (async function () {
   console.log("IIFE called.");
-  // const villages = await twSDK.worldDataAPI("village");
   openUI();
   await twSDK.worldDataAPI("village");
   await twSDK.worldDataAPI("player");
