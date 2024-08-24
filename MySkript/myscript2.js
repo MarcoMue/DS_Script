@@ -199,9 +199,8 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
 
       // Helpers: Fetch entity data and save to localStorage
       const fetchDataAndSave = async () => {
-        const DATA_URL = this.dbConfig[entity].url;
-        // const DATA_URL =
-        //   "https://marcomue.github.io/DS_Script/rawData/village.txt";
+        // const DATA_URL = this.dbConfig[entity].url;
+        const DATA_URL = `https://marcomue.github.io/DS_Script/rawData/${entity}.txt`;
 
         try {
           // fetch data
