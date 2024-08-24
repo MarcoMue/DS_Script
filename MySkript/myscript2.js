@@ -958,15 +958,12 @@ let targetVillages = [
     await loadHTML("ui.html", "content");
     Timing.tickHandlers.timers.init();
 
-    document
-      .getElementById("of")
-      .addEventListener("change", () => setMode("members_troops"));
-    document
-      .getElementById("in")
-      .addEventListener("change", () => setMode("members_defense"));
-    document
-      .getElementById("loadPlannerBtn")
-      .addEventListener("click", loadWBCode);
+    // document
+    //   .getElementById("of")
+    //   .addEventListener("change", () => setMode("members_troops"));
+    // document
+    //   .getElementById("in")
+    //   .addEventListener("change", () => setMode("members_defense"));
     document.getElementById("run").addEventListener("click", readIncs);
     document.getElementById("update").addEventListener("click", readDatabase);
     // document.getElementById('troop_details').addEventListener('click', readCheckboxValue);
