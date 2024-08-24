@@ -4,28 +4,22 @@
     <fieldset>
       <legend>Settings</legend>
       <div id="lastUpdatedContainer">
-        DB Last Updated: <span id="lastUpdatedDate"></span> (<span
-          id="timeAgo"
-        ></span>
-        ago)
+        DB Last Updated:
+        <span id="lastUpdatedDate"></span> ( <span id="timeAgo"></span> ago )
       </div>
       <p>
         <input
           type="radio"
           name="mode"
-          id="of"
-          value="Read troops of the village"
+          id="coord"
+          value="Read Village Coords"
+          checked
         />
-        Read troops of the village
+        <label for="coord">Read Village Coords</label>
       </p>
       <p>
-        <input
-          type="radio"
-          name="mode"
-          id="in"
-          value="Read defenses in the village"
-        />
-        Read defenses in the village
+        <input type="radio" name="mode" id="wb" value="Read Workbench Export" />
+        <label for="wb">Read Workbench Export</label>
       </p>
       <p>
         <input
@@ -40,14 +34,15 @@
     <fieldset>
       <legend>Filters</legend>
       <textarea id="urlvalue" rows="4" cols="50">
-Add Villages here: 123|456, spaces and tabs are ignored  </textarea
-      >
-      <input
+        Add Villages here: 123|456, spaces and tabs are ignored
+      </textarea>
+      <button
         type="button"
         class="btn evt-confirm-btn btn-confirm-yes"
         id="loadPlannerBtn"
-        value="Load Planner"
-      />
+      >
+        Load Planner
+      </button>
       <table id="myTable">
         <tr>
           <th width="320">Dorf</th>
@@ -132,22 +127,23 @@ Add Villages here: 123|456, spaces and tabs are ignored  </textarea
     </fieldset>
     <div>
       <p>
-        <input
+        <button
           type="button"
           class="btn evt-confirm-btn btn-confirm-yes"
           id="run"
-          value="Read Incs"
-        />
+        >
+          Read Incs
+        </button>
       </p>
       <p>
-        <input
+        <button
           type="button"
           class="btn evt-confirm-btn btn-confirm-yes"
           id="update"
-          value="Load DB Data & fetch something"
-        />
+        >
+          Load DB Data & fetch something
+        </button>
       </p>
     </div>
-    <div id="content"></div>
   </form>
 </div>

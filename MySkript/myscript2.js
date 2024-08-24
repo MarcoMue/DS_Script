@@ -6,6 +6,7 @@ DEBUG = true;
 // User Input
 // Script Config
 let scriptConfig = {
+  baseScriptUrl: "https://marcomue.github.io/DS_Script/MySkript",
   scriptData: {
     prefix: "getIncsForPlayer",
     name: "Get Incs for Player",
@@ -76,7 +77,6 @@ let scriptConfig = {
   allowedModes: [],
   isDebug: DEBUG,
   enableCountApi: true,
-  baseScriptUrl: "https://marcomue.github.io/DS_Script/MySkript",
 };
 
 let scriptInfo = `${scriptConfig.scriptData.prefix} ${scriptConfig.scriptData.name} ${scriptConfig.scriptData.version}`;
@@ -707,6 +707,12 @@ let targetVillages = [
     }
   }
 
+  // Function to handle "Read Village Coords"
+  function readVillageCoords() {
+    console.log("Read Village Coords function executed");
+    // Add your logic here
+  }
+
   function convertWBPlanToArray(plan) {
     console.log("convertWBPlanToArray called.");
 
@@ -753,6 +759,23 @@ let targetVillages = [
 
     if (DEBUG) console.debug(`Plan objects created: `, planObjects);
     return planObjects;
+  }
+
+  async function addRadioControls() {
+    document
+      .getElementById("loadPlannerBtn")
+      .addEventListener("click", function () {
+        const coordRadio = document.getElementById("coord");
+        const wbRadio = document.getElementById("wb");
+
+        if (coordRadio.checked) {
+          readVillageCoords();
+        } else if (wbRadio.checked) {
+          readWorkbenchExport();
+        } else {
+          alert("Please select a mode.");
+        }
+      });
   }
 
   async function readIncs() {
@@ -949,5 +972,6 @@ let targetVillages = [
     // document.getElementById('troop_details').addEventListener('click', readCheckboxValue);
 
     showLastUpdatedDb();
+    addRadioControls();
   }
 })();
