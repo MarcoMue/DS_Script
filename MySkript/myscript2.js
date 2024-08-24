@@ -154,16 +154,6 @@ window.twSDK = {
       return string;
     }
   },
-  getVillageIDByCoords: function (x, y) {
-    const xy = parseInt(`${x}${y}`, 10);
-
-    const village = TWMap.villages[xy];
-
-    if (!village) {
-      return NaN;
-    }
-    return village.id;
-  },
   worldDataAPI: async function (entity) {
     console.log("worldDataAPI called with entity:", entity);
 
@@ -530,7 +520,26 @@ window.twSDK = {
         });
     }
   },
-  findVillageInDB: function (x, y) {
+  _getVillageIDByCoords: async function (x, y) {
+    const villages = await twSDK.worldDataAPI("village");
+    console.log("Villages:", villages);
+
+    const xy = parseInt(`${x}${y}`, 10);
+
+    const village = villages[xy];
+
+    if (!village) {
+      return NaN;
+    }
+    return village.id;
+  },
+  _getVillageById: async function (villageId) {
+    const villages = await twSDK.worldDataAPI("village");
+    const village = villages.find((v) => v.id === villageId);
+    return village;
+  },
+  // DB requests
+  getVillageByCoordinates: function (x, y) {
     return new Promise((resolve, reject) => {
       const req = indexedDB.open("villagesDb");
 
@@ -570,9 +579,46 @@ window.twSDK = {
       };
     });
   },
+  getVillageById: function (villageId) {
+    const request = indexedDB.open("villagesDb", 1);
+    request.onerror = function (event) {
+      console.error("Database error:", event.target.errorCode);
+    };
+
+    request.onsuccess = function (event) {
+      const db = event.target.result;
+      const transaction = db.transaction(["villages"], "readonly");
+      const objectStore = transaction.objectStore("villages");
+
+      const myIndex = objectStore.index("coords");
+      myIndex.openCursor().onsuccess = (event) => {
+        const cursor = event.target.result;
+        if (cursor) {
+          console.log("Key:", cursor);
+          cursor.continue();
+        } else {
+          console.log("Entries all displayed.");
+        }
+      };
+
+      const key = villageId;
+      const getRequest = objectStore.get(key);
+
+      getRequest.onerror = function (event) {
+        console.error("Get request error:", event.target.errorCode);
+      };
+
+      getRequest.onsuccess = function (event) {
+        if (getRequest.result) {
+          console.log("Value:", getRequest.result);
+        } else {
+          console.log("No matching record found");
+        }
+      };
+    };
+  },
 };
 
-let intervalId;
 let results = [];
 let commands = [];
 let targetVillages = [];
@@ -629,26 +675,6 @@ let targetVillages = [];
     }, 100);
   }
 
-  function readWorkbenchExport() {
-    let text = document.getElementById("urlvalue");
-
-    console.log(text.value);
-
-    if (text.value !== "") {
-      results = convertWBPlanToArray(text.value);
-      console.log("Results:", results);
-      addRowToTable(results);
-    }
-
-    // Set an interval to add a new row every second
-    // intervalId = setInterval(addRow, 250);
-
-    // Event delegation to handle row removal
-    $(document).on("click", ".removeRow", function () {
-      $(this).closest("tr").remove();
-    });
-  }
-
   function parseBool(input) {
     if (typeof input === "string") {
       return input.toLowerCase() === "true";
@@ -662,21 +688,10 @@ let targetVillages = [];
     }
   }
 
-  function readVillageCoords() {
-    console.log("Read Village Coords function executed");
-
-    let text = document.getElementById("urlvalue").value;
-    const matches = text.match(twSDK.coordsRegex);
-    console.log("Matches:", matches);
-
-    return matches || [];
-  }
-
   function convertWBPlanToArray(plan) {
-    console.log("convertWBPlanToArray called.");
+    console.log("convertWBPlanToArray executed");
 
     const pattern = /==(?=[^\/])/g;
-    // Using the pattern to split and keep the delimiter
     const planArray = plan
       .replace(/\s+/g, "") // Remove all spaces
       .split(pattern)
@@ -720,6 +735,35 @@ let targetVillages = [];
     return planObjects;
   }
 
+  function readWorkbenchExport() {
+    let text = document.getElementById("urlvalue");
+    console.log("ReadWorkbenchExport Text: ", text.value);
+
+    if (text.value !== "") {
+      return convertWBPlanToArray(text.value);
+    }
+
+    // let intervalId;
+
+    // Set an interval to add a new row every second
+    // intervalId = setInterval(addRow, 250);
+
+    // Event delegation to handle row removal
+    // $(document).on("click", ".removeRow", function () {
+    //   $(this).closest("tr").remove();
+    // });
+  }
+
+  function readVillageCoords() {
+    console.log("readVillageCoords executed");
+
+    let text = document.getElementById("urlvalue").value;
+    const matches = text.match(twSDK.coordsRegex);
+    console.log("readVillageCoords Matches:", matches);
+
+    return matches || [];
+  }
+
   async function addRadioControls() {
     document
       .getElementById("loadPlannerBtn")
@@ -730,7 +774,14 @@ let targetVillages = [];
         if (coordRadio.checked) {
           targetVillages = readVillageCoords();
         } else if (wbRadio.checked) {
-          readWorkbenchExport();
+          let results = readWorkbenchExport();
+          results.forEach((result) => {
+            let coords = twSDK._getVillageIDByCoords(result.targetVillageId);
+            let id = twSDK._getVillageById(result.targetVillageId);
+
+            targetVillages.push(coords);
+          });
+          addRowToTable(results);
         } else {
           alert("Please select a mode.");
         }
@@ -870,46 +921,7 @@ let targetVillages = [];
     }
   }
 
-  async function readDatabase() {
-    const villages = await twSDK.worldDataAPI("village");
-
-    const request = indexedDB.open("villagesDb", 1);
-    request.onerror = function (event) {
-      console.error("Database error:", event.target.errorCode);
-    };
-
-    request.onsuccess = function (event) {
-      const db = event.target.result;
-      const transaction = db.transaction(["villages"], "readonly");
-      const objectStore = transaction.objectStore("villages");
-
-      const myIndex = objectStore.index("coords");
-      myIndex.openCursor().onsuccess = (event) => {
-        const cursor = event.target.result;
-        if (cursor) {
-          console.log("Key:", cursor);
-          cursor.continue();
-        } else {
-          console.log("Entries all displayed.");
-        }
-      };
-
-      const key = 16831;
-      const getRequest = objectStore.get(key);
-
-      getRequest.onerror = function (event) {
-        console.error("Get request error:", event.target.errorCode);
-      };
-
-      getRequest.onsuccess = function (event) {
-        if (getRequest.result) {
-          console.log("Value:", getRequest.result);
-        } else {
-          console.log("No matching record found");
-        }
-      };
-    };
-  }
+  async function readDatabase() {}
 
   async function openUI() {
     const html = `<div id="content"></div>`;
