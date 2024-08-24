@@ -712,7 +712,8 @@ let targetVillages = [
   function readVillageCoords() {
     console.log("Read Village Coords function executed");
 
-    const matches = inputString.match(twSDK.coordsRegex);
+    let text = document.getElementById("urlvalue").value;
+    const matches = text.match(twSDK.coordsRegex);
     console.log("Matches:", matches);
 
     return matches || [];
