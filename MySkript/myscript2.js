@@ -111,9 +111,10 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
     dbConfig: {
       village: {
         dbName: "villagesDb",
-        dbVersion: 1,
+        dbVersion: 2,
         dbTable: "villages",
         key: "villageId",
+        indexes: [{ name: "coordIndex", key: "coords", unique: true }],
         url: this.worldDataVillages,
       },
       player: {
@@ -121,6 +122,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         dbVersion: 1,
         dbTable: "players",
         key: "playerId",
+        indexes: [],
         url: this.worldDataPlayers,
       },
       ally: {
@@ -128,6 +130,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         dbVersion: 1,
         dbTable: "tribes",
         key: "tribeId",
+        indexes: [],
         url: this.worldDataTribes,
       },
       conquer: {
@@ -135,6 +138,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         dbVersion: 1,
         dbTable: "conquer",
         key: "",
+        indexes: [],
         url: this.worldDataConquests,
       },
     },
@@ -295,6 +299,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
               this.dbConfig[entity].dbName,
               this.dbConfig[entity].dbTable,
               this.dbConfig[entity].key,
+              this.dbConfig[entity].indexes,
               responseData
             );
 
@@ -316,7 +321,13 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       };
 
       // Helpers: Save to IndexedDb storage
-      async function saveToIndexedDbStorage(dbName, table, keyId, data) {
+      async function saveToIndexedDbStorage(
+        dbName,
+        table,
+        keyId,
+        indexes,
+        data
+      ) {
         console.log("saveToIndexedDbStorage called with data:");
         console.log("dbName:", dbName);
         console.log("table:", table);
@@ -334,7 +345,12 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
             objectStore = db.createObjectStore(table, {
               keyPath: keyId,
             });
-            objectStore.createIndex("coords", "coords", { unique: true });
+
+            if (indexes.length > 0) {
+              objectStore.createIndex(indexes[0].name, indexes[0].key, {
+                unique: indexes[0].unique,
+              });
+            }
           } else {
             db.createObjectStore(table, {
               autoIncrement: true,
