@@ -195,9 +195,9 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
 
       // Helpers: Fetch entity data and save to localStorage
       const fetchDataAndSave = async () => {
-        // const DATA_URL = dbConfig[entity].url;
-        const DATA_URL =
-          "https://marcomue.github.io/DS_Script/rawData/village.txt";
+        const DATA_URL = this.dbConfig[entity].url;
+        // const DATA_URL =
+        //   "https://marcomue.github.io/DS_Script/rawData/village.txt";
 
         try {
           // fetch data
@@ -634,9 +634,9 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
   let commands = [];
   let targetVillages = [];
   await twSDK.worldDataAPI("village");
-  // await twSDK.worldDataAPI("player");
-  // await twSDK.worldDataAPI("tribe");
-  // await twSDK.worldDataAPI("conquer");
+  await twSDK.worldDataAPI("player");
+  await twSDK.worldDataAPI("tribe");
+  await twSDK.worldDataAPI("conquer");
   openUI();
 
   async function loadHTML(url) {
@@ -955,6 +955,8 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
     // document.getElementById('troop_details').addEventListener('click', readCheckboxValue);
 
     showLastUpdatedDb();
+    setInterval(showLastUpdatedDb, 1000);
+
     addRadioControls();
   }
 })();
