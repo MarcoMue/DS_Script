@@ -75,10 +75,11 @@ let scriptConfig = {
     },
   },
   allowedMarkets: [],
-  allowedScreens: ["info_player"],
+  allowedScreens: [],
   allowedModes: [],
   isDebug: DEBUG,
   enableCountApi: true,
+  baseScriptUrl: "https://marcomue.github.io/DS_Script/MySkript",
 };
 
 let scriptInfo = `${scriptConfig.scriptData.prefix} ${scriptConfig.scriptData.name} ${scriptConfig.scriptData.version}`;
@@ -636,9 +637,9 @@ let targetVillages = [
   await loadHTML("content.html", "content");
 
   async function loadHTML(url) {
-    let url = `https://marcomue.github.io/DS_Script/MySkript/${url}`;
+    let fullurl = `${scriptConfig.baseScriptUrl}/${url}`;
     try {
-      const response = await fetch(url);
+      const response = await fetch(fullurl);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
