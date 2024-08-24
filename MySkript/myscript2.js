@@ -631,7 +631,6 @@ let targetVillages = [
   console.log("IIFE called.");
   // const villages = await twSDK.worldDataAPI("village");
   openUI();
-  await loadHTML("content.html", "content");
 
   async function loadHTML(url) {
     let fullurl = `${scriptConfig.baseScriptUrl}/${url}`;
@@ -645,123 +644,6 @@ let targetVillages = [
     } catch (error) {
       console.error("Error loading HTML:", error);
     }
-  }
-
-  function openUI() {
-    const html = `   
-      <h1>All Incs</h1>
-      <div>
-        <form>
-          <fieldset>
-            <legend>Settings</legend>
-              <div id="lastUpdatedContainer">
-                DB Last Updated: <span id="lastUpdatedDate"></span> (<span id="timeAgo"></span> ago)
-              </div>
-            <p>
-              <input type="radio" name="mode" id="of" value="Read troops of the village" />
-              Read troops of the village
-            </p>
-            <p>
-              <input type="radio" name="mode" id="in" value="Read defenses in the village" />
-              Read defenses in the village
-            </p>
-            <p>
-              <input type="checkbox" name="troop_details" id="troop_details" value="Enable Troop Details" />
-              <label for="troop_details">Enable Troop Details</label>
-            </p>
-          </fieldset>
-          <fieldset>
-            <legend>Filters</legend>
-            <textarea id="urlvalue" rows="4" cols="50">
-      Add Villages here: 123|456, spaces and tabs are ignored  </textarea>
-            <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="loadPlannerBtn" value="Load Planner" />
-            <table id="myTable">
-              <tr>
-                <th width="320">Dorf</th>
-                <th>First</th>
-                <th>Two</th>
-                <th>Three</th>
-                <th>Last</th>
-                <th style="text-align: center" width="auto">
-                  <a href="#" class="unit_link" data-unit="spear">
-                    <img src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_spear.png" class=""
-                      data-title="Speerträger" /></a>
-                </th>
-                <th style="text-align: center" width="auto">
-                  <a href="#" class="unit_link" data-unit="sword"><img
-                      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_sword.png" class=""
-                      data-title="Schwertkämpfer" /></a>
-                </th>
-                <th style="text-align: center" width="auto">
-                  <a href="#" class="unit_link" data-unit="axe"><img
-                      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_axe.png" class=""
-                      data-title="Axtkämpfer" /></a>
-                </th>
-                <th style="text-align: center" width="auto">
-                  <a href="#" class="unit_link" data-unit="spy"><img
-                      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_spy.png" class=""
-                      data-title="Späher" /></a>
-                </th>
-                <th style="text-align: center" width="auto">
-                  <a href="#" class="unit_link" data-unit="light"><img
-                      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_light.png" class=""
-                      data-title="Leichte Kavallerie" /></a>
-                </th>
-                <th style="text-align: center" width="auto">
-                  <a href="#" class="unit_link" data-unit="heavy"><img
-                      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_heavy.png" class=""
-                      data-title="Schwere Kavallerie" /></a>
-                </th>
-                <th style="text-align: center" width="auto">
-                  <a href="#" class="unit_link" data-unit="ram"><img
-                      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_ram.png" class=""
-                      data-title="Rammbock" /></a>
-                </th>
-                <th style="text-align: center" width="auto">
-                  <a href="#" class="unit_link" data-unit="catapult"><img
-                      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_catapult.png" class=""
-                      data-title="Katapult" /></a>
-                </th>
-                <th style="text-align: center" width="auto">
-                  <a href="#" class="unit_link" data-unit="snob"><img
-                      src="https://dsde.innogamescdn.com/asset/2a2f957f/graphic/unit/unit_snob.png" class=""
-                      data-title="Adelsgeschlecht" /></a>
-                </th>
-              </tr>
-            </table>
-          </fieldset>
-          <div>
-            <p>
-              <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="run" value="Read Incs" />
-            </p>
-            <p>
-              <input type="button" class="btn evt-confirm-btn btn-confirm-yes" id="update" value="Load DB Data & fetch something" />
-            </p>
-          </div>
-            <div id="content"></div>
-
-        </form>
-      </div>
-`;
-
-    $("#contentContainer").eq(0).prepend(html);
-    $("#mobileContent").eq(0).prepend(html);
-    Timing.tickHandlers.timers.init();
-
-    document
-      .getElementById("of")
-      .addEventListener("change", () => setMode("members_troops"));
-    document
-      .getElementById("in")
-      .addEventListener("change", () => setMode("members_defense"));
-    document
-      .getElementById("loadPlannerBtn")
-      .addEventListener("click", loadWBCode);
-    document.getElementById("run").addEventListener("click", readIncs);
-    document.getElementById("update").addEventListener("click", readDatabase);
-    // document.getElementById('troop_details').addEventListener('click', readCheckboxValue);
-
-    showLastUpdatedDb();
   }
 
   function showLastUpdatedDb() {
@@ -1043,5 +925,29 @@ let targetVillages = [
         }
       };
     };
+  }
+
+  async function openUI() {
+    const html = `<div id="content"></div>`;
+    $("#contentContainer").eq(0).prepend(html);
+    $("#mobileContent").eq(0).prepend(html);
+
+    await loadHTML("ui.html", "content");
+    Timing.tickHandlers.timers.init();
+
+    document
+      .getElementById("of")
+      .addEventListener("change", () => setMode("members_troops"));
+    document
+      .getElementById("in")
+      .addEventListener("change", () => setMode("members_defense"));
+    document
+      .getElementById("loadPlannerBtn")
+      .addEventListener("click", loadWBCode);
+    document.getElementById("run").addEventListener("click", readIncs);
+    document.getElementById("update").addEventListener("click", readDatabase);
+    // document.getElementById('troop_details').addEventListener('click', readCheckboxValue);
+
+    showLastUpdatedDb();
   }
 })();
