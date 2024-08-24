@@ -384,7 +384,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         };
       }
 
-      // Helpers: Read all villages from indexedDB
+      // Helpers: Read all data from indexedDB
       function getAllData(dbName, table) {
         return new Promise((resolve, reject) => {
           const req = indexedDB.open(dbName);
@@ -480,6 +480,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         */
 
       worldData[entity] = await fetchDataAndSave();
+      return [];
       worldData[entity] = await getAllData(
         this.dbConfig[entity].dbName,
         this.dbConfig[entity].dbTable
@@ -656,9 +657,9 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
   let commands = [];
   let targetVillages = [];
   await twSDK.worldDataAPI("village");
-  await twSDK.worldDataAPI("player");
-  await twSDK.worldDataAPI("ally");
-  await twSDK.worldDataAPI("conquer");
+  // await twSDK.worldDataAPI("player");
+  // await twSDK.worldDataAPI("ally");
+  // await twSDK.worldDataAPI("conquer");
   openUI();
 
   async function loadHTML(url) {
