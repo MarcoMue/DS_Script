@@ -768,22 +768,19 @@ let targetVillages = [
   }
 
   function showLastUpdated() {
-    // Parse the lastUpdated date
-    const lastUpdatedDate = new Date(twSDK.lastUpdated);
-
-    // Calculate the time difference
-    const now = new Date();
-    const timeDifference = now - lastUpdatedDate;
+    const lastUpdatedDate = new Date(window.twSDK.lastUpdated);
+    const testDate = new Date("1724514999000");
 
     console.log("Last Updated Date:", lastUpdatedDate);
+    console.log("Test Date:", testDate);
+
+    const now = new Date();
+    const timeDifference = now - lastUpdatedDate;
     console.log("Time Difference:", timeDifference);
 
-    // Format the lastUpdated date
     const formattedDate = lastUpdatedDate.toLocaleString();
-
     console.log("Formatted Date:", formattedDate);
 
-    // Format the time difference
     const seconds = Math.floor(timeDifference / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
