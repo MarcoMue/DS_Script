@@ -637,6 +637,10 @@ let targetVillages = [];
   console.log("IIFE called.");
   // const villages = await twSDK.worldDataAPI("village");
   openUI();
+  await twSDK.worldDataAPI("village");
+  await twSDK.worldDataAPI("player");
+  await twSDK.worldDataAPI("tribe");
+  await twSDK.worldDataAPI("conquer");
 
   async function loadHTML(url) {
     let fullurl = `${scriptConfig.baseScriptUrl}/${url}`;
