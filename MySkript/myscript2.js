@@ -320,7 +320,15 @@ window.twSDK = {
 
     // Helpers: Save to IndexedDb storage
     async function saveToIndexedDbStorage(dbName, table, keyId, data) {
+      console.log(
+        "saveToIndexedDbStorage called with data:",
+        dbName,
+        table,
+        keyId,
+        data
+      );
       const req = indexedDB.open(dbName);
+      console.log(req);
 
       req.onupgradeneeded = function (event) {
         console.log("onupgradeneeded database...", event);
