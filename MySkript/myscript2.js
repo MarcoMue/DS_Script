@@ -114,28 +114,28 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         dbVersion: 1,
         dbTable: "villages",
         key: "villageId",
-        url: worldDataVillages,
+        url: this.worldDataVillages,
       },
       player: {
         dbName: "playersDb",
         dbVersion: 1,
         dbTable: "players",
         key: "playerId",
-        url: worldDataPlayers,
+        url: this.worldDataPlayers,
       },
       ally: {
         dbName: "tribesDb",
         dbVersion: 1,
         dbTable: "tribes",
         key: "tribeId",
-        url: worldDataTribes,
+        url: this.worldDataTribes,
       },
       conquer: {
         dbName: "conquerDb",
         dbVersion: 1,
         dbTable: "conquer",
         key: "",
-        url: worldDataConquests,
+        url: this.worldDataConquests,
       },
     },
     csvToArray: function (strData, strDelimiter = ",") {
@@ -202,7 +202,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         try {
           // fetch data
           const response = await jQuery.ajax(DATA_URL);
-          const data = csvToArray(response);
+          const data = this.csvToArray(response);
           let responseData = [];
 
           // prepare data to be saved in db
@@ -217,7 +217,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
                 .map((item) => {
                   return {
                     villageId: parseInt(item[0]),
-                    villageName: cleanString(item[1]),
+                    villageName: this.cleanString(item[1]),
                     villageX: item[2],
                     villageY: item[3],
                     coords: `${item[2]}|${item[3]}`,
@@ -238,7 +238,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
                 .map((item) => {
                   return {
                     playerId: parseInt(item[0]),
-                    playerName: cleanString(item[1]),
+                    playerName: this.cleanString(item[1]),
                     tribeId: parseInt(item[2]),
                     villages: parseInt(item[3]),
                     points: parseInt(item[4]),
@@ -256,8 +256,8 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
                 .map((item) => {
                   return {
                     tribeId: parseInt(item[0]),
-                    tribeName: cleanString(item[1]),
-                    tribeTag: cleanString(item[2]),
+                    tribeName: this.cleanString(item[1]),
+                    tribeTag: this.cleanString(item[2]),
                     players: parseInt(item[3]),
                     villages: parseInt(item[4]),
                     points: parseInt(item[5]),
@@ -536,7 +536,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       }
     },
     _getVillageIDByCoords: async function (x, y) {
-      const villages = await worldDataAPI("village");
+      const villages = await this.worldDataAPI("village");
       const xy = parseInt(`${x}${y}`, 10);
 
       const village = villages[xy];
@@ -547,7 +547,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       return village.id;
     },
     _getVillageById: async function (villageId) {
-      const villages = await worldDataAPI("village");
+      const villages = await this.worldDataAPI("village");
       const village = villages.find((v) => v.id === villageId);
       return village;
     },
