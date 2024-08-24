@@ -593,7 +593,7 @@ window.twSDK = {
       };
     });
   },
-  getVillageById: function (villageId) {
+  getVillageById: async function (villageId) {
     return new Promise((resolve, reject) => {
       const dbRequest = indexedDB.open(
         dbConfig.village.dbName,
@@ -791,17 +791,18 @@ let targetVillages = [];
         } else if (wbRadio.checked) {
           let results = readWorkbenchExport();
           results.forEach(async (result) => {
-            let coords = await twSDK._getVillageIDByCoords(
-              result.targetVillageId
-            );
-            let id = await twSDK._getVillageById(result.targetVillageId);
+            let v1 = await twSDK._getVillageById(result.targetVillageId);
+            let coords = await twSDK._getVillageIDByCoords(v1.x, v1.y);
 
-            console.log("Coords:", coords);
-            console.log("ID:", id);
+            console.log("Village 1:", v1, coords);
 
-            targetVillages.push(coords);
+            let v2 = await twSDK.getVillageById(result.targetVillageId);
+            let coords2 = await twSDK.getVillageByCoordinates(v2.x, v2.y);
+
+            console.log("Village 2:", v2, coords2);
+            // targetVillages.push(v1);
           });
-          addRowToTable(results);
+          // addRowToTable(results);
         } else {
           alert("Please select a mode.");
         }
