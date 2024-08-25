@@ -652,9 +652,9 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
   let commands = [];
   let targetVillages = [];
   twSDK.worldDataAPI("village");
-  // twSDK.worldDataAPI("player");
-  // twSDK.worldDataAPI("ally");
-  // twSDK.worldDataAPI("conquer");
+  twSDK.worldDataAPI("player");
+  twSDK.worldDataAPI("ally");
+  twSDK.worldDataAPI("conquer");
   openUI();
 
   async function loadHTML(url) {
