@@ -538,11 +538,13 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
     _getVillageIDByCoords: async function (x, y) {
       const villages = await this.worldDataAPI("village");
       let village = villages.find((v) => v[2] === x && v[3] === y);
+      console.log("Village:", village);
       return village;
     },
     _getVillageById: async function (villageId) {
       const villages = await this.worldDataAPI("village");
       const village = villages.find((v) => v[0] === villageId);
+      console.log("Village:", village);
       return village;
     },
     // DB requests
