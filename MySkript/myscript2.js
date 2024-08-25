@@ -684,9 +684,9 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
   }
 
   function addRowToTable(row) {
-    setInterval(function () {
-      $("#myTable").append(row);
-    }, 100);
+    // setInterval(function () {
+    $("#myTable").append(row);
+    // }, 100);
   }
 
   function parseBool(input) {
