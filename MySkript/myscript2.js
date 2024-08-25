@@ -794,7 +794,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
             let v1 = await twSDK._getVillageById(result.targetVillageId);
             let coords = await twSDK._getVillageIDByCoords(v1[2], v1[3]);
             performance.mark("end-convertWBPlanToArray");
-            performance.measure(
+            let measure = performance.measure(
               "convertWBPlanToArray",
               "start-convertWBPlanToArray",
               "end-convertWBPlanToArray"
@@ -806,7 +806,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
             let v2 = await twSDK.getVillageById(result.targetVillageId);
             let coords2 = await twSDK.getVillageByCoordinates(v2[2], v2[3]);
             performance.mark("end-getVillageById");
-            performance.measure(
+            measure = performance.measure(
               "getVillageById",
               "start-getVillageById",
               "end-getVillageById"
