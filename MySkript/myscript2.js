@@ -319,34 +319,6 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         }
       };
 
-      // Helpers: Clear all data from the object store
-      function clearData(req) {
-        const transaction = req.transaction(dbTable, "readwrite");
-        // report on the success of the transaction completing, when everything is done
-        transaction.oncomplete = (event) => {
-          note.appendChild(document.createElement("li")).textContent =
-            "Transaction completed.";
-        };
-
-        transaction.onerror = (event) => {
-          note.appendChild(
-            document.createElement("li")
-          ).textContent = `Transaction not opened due to error: ${transaction.error}`;
-        };
-
-        // create an object store on the transaction
-        const objectStore = transaction.objectStore(dbTable);
-
-        // Make a request to clear all the data out of the object store
-        const objectStoreRequest = objectStore.clear();
-
-        objectStoreRequest.onsuccess = (event) => {
-          // report the success of our request
-          note.appendChild(document.createElement("li")).textContent =
-            "Request successful.";
-        };
-      }
-
       // Helpers: Save to IndexedDb storage
       async function saveToIndexedDbStorage(data) {
         console.log("saveToIndexedDbStorage called with data:");
@@ -386,9 +358,9 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
           console.log("onsuccess database...", event);
           const db = DBOpenRequest.result;
 
-          clearData(db);
           const transaction = db.transaction(dbTable, "readwrite");
           const store = transaction.objectStore(dbTable);
+          store.clear(); // clean store from items before adding new ones
 
           data.forEach((item) => {
             store.put(item);
