@@ -683,11 +683,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
     document.getElementById("timeAgo").textContent = timeAgo;
   }
 
-  function addRowToTable(row) {
-    // setInterval(function () {
-    $("#myTable").append(row);
-    // }, 100);
-  }
+  function addRowToTable(row) {}
 
   function parseBool(input) {
     if (typeof input === "string") {
@@ -860,7 +856,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
               .find(".command-row")
               .each(function () {
                 commands.push($(this));
-                addRowToTable($(this));
+                $("#myTable").append($(this));
               });
 
             $(".widget-command-timer").addClass("timer");
