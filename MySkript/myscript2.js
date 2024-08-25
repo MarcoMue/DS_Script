@@ -195,24 +195,26 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         throw new Error(`Entity ${entity} does not exist!`);
       }
 
-      const dbName = this.dbConfig[entity].dbName;
-      const dbTable = this.dbConfig[entity].dbTable;
-      const dbVersion = this.dbConfig[entity].dbVersion;
-      const dbKey = this.dbConfig[entity].key;
-      const dbIndexes = this.dbConfig[entity].indexes;
+      const dbName = twSDK.dbConfig[entity].dbName;
+      const dbTable = twSDK.dbConfig[entity].dbTable;
+      const dbVersion = twSDK.dbConfig[entity].dbVersion;
+      const dbKey = twSDK.dbConfig[entity].key;
+      const dbIndexes = twSDK.dbConfig[entity].indexes;
 
       // initial world data
       const worldData = {};
 
       // Helpers: Fetch entity data and save to localStorage
       const fetchDataAndSave = async () => {
-        // const DATA_URL = this.dbConfig[entity].url;
+        // const DATA_URL = twSDK.dbConfig[entity].url;
+
+        console.log("Replacing URL:", twSDK.dbConfig[entity].url);
         const DATA_URL = `https://marcomue.github.io/DS_Script/rawData/${entity}.txt`;
 
         try {
           // fetch data
           const response = await jQuery.ajax(DATA_URL);
-          const data = this.csvToArray(response);
+          const data = twSDK.csvToArray(response);
           let responseData = [];
 
           // prepare data to be saved in db
@@ -227,7 +229,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
                 .map((item) => {
                   return {
                     villageId: parseInt(item[0]),
-                    villageName: this.cleanString(item[1]),
+                    villageName: twSDK.cleanString(item[1]),
                     villageX: item[2],
                     villageY: item[3],
                     coords: `${item[2]}|${item[3]}`,
@@ -248,7 +250,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
                 .map((item) => {
                   return {
                     playerId: parseInt(item[0]),
-                    playerName: this.cleanString(item[1]),
+                    playerName: twSDK.cleanString(item[1]),
                     tribeId: parseInt(item[2]),
                     villages: parseInt(item[3]),
                     points: parseInt(item[4]),
@@ -266,8 +268,8 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
                 .map((item) => {
                   return {
                     tribeId: parseInt(item[0]),
-                    tribeName: this.cleanString(item[1]),
-                    tribeTag: this.cleanString(item[2]),
+                    tribeName: twSDK.cleanString(item[1]),
+                    tribeTag: twSDK.cleanString(item[2]),
                     players: parseInt(item[3]),
                     villages: parseInt(item[4]),
                     points: parseInt(item[5]),
@@ -456,8 +458,8 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
           worldData[entity] = await fetchDataAndSave();
         } else {
           worldData[entity] = await getAllData(
-            this.dbConfig[entity].dbName,
-            this.dbConfig[entity].dbTable
+            twSDK.dbConfig[entity].dbName,
+            twSDK.dbConfig[entity].dbTable
           );
         }
       } else {
@@ -538,32 +540,31 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
     },
     villages: [],
     _getVillageIDByCoords: async function (x, y) {
-      if (this.villages.length === 0) {
+      if (twSDK.villages.length === 0) {
         console.log("Villages not loaded yet.");
-        this.villages = await this.worldDataAPI("village");
+        twSDK.villages = await twSDK.worldDataAPI("village");
       }
 
-      let village = this.villages.find((v) => v[2] === x && v[3] === y);
+      let village = twSDK.villages.find((v) => v[2] === x && v[3] === y);
       console.log("Village:", village);
       return village;
     },
     _getVillageById: async function (villageId) {
-      if (this.villages.length === 0) {
+      if (twSDK.villages.length === 0) {
         console.log("Villages not loaded yet.");
-        this.villages = await this.worldDataAPI("village");
+        twSDK.villages = await twSDK.worldDataAPI("village");
       }
-      const village = this.villages.find((v) => v[0] === villageId);
+      const village = twSDK.villages.find((v) => v[0] === villageId);
       console.log("Village:", village);
       return village;
     },
     // DB requests
     // Function to search for a record by coords using the index
     getVillageByCoordinates: async function (x, y) {
-      console.log("dbconfig", this.dbConfig);
       return new Promise((resolve, reject) => {
         const DBOpenRequest = indexedDB.open(
-          dbConfig.village.dbName,
-          dbConfig.village.dbVersion
+          twSDK.dbConfig.village.dbName,
+          twSDK.dbConfig.village.dbVersion
         );
 
         DBOpenRequest.onerror = function (event) {
@@ -573,7 +574,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
 
         DBOpenRequest.onsuccess = function (event) {
           const db = DBOpenRequest.result;
-          let table = dbConfig.village.dbTable;
+          let table = twSDK.dbConfig.village.dbTable;
 
           const transaction = db.transaction([table], "readonly");
           const objectStore = transaction.objectStore(table);
@@ -600,10 +601,9 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
     },
     getVillageById: async function (villageId) {
       return new Promise((resolve, reject) => {
-        console.log("dbconfig", this.dbConfig);
         const DBOpenRequest = indexedDB.open(
-          this.dbConfig.village.dbName,
-          this.dbConfig.village.dbVersion
+          twSDK.dbConfig.village.dbName,
+          twSDK.dbConfig.village.dbVersion
         );
 
         DBOpenRequest.onerror = function (event) {
@@ -613,7 +613,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
 
         DBOpenRequest.onsuccess = function (event) {
           const db = DBOpenRequest.result;
-          let table = this.dbConfig.village.dbTable;
+          let table = twSDK.dbConfig.village.dbTable;
 
           const transaction = db.transaction([table], "readonly");
           const objectStore = transaction.objectStore(table);
