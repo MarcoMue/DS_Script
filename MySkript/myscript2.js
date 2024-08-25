@@ -320,12 +320,8 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       };
 
       // Helpers: Clear all data from the object store
-      function clearData() {
-        // open a read/write db transaction, ready for clearing the data
-        const req = indexedDB.open(dbName, 1);
-
+      function clearData(req) {
         const transaction = req.transaction(dbTable, "readwrite");
-
         // report on the success of the transaction completing, when everything is done
         transaction.oncomplete = (event) => {
           note.appendChild(document.createElement("li")).textContent =
@@ -356,12 +352,13 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         console.log("saveToIndexedDbStorage called with data:");
         console.log("data:", data);
 
-        const req = indexedDB.open(dbName, dbVersion);
-        console.log(req);
+        const DBOpenRequest = indexedDB.open(dbName, dbVersion);
 
-        req.onupgradeneeded = function (event) {
+        DBOpenRequest.onupgradeneeded = function (event) {
           console.log("onupgradeneeded database...", event);
-          const db = this.result;
+
+          const db = event.target.result;
+
           let objectStore;
           if (dbKey.length) {
             objectStore = db.createObjectStore(dbTable, {
@@ -374,7 +371,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
               });
             }
           } else {
-            db.createObjectStore(dbTable, {
+            DBOpenRequest.createObjectStore(dbTable, {
               autoIncrement: true,
             });
           }
@@ -385,10 +382,11 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
           }
         };
 
-        req.onsuccess = function (event) {
-          clearData(dbName, dbTable);
+        DBOpenRequest.onsuccess = function (event) {
           console.log("onsuccess database...", event);
-          const db = this.result;
+          const db = DBOpenRequest.result;
+
+          clearData(db);
           const transaction = db.transaction(dbTable, "readwrite");
           const store = transaction.objectStore(dbTable);
 
@@ -399,7 +397,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
           UI.SuccessMessage("Database updated!");
         };
 
-        req.onerror = function (event) {
+        DBOpenRequest.onerror = function (event) {
           console.error(
             "onerror saveToIndexedDbStorage:",
             event.target.errorCode
@@ -410,10 +408,10 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       // Helpers: Read all data from indexedDB
       function getAllData() {
         return new Promise((resolve, reject) => {
-          const req = indexedDB.open(dbName, dbVersion);
+          const DBOpenRequest = indexedDB.open(dbName, dbVersion);
 
-          req.onsuccess = () => {
-            const db = req.result;
+          DBOpenRequest.onsuccess = () => {
+            const db = DBOpenRequest.result;
 
             const dbQuery = db
               .transaction(dbTable, "readwrite")
@@ -429,7 +427,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
             };
           };
 
-          req.onerror = (event) => {
+          DBOpenRequest.onerror = (event) => {
             reject(event.target.error);
           };
         });
@@ -598,35 +596,35 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
     // Function to search for a record by coords using the index
     getVillageByCoordinates: async function (x, y) {
       return new Promise((resolve, reject) => {
-        const dbRequest = indexedDB.open(
+        const DBOpenRequest = indexedDB.open(
           dbConfig.village.dbName,
           dbConfig.village.dbVersion
         );
 
-        dbRequest.onerror = function (event) {
+        DBOpenRequest.onerror = function (event) {
           console.error("Database error:", event.target.errorCode);
           reject(event.target.errorCode);
         };
 
-        dbRequest.onsuccess = function (event) {
-          const db = event.target.result;
+        DBOpenRequest.onsuccess = function (event) {
+          const db = DBOpenRequest.result;
           let table = dbConfig.village.dbTable;
 
           const transaction = db.transaction([table], "readonly");
           const objectStore = transaction.objectStore(table);
 
           const index = objectStore.index("coords");
-          const getRequest = index.get(`${x}|${y}`);
+          const DBOpenRequest = index.get(`${x}|${y}`);
 
-          getRequest.onerror = function (event) {
+          DBOpenRequest.onerror = function (event) {
             console.error("Get request error:", event.target.errorCode);
             reject(event.target.errorCode);
           };
 
-          getRequest.onsuccess = function (event) {
-            if (getRequest.result) {
-              console.log("Value:", getRequest.result);
-              resolve(getRequest.result);
+          DBOpenRequest.onsuccess = function (event) {
+            if (DBOpenRequest.result) {
+              console.log("Value:", DBOpenRequest.result);
+              resolve(DBOpenRequest.result);
             } else {
               console.log("No matching record found");
               resolve(null);
@@ -637,18 +635,18 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
     },
     getVillageById: async function (villageId) {
       return new Promise((resolve, reject) => {
-        const dbRequest = indexedDB.open(
+        const DBOpenRequest = indexedDB.open(
           this.dbConfig.village.dbName,
           this.dbConfig.village.dbVersion
         );
 
-        dbRequest.onerror = function (event) {
+        DBOpenRequest.onerror = function (event) {
           console.error("Database error:", event.target.errorCode);
           reject(event.target.errorCode);
         };
 
-        dbRequest.onsuccess = function (event) {
-          const db = event.target.result;
+        DBOpenRequest.onsuccess = function (event) {
+          const db = DBOpenRequest.result;
           let table = this.dbConfig.village.dbTable;
 
           const transaction = db.transaction([table], "readonly");
