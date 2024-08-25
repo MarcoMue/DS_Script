@@ -635,10 +635,10 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
   let results = [];
   let commands = [];
   let targetVillages = [];
-  twSDK.worldDataAPI("village");
-  twSDK.worldDataAPI("player");
-  twSDK.worldDataAPI("ally");
-  twSDK.worldDataAPI("conquer");
+  // twSDK.worldDataAPI("village");
+  // twSDK.worldDataAPI("player");
+  // twSDK.worldDataAPI("ally");
+  // twSDK.worldDataAPI("conquer");
   openUI();
 
   async function loadHTML(url) {
@@ -795,10 +795,10 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
             let coords = await twSDK._getVillageIDByCoords(v1[2], v1[3]);
             console.log("Village 1:", v1, coords);
 
-            let v2 = await twSDK.getVillageById(result.targetVillageId);
-            let coords2 = await twSDK.getVillageByCoordinates(v2[2], v2[3]);
-            console.log("Village 2:", v2, coords2);
-            // targetVillages.push(v1);
+            // let v2 = await twSDK.getVillageById(result.targetVillageId);
+            // let coords2 = await twSDK.getVillageByCoordinates(v2[2], v2[3]);
+            // console.log("Village 2:", v2, coords2);
+            targetVillages.push(v1);
           });
           // addRowToTable(results);
         } else {
@@ -812,10 +812,11 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
     console.log("readIncs called.");
     let commandIDs = [];
 
-    const start = performance.now();
     async function fetchPages(targetVillages) {
       let pages = await Promise.all(
         targetVillages.map(async (village) => {
+          console.log("Fetching village:", village);
+
           try {
             const villageData = await twSDK.findVillageInDB(
               village.split("|")[0],
@@ -840,8 +841,6 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       return pages;
     }
     const pagesToFetch = await fetchPages(targetVillages);
-    const end = performance.now();
-    console.log(`loadWBCode took ${end - start} milliseconds`);
 
     if (pagesToFetch.length) {
       twSDK.startProgressBar(pagesToFetch.length);
