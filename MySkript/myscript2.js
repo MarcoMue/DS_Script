@@ -322,14 +322,16 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       // Helpers: Save to IndexedDb storage
       async function saveToIndexedDbStorage(data) {
         console.log("saveToIndexedDbStorage called with data:");
-        console.log("data:", data);
+        // console.log("data:", data);
 
+        console.log(`opening database with ${dbName} and version ${dbVersion}`);
         const DBOpenRequest = indexedDB.open(dbName, dbVersion);
 
         DBOpenRequest.onupgradeneeded = function (event) {
           console.log("onupgradeneeded database...", event);
 
           const db = event.target.result;
+          console.log("db:", db);
 
           let objectStore;
           if (dbKey.length) {
@@ -343,10 +345,12 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
               });
             }
           } else {
-            DBOpenRequest.createObjectStore(dbTable, {
+            objectStore = db.createObjectStore(dbTable, {
               autoIncrement: true,
             });
           }
+
+          console.log("objectStore:", objectStore);
 
           const indexNames = objectStore.indexNames;
           for (let i = 0; i < indexNames.length; i++) {
@@ -357,6 +361,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         DBOpenRequest.onsuccess = function (event) {
           console.log("onsuccess database...", event);
           const db = DBOpenRequest.result;
+          console.log("db:", db);
 
           const transaction = db.transaction(dbTable, "readwrite");
           const store = transaction.objectStore(dbTable);
@@ -470,7 +475,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       } else {
         worldData[entity] = await fetchDataAndSave();
       }
-        */
+      */
 
       worldData[entity] = await fetchDataAndSave();
       return [];
