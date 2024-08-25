@@ -793,7 +793,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
           targetVillages = readVillageCoords();
         } else if (wbRadio.checked) {
           let results = readWorkbenchExport();
-          const villages = await this.worldDataAPI("village");
+          const villages = await twSDK.worldDataAPI("village");
 
           results.forEach(async (result) => {
             let v1 = await twSDK._getVillageById(result.targetVillageId);
