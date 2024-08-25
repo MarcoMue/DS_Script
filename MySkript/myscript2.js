@@ -548,6 +548,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
     // DB requests
     // Function to search for a record by coords using the index
     getVillageByCoordinates: async function (x, y) {
+      console.log("dbconfig", this.dbConfig);
       return new Promise((resolve, reject) => {
         const DBOpenRequest = indexedDB.open(
           dbConfig.village.dbName,
@@ -588,6 +589,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
     },
     getVillageById: async function (villageId) {
       return new Promise((resolve, reject) => {
+        console.log("dbconfig", this.dbConfig);
         const DBOpenRequest = indexedDB.open(
           this.dbConfig.village.dbName,
           this.dbConfig.village.dbVersion
