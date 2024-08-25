@@ -631,6 +631,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       });
     },
   };
+  window.allIncs = twSDK;
 
   let results = [];
   let commands = [];
