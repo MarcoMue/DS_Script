@@ -142,6 +142,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         url: this.worldDataConquests,
       },
     },
+    // functions
     csvToArray: function (strData, strDelimiter = ",") {
       var objPattern = new RegExp(
         "(\\" +
@@ -535,15 +536,23 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
           });
       }
     },
+    villages: [],
     _getVillageIDByCoords: async function (x, y) {
-      const villages = await this.worldDataAPI("village");
-      let village = villages.find((v) => v[2] === x && v[3] === y);
+      if (this.villages.length === 0) {
+        console.log("Villages not loaded yet.");
+        this.villages = await this.worldDataAPI("village");
+      }
+
+      let village = this.villages.find((v) => v[2] === x && v[3] === y);
       console.log("Village:", village);
       return village;
     },
     _getVillageById: async function (villageId) {
-      const villages = await this.worldDataAPI("village");
-      const village = villages.find((v) => v[0] === villageId);
+      if (this.villages.length === 0) {
+        console.log("Villages not loaded yet.");
+        this.villages = await this.worldDataAPI("village");
+      }
+      const village = this.villages.find((v) => v[0] === villageId);
       console.log("Village:", village);
       return village;
     },
@@ -776,7 +785,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
   async function addRadioControls() {
     document
       .getElementById("loadPlannerBtn")
-      .addEventListener("click", function () {
+      .addEventListener("click", async function () {
         const coordRadio = document.getElementById("coord");
         const wbRadio = document.getElementById("wb");
 
@@ -784,6 +793,8 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
           targetVillages = readVillageCoords();
         } else if (wbRadio.checked) {
           let results = readWorkbenchExport();
+          const villages = await this.worldDataAPI("village");
+
           results.forEach(async (result) => {
             let v1 = await twSDK._getVillageById(result.targetVillageId);
             let coords = await twSDK._getVillageIDByCoords(v1.x, v1.y);
