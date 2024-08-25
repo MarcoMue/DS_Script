@@ -790,12 +790,28 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
           twSDK.villages = await twSDK.worldDataAPI("village");
 
           results.forEach(async (result) => {
+            performance.mark("start-convertWBPlanToArray");
             let v1 = await twSDK._getVillageById(result.targetVillageId);
             let coords = await twSDK._getVillageIDByCoords(v1[2], v1[3]);
+            performance.mark("end-convertWBPlanToArray");
+            performance.measure(
+              "convertWBPlanToArray",
+              "start-convertWBPlanToArray",
+              "end-convertWBPlanToArray"
+            );
+            console.log(`array calls took ${measure.duration} milliseconds`);
             console.log("Village 1:", v1, coords);
 
+            performance.mark("start-getVillageById");
             let v2 = await twSDK.getVillageById(result.targetVillageId);
             let coords2 = await twSDK.getVillageByCoordinates(v2[2], v2[3]);
+            performance.mark("end-getVillageById");
+            performance.measure(
+              "getVillageById",
+              "start-getVillageById",
+              "end-getVillageById"
+            );
+            console.log(`DB calls took ${measure.duration} milliseconds`);
             console.log("Village 2:", v2, coords2);
             // targetVillages.push(v1);
           });
