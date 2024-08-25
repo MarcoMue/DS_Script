@@ -579,7 +579,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
           const transaction = db.transaction([table], "readonly");
           const objectStore = transaction.objectStore(table);
 
-          const index = objectStore.index("coords");
+          const index = objectStore.index("coordIndex");
           const indeReq = index.get(`${x}|${y}`);
 
           indeReq.onerror = function (event) {
