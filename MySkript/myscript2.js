@@ -544,19 +544,14 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         console.log("Villages not loaded yet.");
         twSDK.villages = await twSDK.worldDataAPI("village");
       }
-
-      let village = twSDK.villages.find((v) => v[2] === x && v[3] === y);
-      console.log("Village:", village);
-      return village;
+      return twSDK.villages.find((v) => v[2] === x && v[3] === y);
     },
     _getVillageById: async function (villageId) {
       if (twSDK.villages.length === 0) {
         console.log("Villages not loaded yet.");
         twSDK.villages = await twSDK.worldDataAPI("village");
       }
-      const village = twSDK.villages.find((v) => v[0] === villageId);
-      console.log("Village:", village);
-      return village;
+      return twSDK.villages.find((v) => v[0] === villageId);
     },
     // DB requests
     // Function to search for a record by coords using the index
