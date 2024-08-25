@@ -353,7 +353,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         };
 
         DBOpenRequest.onsuccess = function (event) {
-          const db = DBOpenRequest.result;
+          const db = event.target.result;
           const transaction = db.transaction(dbTable, "readwrite");
           const store = transaction.objectStore(dbTable);
           store.clear(); // clean store from items before adding new ones
@@ -378,8 +378,8 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         return new Promise((resolve, reject) => {
           const DBOpenRequest = indexedDB.open(dbName, dbVersion);
 
-          DBOpenRequest.onsuccess = () => {
-            const db = DBOpenRequest.result;
+          DBOpenRequest.onsuccess = (event) => {
+            const db = event.target.result;
 
             const dbQuery = db
               .transaction(dbTable, "readwrite")
@@ -573,24 +573,23 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         };
 
         DBOpenRequest.onsuccess = function (event) {
-          const db = DBOpenRequest.result;
+          const db = event.target.result;
           let table = twSDK.dbConfig.village.dbTable;
 
           const transaction = db.transaction([table], "readonly");
           const objectStore = transaction.objectStore(table);
 
           const index = objectStore.index("coords");
-          const DBOpenRequest = index.get(`${x}|${y}`);
+          const indeReq = index.get(`${x}|${y}`);
 
-          DBOpenRequest.onerror = function (event) {
+          indeReq.onerror = function (event) {
             console.error("Get request error:", event.target.errorCode);
             reject(event.target.errorCode);
           };
 
-          DBOpenRequest.onsuccess = function (event) {
-            if (DBOpenRequest.result) {
-              console.log("Value:", DBOpenRequest.result);
-              resolve(DBOpenRequest.result);
+          indeReq.onsuccess = function (event) {
+            if (indeReq.result) {
+              resolve(indeReq.result);
             } else {
               console.log("No matching record found");
               resolve(null);
@@ -612,7 +611,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         };
 
         DBOpenRequest.onsuccess = function (event) {
-          const db = DBOpenRequest.result;
+          const db = event.target.result;
           let table = twSDK.dbConfig.village.dbTable;
 
           const transaction = db.transaction([table], "readonly");
