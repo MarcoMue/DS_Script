@@ -111,7 +111,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
     dbConfig: {
       village: {
         dbName: "villagesDb",
-        dbVersion: 2,
+        dbVersion: 1,
         dbTable: "villages",
         key: "villageId",
         indexes: [{ name: "coordIndex", key: "coords", unique: true }],
@@ -193,6 +193,12 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       if (!allowedEntities.includes(entity)) {
         throw new Error(`Entity ${entity} does not exist!`);
       }
+
+      const dbName = this.dbConfig[entity].dbName;
+      const dbTable = this.dbConfig[entity].dbTable;
+      const dbVersion = this.dbConfig[entity].dbVersion;
+      const dbKey = this.dbConfig[entity].key;
+      const dbIndexes = this.dbConfig[entity].indexes;
 
       // initial world data
       const worldData = {};
@@ -294,13 +300,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
 
           try {
             // save data in db
-            saveToIndexedDbStorage(
-              this.dbConfig[entity].dbName,
-              this.dbConfig[entity].dbTable,
-              this.dbConfig[entity].key,
-              this.dbConfig[entity].indexes,
-              responseData
-            );
+            saveToIndexedDbStorage(responseData);
 
             // update last updated localStorage item
             localStorage.setItem(
@@ -320,11 +320,11 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       };
 
       // Helpers: Clear all data from the object store
-      function clearData(dbName, table) {
+      function clearData() {
         // open a read/write db transaction, ready for clearing the data
-        const req = indexedDB.open(dbName);
+        const req = indexedDB.open(dbName, 1);
 
-        const transaction = req.transaction(table, "readwrite");
+        const transaction = req.transaction(dbTable, "readwrite");
 
         // report on the success of the transaction completing, when everything is done
         transaction.oncomplete = (event) => {
@@ -339,7 +339,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         };
 
         // create an object store on the transaction
-        const objectStore = transaction.objectStore(table);
+        const objectStore = transaction.objectStore(dbTable);
 
         // Make a request to clear all the data out of the object store
         const objectStoreRequest = objectStore.clear();
@@ -352,38 +352,29 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       }
 
       // Helpers: Save to IndexedDb storage
-      async function saveToIndexedDbStorage(
-        dbName,
-        table,
-        keyId,
-        indexes,
-        data
-      ) {
+      async function saveToIndexedDbStorage(data) {
         console.log("saveToIndexedDbStorage called with data:");
-        console.log("dbName:", dbName);
-        console.log("table:", table);
-        console.log("keyId:", keyId);
         console.log("data:", data);
 
-        const req = indexedDB.open(dbName);
+        const req = indexedDB.open(dbName, dbVersion);
         console.log(req);
 
         req.onupgradeneeded = function (event) {
           console.log("onupgradeneeded database...", event);
           const db = this.result;
           let objectStore;
-          if (keyId.length) {
-            objectStore = db.createObjectStore(table, {
-              keyPath: keyId,
+          if (dbKey.length) {
+            objectStore = db.createObjectStore(dbTable, {
+              keyPath: dbKey,
             });
 
-            if (indexes.length > 0) {
-              objectStore.createIndex(indexes[0].name, indexes[0].key, {
-                unique: indexes[0].unique,
+            if (dbIndexes.length > 0) {
+              objectStore.createIndex(dbIndexes[0].name, dbIndexes[0].key, {
+                unique: dbIndexes[0].unique,
               });
             }
           } else {
-            db.createObjectStore(table, {
+            db.createObjectStore(dbTable, {
               autoIncrement: true,
             });
           }
@@ -395,11 +386,11 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         };
 
         req.onsuccess = function (event) {
-          clearData(dbName, table);
+          clearData(dbName, dbTable);
           console.log("onsuccess database...", event);
           const db = this.result;
-          const transaction = db.transaction(table, "readwrite");
-          const store = transaction.objectStore(table);
+          const transaction = db.transaction(dbTable, "readwrite");
+          const store = transaction.objectStore(dbTable);
 
           data.forEach((item) => {
             store.put(item);
@@ -417,16 +408,16 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       }
 
       // Helpers: Read all data from indexedDB
-      function getAllData(dbName, table) {
+      function getAllData() {
         return new Promise((resolve, reject) => {
-          const req = indexedDB.open(dbName);
+          const req = indexedDB.open(dbName, dbVersion);
 
           req.onsuccess = () => {
             const db = req.result;
 
             const dbQuery = db
-              .transaction(table, "readwrite")
-              .objectStore(table)
+              .transaction(dbTable, "readwrite")
+              .objectStore(dbTable)
               .getAll();
 
             dbQuery.onsuccess = (event) => {
@@ -513,10 +504,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
 
       worldData[entity] = await fetchDataAndSave();
       return [];
-      worldData[entity] = await getAllData(
-        this.dbConfig[entity].dbName,
-        this.dbConfig[entity].dbTable
-      );
+      worldData[entity] = await getAllData(dbName, dbTable);
       // transform the data so at the end an array of array is returned
       worldData[entity] = objectToArray(worldData[entity], entity);
       return worldData[entity];
