@@ -817,20 +817,8 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       let pages = await Promise.all(
         targetVillages.map(async (village) => {
           console.log("Fetching village:", village);
-
           try {
-            const villageData = await twSDK.findVillageInDB(
-              village.split("|")[0],
-              village.split("|")[1]
-            );
-            if (villageData) {
-              console.log("Found village:", villageData);
-              if (villageData.villageId) {
-                return `/game.php?screen=info_village&id=${villageData.villageId}`;
-              }
-            } else {
-              console.log("Village not found");
-            }
+            return `/game.php?screen=info_village&id=${village[0]}`;
           } catch (error) {
             console.error("Error:", error);
           }
