@@ -852,13 +852,6 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
                 // Select the current row
                 let $row = $(this);
 
-                // Edit the row content as needed
-                // For example, change the text of a cell with class 'command-cell'
-                $row.find(".command-cell").text("New Content");
-
-                // Add a new class to the row
-                $row.addClass("new-class");
-
                 $row.append(
                   `<td class="command-cell">Command ID: ${$row.attr(
                     "data-id"
