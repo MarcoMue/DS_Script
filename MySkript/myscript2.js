@@ -832,7 +832,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       twSDK.startProgressBar(pagesToFetch.length);
       twSDK.getAll(
         pagesToFetch,
-        function (index, data) {
+        async function (index, data) {
           twSDK.updateProgressBar(index, pagesToFetch.length);
           console.log("Fetching data for village:", pagesToFetch[index]);
           console.log("Data:", data);
@@ -864,6 +864,9 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
             const troopDetailsCheckbox =
               document.getElementById("troop_details");
             const isChecked = troopDetailsCheckbox.checked;
+
+            const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+            await sleep(2000);
 
             if (isChecked) {
               let timerId = setInterval(function () {
