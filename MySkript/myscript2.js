@@ -498,51 +498,12 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         jQuery("#progressbar").fadeOut(1000);
       }
     },
-    getAll: function (
-      urls, // array of URLs
-      onLoad, // called when any URL is loaded, params (index, data)
-      onDone, // called when all URLs successfully loaded, no params
-      onError // called when a URL load fails or if onLoad throws an exception, params (error)
-    ) {
-      var numDone = 0;
-      var lastRequestTime = 0;
-      var minWaitTime = this.delayBetweenRequests; // ms between requests
-      loadNext();
-      function loadNext() {
-        if (numDone == urls.length) {
-          onDone();
-          return;
-        }
-
-        let now = Date.now();
-        let timeElapsed = now - lastRequestTime;
-        if (timeElapsed < minWaitTime) {
-          let timeRemaining = minWaitTime - timeElapsed;
-          setTimeout(loadNext, timeRemaining);
-          return;
-        }
-        lastRequestTime = now;
-        jQuery
-          .get(urls[numDone])
-          .done((data) => {
-            try {
-              onLoad(numDone, data);
-              ++numDone;
-              loadNext();
-            } catch (e) {
-              onError(e);
-            }
-          })
-          .fail((xhr) => {
-            onError(xhr);
-          });
-      }
-    },
     villages: [],
     _getVillageIDByCoords: async function (x, y) {
       if (twSDK.villages.length === 0) {
         console.log("Villages not loaded yet.");
         twSDK.villages = await twSDK.worldDataAPI("village");
+        showLastUpdatedDb();
       }
       return twSDK.villages.find((v) => v[2] === x && v[3] === y);
     },
@@ -550,6 +511,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       if (twSDK.villages.length === 0) {
         console.log("Villages not loaded yet.");
         twSDK.villages = await twSDK.worldDataAPI("village");
+        showLastUpdatedDb();
       }
       return twSDK.villages.find((v) => v[0] === villageId);
     },
@@ -630,6 +592,46 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         };
       });
     },
+    getAll: function (
+      urls, // array of URLs
+      onLoad, // called when any URL is loaded, params (index, data)
+      onDone, // called when all URLs successfully loaded, no params
+      onError // called when a URL load fails or if onLoad throws an exception, params (error)
+    ) {
+      var numDone = 0;
+      var lastRequestTime = 0;
+      var minWaitTime = this.delayBetweenRequests; // ms between requests
+      loadNext();
+      function loadNext() {
+        if (numDone == urls.length) {
+          onDone();
+          return;
+        }
+
+        let now = Date.now();
+        let timeElapsed = now - lastRequestTime;
+        if (timeElapsed < minWaitTime) {
+          let timeRemaining = minWaitTime - timeElapsed;
+          setTimeout(loadNext, timeRemaining);
+          return;
+        }
+        lastRequestTime = now;
+        jQuery
+          .get(urls[numDone])
+          .done((data) => {
+            try {
+              onLoad(numDone, data);
+              ++numDone;
+              loadNext();
+            } catch (e) {
+              onError(e);
+            }
+          })
+          .fail((xhr) => {
+            onError(xhr);
+          });
+      }
+    },
   };
   window.allIncs = twSDK;
 
@@ -682,8 +684,6 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
     document.getElementById("lastUpdatedDate").textContent = formattedDate;
     document.getElementById("timeAgo").textContent = timeAgo;
   }
-
-  function addRowToTable(row) {}
 
   function parseBool(input) {
     if (typeof input === "string") {
