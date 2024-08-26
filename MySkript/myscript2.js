@@ -785,23 +785,24 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
           targetVillages = readVillageCoords();
         } else if (wbRadio.checked) {
           let results = readWorkbenchExport();
-          twSDK.villages = await twSDK.worldDataAPI("village");
-
           results.forEach(async (result) => {
             let v1 = await twSDK._getVillageById(result.targetVillageId);
-            let coords = await twSDK._getVillageIDByCoords(v1[2], v1[3]);
-            console.log("Village 1:", v1, coords);
+            let v2 = await twSDK._getVillageIDByCoords(v1[2], v1[3]);
 
-            // let v2 = await twSDK.getVillageById(result.targetVillageId);
-            // let coords2 = await twSDK.getVillageByCoordinates(v2[2], v2[3]);
-            // console.log("Village 2:", v2, coords2);
+            //ID 0: 4941
+            //NAME 1: "006"
+            //X 2: "499"
+            //Y 3: "489"
+            //? 4: 1577266935
+            //? 5: 4172
+            //Bonustype 6: 6
+            // console.log("Village 1:", v1, v2);
             targetVillages.push(v1);
           });
           // addRowToTable(results);
         } else {
           alert("Please select a mode.");
         }
-        // addVillagesToTable();
         await readIncs();
       });
   }
@@ -814,12 +815,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       let pages = await Promise.all(
         targetVillages.map(async (village) => {
           console.log("Fetching village:", village);
-          try {
-            return `/game.php?screen=info_village&id=${village[0]}`;
-          } catch (error) {
-            console.error("Error:", error);
-          }
-          return null;
+          return `/game.php?screen=info_village&id=${village[0]}`;
         })
       );
 
@@ -853,8 +849,34 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
               .first()
               .find(".command-row")
               .each(function () {
-                commands.push($(this));
-                $("#myTable").append($(this));
+                // Select the current row
+                let $row = $(this);
+
+                // Edit the row content as needed
+                // For example, change the text of a cell with class 'command-cell'
+                $row.find(".command-cell").text("New Content");
+
+                // Add a new class to the row
+                $row.addClass("new-class");
+
+                $row.append(
+                  `<td class="command-cell">Command ID: ${$row.attr(
+                    "data-id"
+                  )}</td>`
+                );
+
+                // Create a new element to insert before the row
+                let $newElement = $(
+                  `<td class="command-cell">Village: ${targetVillages[index]}</td>`
+                );
+                // Insert the new element before the row
+                $row.before($newElement);
+
+                // Push the modified row to the commands array
+                commands.push($row);
+
+                // Append the modified row to #myTable
+                $("#myTable").append($row);
               });
 
             $(".widget-command-timer").addClass("timer");
@@ -864,9 +886,6 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
             const troopDetailsCheckbox =
               document.getElementById("troop_details");
             const isChecked = troopDetailsCheckbox.checked;
-
-            const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-            await sleep(2000);
 
             if (isChecked) {
               let timerId = setInterval(function () {
