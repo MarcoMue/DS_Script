@@ -802,6 +802,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
           alert("Please select a mode.");
         }
         // addVillagesToTable();
+        await readIncs();
       });
   }
 
@@ -834,10 +835,8 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         function (index, data) {
           twSDK.updateProgressBar(index, pagesToFetch.length);
           console.log("Fetching data for village:", pagesToFetch[index]);
-          // console.log("Index:", index);
-          // console.log("Data:", data);
+          console.log("Data:", data);
 
-          // const htmlDoc = jQuery.parseHTML(data);
           let $cc = jQuery(data).find(".commands-container");
           if ($cc.length > 0) {
             $cc
@@ -846,7 +845,6 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
               .find(".quickedit-out")
               .each(function () {
                 let commandID = $(this).attr("data-id");
-                console.log(commandID);
                 commandIDs.push(commandID);
               });
 
