@@ -80,7 +80,7 @@ let buttonIcons = $.map(settings, (obj) => obj[1]);
 let buttonColors = $.map(settings, (obj) => obj[2]);
 let buttonTextColors = $.map(settings, (obj) => obj[3]);
 
-function iT(nr, line) {
+function addRenameIncButtonActions(nr, line) {
   var html = "";
   if (buttonNames) html += '<span style="float: right;">';
   buttonIcons.forEach(function (nome, num) {
@@ -117,7 +117,7 @@ function iT(nr, line) {
               buttonNames[num]
           );
         $(line).find("input[type=button]").click();
-        iT(nr, line);
+        addRenameIncButtonActions(nr, line);
       });
     } else if (nome.indexOf("|")) {
       $("#opt" + nr + "_" + num).click(function () {
@@ -126,7 +126,7 @@ function iT(nr, line) {
           .find("input[type=text]")
           .val($(line).find("input[type=text]").val() + buttonNames[num]);
         $(line).find("input[type=button]").click();
-        iT(nr, line);
+        addRenameIncButtonActions(nr, line);
       });
     }
   });
@@ -139,7 +139,8 @@ function iTshort(nr, line) {
     if (
       buttonNames[num] == " | DONE" ||
       buttonNames[num] == " | Gedefft" ||
-      buttonNames[num] == " | Getabbt"
+      buttonNames[num] == " | Getabbt" ||
+      buttonNames[num] == " | Raustellen"
     ) {
       html +=
         '<button type="button" id="opt' +
@@ -222,22 +223,29 @@ if (
   location.href.indexOf("mode=incomings&subtype=attacks") == -1
 ) {
   $("#commands_incomings .command-row").each(function (nr, line) {
-    if (!isSupport(line)) iT(nr, line, true);
+    if (!isSupport(line)) addRenameIncButtonActions(nr, line, true);
   });
 } else {
   $("#incomings_table tr.nowrap").each(function (nr, line) {
     if (!isSupport(line)) {
       iTshort(nr, line, true);
-      var name = $.trim($(line).find(".quickedit-label").text());
-      var code = buttonNames.indexOf(
-        name.indexOf(" ") >= 0 ? name.substr(name.indexOf(" ") + 1) : name
-      );
-      var dual = check(name);
+      var incLabelName = $.trim($(line).find(".quickedit-label").text());
+
+      //
+      var textAfterFirstSpace =
+        incLabelName.indexOf(" ") >= 0
+          ? incLabelName.substr(incLabelName.indexOf(" ") + 1)
+          : incLabelName;
+
+      // Determines the code by checking if the name contains a space and extracting the relevant part.
+      // find space, then take string after space
+      var spaceInIncLabelName = buttonNames.indexOf(textAfterFirstSpace);
+      var dual = check(incLabelName, undefined);
       var codes = [];
-      codes[0] = check(name, 1);
-      codes[1] = check(name, 2);
-      if (code != -1) {
-        var colorcode = buttonColors[code];
+      codes[0] = check(incLabelName, 1);
+      codes[1] = check(incLabelName, 2);
+      if (spaceInIncLabelName != -1) {
+        var colorcode = buttonColors[spaceInIncLabelName];
         var color = colors[colorcode][1];
         if (!color) color = "#6c4d2d";
         if (attack_layout === "line") {
@@ -373,18 +381,19 @@ if (
   });
 }
 
-function check(name, nr) {
+function check(incName, nr) {
   var i, j;
   for (i = 0; i < buttonNames.length; i++) {
     for (j = 0; j < buttonNames.length; j++) {
-      if (name.indexOf(buttonNames[i] + buttonNames[j]) != -1) {
-        if (nr == 1) return i;
-        else if (nr == 2) return j;
-        else return true;
+      // Check if the concatenated button names are found in the name string
+      if (incName.indexOf(buttonNames[i] + buttonNames[j]) != -1) {
+        if (nr == 1) return i; // Return index i if nr is 1
+        else if (nr == 2) return j; // Return index j if nr is 2
+        else return true; // Return true for any other value of nr
       }
     }
   }
-  return false;
+  return false; // Return false if no match is found
 }
 
 function isSupport(line) {
