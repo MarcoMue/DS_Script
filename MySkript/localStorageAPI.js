@@ -1,7 +1,7 @@
 // Define some methods in the library script
 window.c_sdk = {
   types: {
-    VV: class {
+    Village: class {
       constructor(name, age) {
         this.name = name;
         this.age = age;
@@ -301,7 +301,7 @@ window.c_sdk = {
   },
 };
 
-const { VV, Person, Car } = window.c_sdk.types;
+const { Village, Person, Car } = window.c_sdk.types;
 
 // Create instances of your classes
 const person1 = new Person("Alice", 30);
