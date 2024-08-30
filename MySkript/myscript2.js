@@ -15,6 +15,10 @@ function loadScript(url) {
 
 (async function () {
   console.log("IIFE called.");
+
+  // Load the library script
+  await loadScript(`${scriptConfig.baseScriptUrl}/localStorageAPI.js`);
+
   let scriptConfig = {
     baseScriptUrl: "https://marcomue.github.io/DS_Script/MySkript",
     scriptData: {
@@ -652,9 +656,6 @@ function loadScript(url) {
     await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
   }
 
-  // Load the library script
-  await loadScript(`${scriptConfig.baseScriptUrl}/localStorageAPI.js`);
-
   // Now you can use the library's functions
   c_sdk.libraryMethod1({ key: "value" });
   c_sdk.libraryMethod2("Hello, World!");
@@ -662,10 +663,7 @@ function loadScript(url) {
   let results = [];
   let commands = [];
   let targetVillages = [];
-  // twSDK.worldDataAPI("village");
-  // twSDK.worldDataAPI("player");
-  // twSDK.worldDataAPI("ally");
-  // twSDK.worldDataAPI("conquer");
+  c_sdk.updateDB("village");
   openUI();
 
   async function loadHTML(url) {
@@ -959,6 +957,10 @@ function loadScript(url) {
     }
   }
 
+  async function asyncTestButton() {
+    c_sdk.updateDB("village");
+  }
+
   async function openUI() {
     const html = `<div id="content"></div>`;
     $("#contentContainer").eq(0).prepend(html);
@@ -974,6 +976,7 @@ function loadScript(url) {
     //   .getElementById("in")
     //   .addEventListener("change", () => setMode("members_defense"));
     document.getElementById("run").addEventListener("click", readIncs);
+    document.getElementById("test").addEventListener("click", asyncTestButton);
     // document.getElementById('troop_details').addEventListener('click', readCheckboxValue);
 
     showLastUpdatedDb();
