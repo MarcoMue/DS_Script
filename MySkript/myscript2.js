@@ -1,5 +1,17 @@
 if (typeof DEBUG !== "boolean") DEBUG = false;
 // TODO init and load DB for villages and players / tribes
+// TODO: use Bundler to load all files
+
+// Function to dynamically load a script
+function loadScript(url) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = url;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
 
 (async function () {
   console.log("IIFE called.");
@@ -635,6 +647,18 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
   };
   window.allIncs = twSDK;
 
+  // Load jQuery if not already loaded
+  if (typeof jQuery === "undefined") {
+    await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
+  }
+
+  // Load the library script
+  await loadScript("https://example.com/library.js");
+
+  // Now you can use the library's functions
+  c_sdk.libraryMethod1({ key: "value" });
+  c_sdk.libraryMethod2("Hello, World!");
+
   let results = [];
   let commands = [];
   let targetVillages = [];
@@ -803,7 +827,6 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
         } else {
           alert("Please select a mode.");
         }
-        await readIncs();
       });
   }
 
