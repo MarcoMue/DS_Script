@@ -663,7 +663,6 @@ function loadScript(url) {
   let results = [];
   let commands = [];
   let targetVillages = [];
-  c_sdk.updateDB("village");
   openUI();
 
   async function loadHTML(url) {
