@@ -1,17 +1,31 @@
-// Define your classes
-class Person {
-  constructor(name, age) {
-    this.name = name;
-    this.age = age;
-  }
-}
+// Define some methods in the library script
+window.c_sdk = {
+  types: {
+    Person: class {
+      constructor(name, age) {
+        this.name = name;
+        this.age = age;
+      }
+    },
 
-class Car {
-  constructor(make, model) {
-    this.make = make;
-    this.model = model;
-  }
-}
+    Car: class {
+      constructor(make, model) {
+        this.make = make;
+        this.model = model;
+      }
+    },
+  },
+
+  libraryMethod1: function (data) {
+    console.log("Library Method 1 called with data:", data);
+  },
+  libraryMethod2: function (param) {
+    console.log("Library Method 2 called with param:", param);
+  },
+};
+
+const Person = window.c_sdk.types.Person;
+const Car = window.c_sdk.types.Car;
 
 // Create instances of your classes
 const person1 = new Person("Alice", 30);
@@ -46,13 +60,3 @@ const retrievedCars = retrievedData.cars.map((c) => new Car(c.make, c.model));
 // Log the retrieved instances to verify
 console.log(retrievedPersons);
 console.log(retrievedCars);
-
-// Define some methods in the library script
-window.c_sdk = {
-  libraryMethod1: function (data) {
-    console.log("Library Method 1 called with data:", data);
-  },
-  libraryMethod2: function (param) {
-    console.log("Library Method 2 called with param:", param);
-  },
-};
