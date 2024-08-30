@@ -16,6 +16,10 @@ function loadScript(url) {
 (async function () {
   console.log("IIFE called.");
 
+  if (typeof jQuery === "undefined") {
+    throw new Error("jQuery is required for this script to work.");
+  }
+
   let scriptConfig = {
     baseScriptUrl: "https://marcomue.github.io/DS_Script/MySkript",
     scriptData: {
@@ -647,11 +651,6 @@ function loadScript(url) {
     },
   };
   window.allIncs = twSDK;
-
-  // Load jQuery if not already loaded
-  if (typeof jQuery === "undefined") {
-    await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
-  }
 
   // Load the library script
   await loadScript(`${scriptConfig.baseScriptUrl}/localStorageAPI.js`);
