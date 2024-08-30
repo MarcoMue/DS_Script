@@ -653,7 +653,7 @@ function loadScript(url) {
   }
 
   // Load the library script
-  await loadScript(`${baseScriptUrl}/localStorageAPI.js`);
+  await loadScript(`${scriptConfig.baseScriptUrl}/localStorageAPI.js`);
 
   // Now you can use the library's functions
   c_sdk.libraryMethod1({ key: "value" });
