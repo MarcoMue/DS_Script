@@ -1,4 +1,6 @@
-// Define some methods in the library script
+console.log(window.c_sdk);
+console.log(window.c_sdk.types);
+
 window.c_sdk = {
   types: {
     Village: class {

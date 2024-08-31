@@ -655,6 +655,10 @@ function loadScript(url) {
   // Load the library script
   await loadScript(`${scriptConfig.baseScriptUrl}/localStorageAPI.js`);
 
+  if (typeof c_sdk === "undefined") {
+    throw new Error("c_sdk is required for this script to work.");
+  }
+
   // Now you can use the library's functions
   c_sdk.libraryMethod1({ key: "value" });
   c_sdk.libraryMethod2("Hello, World!");
@@ -794,6 +798,26 @@ function loadScript(url) {
     return matches || [];
   }
 
+  function extractVillages(results) {
+    console.log("extractVillages called.");
+    let villages = [];
+    results.forEach(async (result) => {
+      let v1 = await twSDK._getVillageById(result.targetVillageId);
+      let v2 = await twSDK._getVillageIDByCoords(v1[2], v1[3]);
+
+      //ID 0: 4941
+      //NAME 1: "006"
+      //X 2: "499"
+      //Y 3: "489"
+      //? 4: 1577266935
+      //? 5: 4172
+      //Bonustype 6: 6
+      // console.log("Village 1:", v1, v2);
+      villages.push(v1);
+    });
+    return villages;
+  }
+
   async function addRadioControls() {
     document
       .getElementById("loadPlannerBtn")
@@ -805,21 +829,7 @@ function loadScript(url) {
           targetVillages = readVillageCoords();
         } else if (wbRadio.checked) {
           let results = readWorkbenchExport();
-          results.forEach(async (result) => {
-            let v1 = await twSDK._getVillageById(result.targetVillageId);
-            let v2 = await twSDK._getVillageIDByCoords(v1[2], v1[3]);
-
-            //ID 0: 4941
-            //NAME 1: "006"
-            //X 2: "499"
-            //Y 3: "489"
-            //? 4: 1577266935
-            //? 5: 4172
-            //Bonustype 6: 6
-            // console.log("Village 1:", v1, v2);
-            targetVillages.push(v1);
-          });
-          // addRowToTable(results);
+          targetVillages = extractVillages(results);
         } else {
           alert("Please select a mode.");
         }
