@@ -455,6 +455,8 @@
         worldData[entity] = await fetchDataAndSave();
 
         console.timeEnd("fetchAndUpdateDB");
+        console.log("World data:", worldData);
+
         resolve(worldData[entity]);
       });
     },
