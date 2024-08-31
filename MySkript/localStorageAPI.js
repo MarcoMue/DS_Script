@@ -38,11 +38,13 @@
     },
     config: {
       basePath: "https://de228.die-staemme.de",
+      worldInfoInterface: "/interface.php?func=get_config",
+      unitInfoInterface: "/interface.php?func=get_unit_info",
+      buildingInfoInterface: "/interface.php?func=get_building_info",
       worldDataVillages: "/map/village.txt",
       worldDataPlayers: "/map/player.txt",
       worldDataTribes: "/map/ally.txt",
       worldDataConquests: "/map/conquer_extended.txt",
-      worldsettings: "/interface.php?func=get_config",
       dbConfig: {
         village: {
           dbName: "c_villagesDb",
@@ -50,7 +52,7 @@
           dbTable: "villages",
           key: "villageId",
           indexes: [{ name: "coordIndex", key: "coords", unique: true }],
-          url: c_sdk.config.worldDataVillages,
+          url: this.worldDataVillages,
         },
         player: {
           dbName: "playersDb",
@@ -58,7 +60,7 @@
           dbTable: "players",
           key: "playerId",
           indexes: [],
-          url: c_sdk.config.worldDataPlayers,
+          url: this.worldDataPlayers,
         },
         ally: {
           dbName: "tribesDb",
