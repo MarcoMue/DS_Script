@@ -444,6 +444,7 @@
 
         // decide what to do based on current time and last updated entity time
         const worldData = {};
+        /*
         if (LAST_UPDATED_TIME !== null) {
           if (
             Date.parse(new Date()) >=
@@ -456,6 +457,10 @@
         } else {
           worldData[entity] = await fetchDataAndSave();
         }
+          */
+
+        worldData[entity] = await fetchDataAndSave();
+
         console.timeEnd("fetchAndUpdateDB");
         resolve(worldData[entity]);
       });
