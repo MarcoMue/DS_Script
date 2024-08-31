@@ -161,7 +161,7 @@ function loadScript(url) {
     },
     // functions
     csvToArray: function (strData, strDelimiter = ",") {
-      var objPattern = new RegExp(
+      let objPattern = new RegExp(
         "(\\" +
           strDelimiter +
           "|\\r?\\n|\\r|^)" +
@@ -171,17 +171,17 @@ function loadScript(url) {
           "\\r\\n]*))",
         "gi"
       );
-      var arrData = [[]];
-      var arrMatches = null;
+      let arrData = [[]];
+      let arrMatches = null;
       while ((arrMatches = objPattern.exec(strData))) {
-        var strMatchedDelimiter = arrMatches[1];
+        let strMatchedDelimiter = arrMatches[1];
         if (
           strMatchedDelimiter.length &&
           strMatchedDelimiter !== strDelimiter
         ) {
           arrData.push([]);
         }
-        var strMatchedValue;
+        let strMatchedValue;
 
         if (arrMatches[2]) {
           strMatchedValue = arrMatches[2].replace(new RegExp('""', "g"), '"');
@@ -615,9 +615,9 @@ function loadScript(url) {
       onDone, // called when all URLs successfully loaded, no params
       onError // called when a URL load fails or if onLoad throws an exception, params (error)
     ) {
-      var numDone = 0;
-      var lastRequestTime = 0;
-      var minWaitTime = this.delayBetweenRequests; // ms between requests
+      let numDone = 0;
+      let lastRequestTime = 0;
+      let minWaitTime = this.delayBetweenRequests; // ms between requests
       loadNext();
       function loadNext() {
         if (numDone == urls.length) {
