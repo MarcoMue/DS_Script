@@ -897,9 +897,11 @@ function loadScript(url) {
     }
   }
 
-  async function asyncTestButton() {
+  async function TestButton1() {
     await c_sdk.fetchAndUpdateDB("village");
+  }
 
+  async function TestButton2() {
     console.log(await c_sdk.getVillageByCoordinates(452, 479));
     console.log(await c_sdk.getVillageById(42));
   }
@@ -919,7 +921,9 @@ function loadScript(url) {
     //   .getElementById("in")
     //   .addEventListener("change", () => setMode("members_defense"));
     document.getElementById("run").addEventListener("click", readIncs);
-    document.getElementById("test").addEventListener("click", asyncTestButton);
+    document.getElementById("test1").addEventListener("click", TestButton1);
+    document.getElementById("test2").addEventListener("click", TestButton2);
+
     // document.getElementById('troop_details').addEventListener('click', readCheckboxValue);
 
     showLastUpdatedDb();
