@@ -409,9 +409,7 @@
     // Bad performance
     getVillageByCoordinates: async function (x, y) {
       return new Promise((resolve, reject) => {
-        const { dbName, dbTable, dbVersion, key, indexes, url } =
-          c_sdk.dbConfig[entity];
-
+        const { dbName, dbTable, dbVersion } = c_sdk.dbConfig["village"];
         const DBOpenRequest = indexedDB.open(dbName, dbVersion);
 
         DBOpenRequest.onerror = function (event) {
@@ -445,9 +443,7 @@
     },
     getVillageById: async function (villageId) {
       return new Promise((resolve, reject) => {
-        const { dbName, dbTable, dbVersion, key, indexes, url } =
-          c_sdk.dbConfig[entity];
-
+        const { dbName, dbTable, dbVersion } = c_sdk.dbConfig["village"];
         const DBOpenRequest = indexedDB.open(dbName, dbVersion);
 
         DBOpenRequest.onerror = function (event) {
