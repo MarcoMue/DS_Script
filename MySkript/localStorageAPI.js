@@ -45,39 +45,39 @@
       worldDataPlayers: "/map/player.txt",
       worldDataTribes: "/map/ally.txt",
       worldDataConquests: "/map/conquer_extended.txt",
-      dbConfig: {
-        village: {
-          dbName: "c_villagesDb",
-          dbVersion: 1,
-          dbTable: "villages",
-          key: "villageId",
-          indexes: [{ name: "coordIndex", key: "coords", unique: true }],
-          url: this.worldDataVillages,
-        },
-        player: {
-          dbName: "playersDb",
-          dbVersion: 1,
-          dbTable: "players",
-          key: "playerId",
-          indexes: [],
-          url: this.worldDataPlayers,
-        },
-        ally: {
-          dbName: "tribesDb",
-          dbVersion: 1,
-          dbTable: "tribes",
-          key: "tribeId",
-          indexes: [],
-          url: this.worldDataTribes,
-        },
-        conquer: {
-          dbName: "conquerDb",
-          dbVersion: 1,
-          dbTable: "conquer",
-          key: "",
-          indexes: [],
-          url: this.worldDataConquests,
-        },
+    },
+    dbConfig: {
+      village: {
+        dbName: "c_villagesDb",
+        dbVersion: 1,
+        dbTable: "villages",
+        key: "villageId",
+        indexes: [{ name: "coordIndex", key: "coords", unique: true }],
+        url: "/map/village.txt",
+      },
+      player: {
+        dbName: "playersDb",
+        dbVersion: 1,
+        dbTable: "players",
+        key: "playerId",
+        indexes: [],
+        url: "/map/player.txt",
+      },
+      ally: {
+        dbName: "tribesDb",
+        dbVersion: 1,
+        dbTable: "tribes",
+        key: "tribeId",
+        indexes: [],
+        url: "/map/ally.txt",
+      },
+      conquer: {
+        dbName: "conquerDb",
+        dbVersion: 1,
+        dbTable: "conquer",
+        key: "",
+        indexes: [],
+        url: "/map/conquer_extended.txt",
       },
     },
     storeDataInLocalStorage: function (data) {
@@ -183,13 +183,7 @@
         throw new Error(`Entity ${entity} does not exist!`);
       }
 
-      const { dbName, dbTable, dbVersion, dbKey, dbIndexes } =
-        c_sdk.config.dbConfig[entity];
-      // const dbName = twSDK.dbConfig[entity].dbName;
-      // const dbTable = twSDK.dbConfig[entity].dbTable;
-      // const dbVersion = twSDK.dbConfig[entity].dbVersion;
-      // const dbKey = twSDK.dbConfig[entity].key;
-      // const dbIndexes = twSDK.dbConfig[entity].indexes;
+      const { dbName, dbTable, dbVersion, dbKey, dbIndexes } = dbConfig[entity];
 
       // initial world data
       const worldData = {};
