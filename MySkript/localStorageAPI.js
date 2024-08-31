@@ -24,6 +24,37 @@
           this.rank = rank;
         }
       },
+      Tribe: class {
+        constructor(id, name, tag, members, villages, points, allPoints, rank) {
+          this.id = id;
+          this.name = name;
+          this.tag = tag;
+          this.members = members;
+          this.villages = villages;
+          this.points = points;
+          this.allPoints = allPoints;
+          this.rank = rank;
+        }
+      },
+      Conquer: class {
+        constructor(
+          villageId,
+          unixTimestamp,
+          newPlayerId,
+          oldPlayerId,
+          oldTribeId,
+          newTribeId,
+          villagePoints
+        ) {
+          this.villageId = villageId;
+          this.unixTimestamp = unixTimestamp;
+          this.newPlayerId = newPlayerId;
+          this.oldPlayerId = oldPlayerId;
+          this.oldTribeId = oldTribeId;
+          this.newTribeId = newTribeId;
+          this.villagePoints = villagePoints;
+        }
+      },
       Person: class {
         constructor(name, age) {
           this.name = name;
@@ -49,7 +80,7 @@
     },
     dbConfig: {
       village: {
-        dbName: "c_villagesDb",
+        dbName: "VillagesDB",
         dbVersion: 1,
         dbTable: "villages",
         key: "id",
@@ -57,18 +88,18 @@
         url: "/map/village.txt",
       },
       player: {
-        dbName: "playersDb",
+        dbName: "PlayerDB",
         dbVersion: 1,
         dbTable: "players",
-        key: "playerId",
+        key: "id",
         indexes: [],
         url: "/map/player.txt",
       },
-      ally: {
-        dbName: "tribesDb",
+      tribe: {
+        dbName: "TribesDB",
         dbVersion: 1,
         dbTable: "tribes",
-        key: "tribeId",
+        key: "id",
         indexes: [],
         url: "/map/ally.txt",
       },
@@ -76,7 +107,7 @@
         dbName: "conquerDb",
         dbVersion: 1,
         dbTable: "conquer",
-        key: "",
+        key: "villageId",
         indexes: [],
         url: "/map/conquer_extended.txt",
       },
@@ -171,6 +202,9 @@
         return string;
       }
     },
+    updateLastUpdatedTimestamp: function (entity) {
+      localStorage.setItem(`${entity}_last_updated`, Date.parse(new Date()));
+    },
     fetchAndUpdateDB: async function (entity) {
       return new Promise(async (resolve, reject) => {
         console.log("IndexedDB called with entity:", entity);
@@ -182,7 +216,7 @@
         );
 
         // check if entity is allowed and can be fetched
-        const allowedEntities = ["village", "player", "ally", "conquer"];
+        const allowedEntities = ["village", "player", "tribe", "conquer"];
         if (!allowedEntities.includes(entity)) {
           reject(`Entity ${entity} is not allowed!`);
           throw new Error(`Entity ${entity} does not exist!`);
@@ -190,7 +224,7 @@
 
         const { dbName, dbTable, dbVersion, key, indexes, url } =
           c_sdk.dbConfig[entity];
-        const { Village } = c_sdk.types;
+        const { Village, Player, Tribe, Conquer } = c_sdk.types;
 
         // Helpers: Fetch entity data and save to localStorage
         async function fetchDataAndSave() {
@@ -224,16 +258,6 @@
                       parseInt(item[5]),
                       parseInt(item[6])
                     );
-                    return {
-                      villageId: parseInt(item[0]),
-                      villageName: c_sdk.cleanString(item[1]),
-                      villageX: item[2],
-                      villageY: item[3],
-                      coord: `${item[2]}|${item[3]}`,
-                      playerId: parseInt(item[4]),
-                      villagePoints: parseInt(item[5]),
-                      villageType: parseInt(item[6]),
-                    };
                   });
 
                 break;
@@ -245,17 +269,17 @@
                     }
                   })
                   .map((item) => {
-                    return {
-                      playerId: parseInt(item[0]),
-                      playerName: c_sdk.cleanString(item[1]),
-                      tribeId: parseInt(item[2]),
-                      villages: parseInt(item[3]),
-                      points: parseInt(item[4]),
-                      rank: parseInt(item[5]),
-                    };
+                    return new Player(
+                      parseInt(item[0]),
+                      c_sdk.cleanString(item[1]),
+                      parseInt(item[2]),
+                      parseInt(item[3]),
+                      parseInt(item[4]),
+                      parseInt(item[5])
+                    );
                   });
                 break;
-              case "ally":
+              case "tribe":
                 responseData = data
                   .filter((item) => {
                     if (item[0] != "") {
@@ -263,16 +287,16 @@
                     }
                   })
                   .map((item) => {
-                    return {
-                      tribeId: parseInt(item[0]),
-                      tribeName: c_sdk.cleanString(item[1]),
-                      tribeTag: c_sdk.cleanString(item[2]),
-                      players: parseInt(item[3]),
-                      villages: parseInt(item[4]),
-                      points: parseInt(item[5]),
-                      allPoints: parseInt(item[6]),
-                      rank: parseInt(item[7]),
-                    };
+                    return new Tribe(
+                      parseInt(item[0]),
+                      c_sdk.cleanString(item[1]),
+                      c_sdk.cleanString(item[2]),
+                      parseInt(item[3]),
+                      parseInt(item[4]),
+                      parseInt(item[5]),
+                      parseInt(item[6]),
+                      parseInt(item[7])
+                    );
                   });
                 break;
               case "conquer":
@@ -283,15 +307,15 @@
                     }
                   })
                   .map((item) => {
-                    return {
-                      villageId: parseInt(item[0]),
-                      unixTimestamp: parseInt(item[1]),
-                      newPlayerId: parseInt(item[2]),
-                      newPlayerId: parseInt(item[3]),
-                      oldTribeId: parseInt(item[4]),
-                      newTribeId: parseInt(item[5]),
-                      villagePoints: parseInt(item[6]),
-                    };
+                    return new Conquer(
+                      parseInt(item[0]),
+                      parseInt(item[1]),
+                      parseInt(item[2]),
+                      parseInt(item[3]),
+                      parseInt(item[4]),
+                      parseInt(item[5]),
+                      parseInt(item[6])
+                    );
                   });
                 break;
               default:
@@ -299,18 +323,11 @@
             }
 
             try {
-              // save data in db
               saveToIndexedDbStorage(responseData);
-
-              // update last updated localStorage item
-              localStorage.setItem(
-                `${entity}_last_updated`,
-                Date.parse(new Date())
-              );
+              updateLastUpdatedTimestamp(entity);
             } catch (error) {
               console.error("Error saving data to indexedDB:", error);
             }
-
             return responseData;
           } catch (error) {
             throw new Error(`Error fetching data for ${entity}: ${error}`);
@@ -393,9 +410,8 @@
           });
         }
 
-        // initial world data
-        const worldData = {};
         // decide what to do based on current time and last updated entity time
+        const worldData = {};
         if (LAST_UPDATED_TIME !== null) {
           if (
             Date.parse(new Date()) >=
