@@ -532,83 +532,6 @@ function loadScript(url) {
       }
       return twSDK.villages.find((v) => v[0] === villageId);
     },
-    // DB requests
-    // Function to search for a record by coords using the index
-    // Bad performance
-    getVillageByCoordinates: async function (x, y) {
-      return new Promise((resolve, reject) => {
-        const DBOpenRequest = indexedDB.open(
-          twSDK.dbConfig.village.dbName,
-          twSDK.dbConfig.village.dbVersion
-        );
-
-        DBOpenRequest.onerror = function (event) {
-          console.error("Database error:", event.target.errorCode);
-          reject(event.target.errorCode);
-        };
-
-        DBOpenRequest.onsuccess = function (event) {
-          const db = event.target.result;
-          let table = twSDK.dbConfig.village.dbTable;
-
-          const transaction = db.transaction([table], "readonly");
-          const objectStore = transaction.objectStore(table);
-
-          const index = objectStore.index("coordIndex");
-          const indeReq = index.get(`${x}|${y}`);
-
-          indeReq.onerror = function (event) {
-            console.error("Get request error:", event.target.errorCode);
-            reject(event.target.errorCode);
-          };
-
-          indeReq.onsuccess = function (event) {
-            if (indeReq.result) {
-              resolve(indeReq.result);
-            } else {
-              console.log("No matching record found");
-              resolve(null);
-            }
-          };
-        };
-      });
-    },
-    getVillageById: async function (villageId) {
-      return new Promise((resolve, reject) => {
-        const DBOpenRequest = indexedDB.open(
-          twSDK.dbConfig.village.dbName,
-          twSDK.dbConfig.village.dbVersion
-        );
-
-        DBOpenRequest.onerror = function (event) {
-          console.error("Database error:", event.target.errorCode);
-          reject(event.target.errorCode);
-        };
-
-        DBOpenRequest.onsuccess = function (event) {
-          const db = event.target.result;
-          let table = twSDK.dbConfig.village.dbTable;
-
-          const transaction = db.transaction([table], "readonly");
-          const objectStore = transaction.objectStore(table);
-          const getRequest = objectStore.get(villageId);
-
-          getRequest.onerror = function (event) {
-            console.error("Get request error:", event.target.errorCode);
-          };
-
-          getRequest.onsuccess = function (event) {
-            if (getRequest.result) {
-              console.log("Value:", getRequest.result);
-              resolve(getRequest.result);
-            } else {
-              console.log("No matching record found");
-              resolve(null);
-            }
-          };
-        };
-      });
-    },
     getAll: function (
       urls, // array of URLs
       onLoad, // called when any URL is loaded, params (index, data)
@@ -975,7 +898,10 @@ function loadScript(url) {
   }
 
   async function asyncTestButton() {
-    c_sdk.updateDB("village");
+    c_sdk.fetchAndUpdateDB("village");
+
+    console.log(c_sdk.getVillageByCoordinates(452, 479));
+    console.log(c_sdk.getVillageById(42));
   }
 
   async function openUI() {

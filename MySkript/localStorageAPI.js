@@ -81,8 +81,7 @@
         url: "/map/conquer_extended.txt",
       },
     },
-    storeDataInLocalStorage: function (data) {
-      console.log("Library Method 1 called with data:", data);
+    storeDataInLocalStorage: function () {
       const { Village, Person, Car } = c_sdk.types;
 
       // Create instances of your classes
@@ -106,7 +105,7 @@
       localStorage.setItem("myData", jsonString);
     },
     retrieveInstances: function (param) {
-      console.log("Library Method 2 called with param:", param);
+      console.log("retrieveInstances called with param:", param);
       const { Village, Person, Car } = c_sdk.types;
 
       // Retrieve the JSON string from localStorage
@@ -172,7 +171,7 @@
         return string;
       }
     },
-    updateDB: async function (entity) {
+    fetchAndUpdateDB: async function (entity) {
       console.log("IndexedDB called with entity:", entity);
 
       const TIME_INTERVAL = 60 * 60 * 1000; // fetch data every hour
@@ -186,7 +185,6 @@
 
       const { dbName, dbTable, dbVersion, key, indexes, url } =
         c_sdk.dbConfig[entity];
-
       const { Village } = c_sdk.types;
 
       // initial world data
@@ -340,11 +338,6 @@
               autoIncrement: true,
             });
           }
-
-          const indexNames = objectStore.indexNames;
-          for (let i = 0; i < indexNames.length; i++) {
-            console.log(indexNames[i]);
-          }
         };
 
         DBOpenRequest.onsuccess = function (event) {
@@ -397,7 +390,6 @@
       }
 
       // decide what to do based on current time and last updated entity time
-      /*
       if (LAST_UPDATED_TIME !== null) {
         if (
           Date.parse(new Date()) >=
@@ -410,9 +402,79 @@
       } else {
         worldData[entity] = await fetchDataAndSave();
       }
-        */
       //TEMP: do it anyway
       worldData[entity] = await fetchDataAndSave();
+    },
+    // Function to search for a record by coords using the index
+    // Bad performance
+    getVillageByCoordinates: async function (x, y) {
+      return new Promise((resolve, reject) => {
+        const { dbName, dbTable, dbVersion, key, indexes, url } =
+          c_sdk.dbConfig[entity];
+
+        const DBOpenRequest = indexedDB.open(dbName, dbVersion);
+
+        DBOpenRequest.onerror = function (event) {
+          console.error("Database error:", event.target.errorCode);
+          reject(event.target.errorCode);
+        };
+
+        DBOpenRequest.onsuccess = function (event) {
+          const db = event.target.result;
+          const transaction = db.transaction([dbTable], "readonly");
+          const objectStore = transaction.objectStore(dbTable);
+
+          const index = objectStore.index("coordIndex");
+          const indeReq = index.get(`${x}|${y}`);
+
+          indeReq.onerror = function (event) {
+            console.error("Get request error:", event.target.errorCode);
+            reject(event.target.errorCode);
+          };
+
+          indeReq.onsuccess = function (event) {
+            if (indeReq.result) {
+              resolve(indeReq.result);
+            } else {
+              console.log("No matching record found");
+              resolve(null);
+            }
+          };
+        };
+      });
+    },
+    getVillageById: async function (villageId) {
+      return new Promise((resolve, reject) => {
+        const { dbName, dbTable, dbVersion, key, indexes, url } =
+          c_sdk.dbConfig[entity];
+
+        const DBOpenRequest = indexedDB.open(dbName, dbVersion);
+
+        DBOpenRequest.onerror = function (event) {
+          console.error("Database error:", event.target.errorCode);
+          reject(event.target.errorCode);
+        };
+
+        DBOpenRequest.onsuccess = function (event) {
+          const db = event.target.result;
+          const transaction = db.transaction([dbTable], "readonly");
+          const objectStore = transaction.objectStore(dbTable);
+          const getRequest = objectStore.get(villageId);
+
+          getRequest.onerror = function (event) {
+            console.error("Get request error:", event.target.errorCode);
+          };
+
+          getRequest.onsuccess = function (event) {
+            if (getRequest.result) {
+              resolve(getRequest.result);
+            } else {
+              console.log("No matching record found");
+              resolve(null);
+            }
+          };
+        };
+      });
     },
   };
 })();
