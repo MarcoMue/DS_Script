@@ -335,6 +335,7 @@
 
         async function saveToIndexedDbStorage(data) {
           const openDB = () => {
+            console.time("openDB");
             return new Promise((resolve, reject) => {
               const DBOpenRequest = indexedDB.open(dbName, dbVersion);
 
@@ -357,59 +358,80 @@
                     autoIncrement: true,
                   });
                 }
-
+                console.timeEnd("openDB");
                 console.log("Object store created:", objectStore);
               };
 
               DBOpenRequest.onsuccess = function (event) {
                 console.log("Database onsuccess & resolve");
+                console.timeEnd("openDB");
                 resolve(DBOpenRequest.result);
               };
 
               DBOpenRequest.onerror = function (event) {
+                console.timeEnd("openDB");
                 reject(DBOpenRequest.error);
               };
 
               DBOpenRequest.onblocked = function () {
                 console.error("Database open blocked");
+                console.timeEnd("openDB");
                 reject(new Error("Database open blocked"));
               };
             });
           };
 
           const clearStore = (db) => {
+            console.time("clearStore");
             return new Promise((resolve, reject) => {
               const transaction = db.transaction(dbTable, "readwrite");
               const store = transaction.objectStore(dbTable);
               const clearRequest = store.clear();
 
-              clearRequest.onsuccess = () => resolve();
-              clearRequest.onerror = (event) => reject(event.target.errorCode);
+              clearRequest.onsuccess = () => {
+                console.timeEnd("clearStore");
+                return resolve();
+              };
+              clearRequest.onerror = (event) => {
+                console.timeEnd("clearStore");
+                return reject(event.target.errorCode);
+              };
             });
           };
 
           const putData = (db, data) => {
+            console.time("putData");
             return new Promise((resolve, reject) => {
               const transaction = db.transaction(dbTable, "readwrite");
               const store = transaction.objectStore(dbTable);
 
               data.forEach((item) => {
                 const putRequest = store.put(item);
-                putRequest.onerror = (event) => reject(event.target.errorCode);
+                putRequest.onerror = (event) => {
+                  console.timeEnd("putData");
+                  return reject(event.target.errorCode);
+                };
               });
 
-              transaction.oncomplete = () => resolve();
-              transaction.onerror = (event) => reject(event.target.errorCode);
+              transaction.oncomplete = () => {
+                console.timeEnd("putData");
+                return resolve();
+              };
+              transaction.onerror = (event) => {
+                console.timeEnd("putData");
+                return reject(event.target.errorCode);
+              };
             });
           };
 
           try {
+            console.time("full");
             const db = await openDB();
-
             await clearStore(db);
             await putData(db, data);
             c_sdk.updateLastUpdatedTimestamp(entity);
             UI.SuccessMessage("Database updated!");
+            console.timeEnd("full");
           } catch (error) {
             console.error("saveToIndexedDbStorage error:", error);
           }
@@ -488,6 +510,8 @@
           const indeReq = index.get(`${x}|${y}`);
 
           indeReq.onerror = function (event) {
+            console.time("getVillageByCoordinates");
+
             console.timeEnd("getVillageByCoordinates");
 
             console.error("Get request error:", event.target.errorCode);
