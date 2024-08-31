@@ -898,15 +898,23 @@ function loadScript(url) {
   }
 
   async function TestButton1() {
-    await c_sdk.fetchAndUpdateDB("village");
+    let vv = await c_sdk.fetchAndUpdateDB("village");
+    console.log("Villages:", vv);
 
     console.log(await c_sdk.getVillageByCoordinates(452, 479));
     console.log(await c_sdk.getVillageById(42));
   }
 
   async function TestButton2() {
-    console.log(await c_sdk.getVillageByCoordinates(452, 479));
-    console.log(await c_sdk.getVillageById(42));
+    try {
+      let vv = await c_sdk.fetchAndUpdateDB("village");
+      console.log("Villages:", vv);
+
+      console.log(await c_sdk.getVillageByCoordinates(452, 479));
+      console.log(await c_sdk.getVillageById(42));
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
   }
 
   async function openUI() {
