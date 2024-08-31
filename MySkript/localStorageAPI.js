@@ -186,6 +186,8 @@
       const { dbName, dbTable, dbVersion, dbKey, dbIndexes, url } =
         c_sdk.dbConfig[entity];
 
+      const { Village } = c_sdk.types;
+
       // initial world data
       const worldData = {};
 
