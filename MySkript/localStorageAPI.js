@@ -198,7 +198,7 @@
         try {
           // fetch data
           const response = await jQuery.ajax(DATA_URL);
-          const data = csvToArray(response);
+          const data = c_sdk.csvToArray(response);
           let responseData = [];
 
           // prepare data to be saved in db
