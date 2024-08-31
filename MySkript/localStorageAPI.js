@@ -8,7 +8,7 @@
           this.name = name;
           this.x = x;
           this.y = y;
-          this.coords = `${x}|${y}`;
+          this.coord = `${x}|${y}`;
           this.player_id = player_id;
           this.points = points;
           this.bonus_id = bonus_id;
@@ -52,8 +52,8 @@
         dbName: "c_villagesDb",
         dbVersion: 1,
         dbTable: "villages",
-        key: "villageId",
-        indexes: [{ name: "coordIndex", key: "coords", unique: true }],
+        key: "id",
+        indexes: [{ name: "coordIndex", key: "coord", unique: true }],
         url: "/map/village.txt",
       },
       player: {
@@ -229,7 +229,7 @@
                     villageName: c_sdk.cleanString(item[1]),
                     villageX: item[2],
                     villageY: item[3],
-                    coords: `${item[2]}|${item[3]}`,
+                    coord: `${item[2]}|${item[3]}`,
                     playerId: parseInt(item[4]),
                     villagePoints: parseInt(item[5]),
                     villageType: parseInt(item[6]),
