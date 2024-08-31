@@ -339,11 +339,10 @@
 
             DBOpenRequest.onupgradeneeded = function () {
               const db = DBOpenRequest.result;
+              let objectStore;
 
               if (key.length) {
-                db.createObjectStore(dbTable, {
-                  keyPath: key,
-                });
+                objectStore = db.createObjectStore(dbTable, { keyPath: key });
 
                 if (indexes.length > 0) {
                   indexes.forEach((i) => {
@@ -353,7 +352,7 @@
                   });
                 }
               } else {
-                db.createObjectStore(dbTable, {
+                objectStore = db.createObjectStore(dbTable, {
                   autoIncrement: true,
                 });
               }
