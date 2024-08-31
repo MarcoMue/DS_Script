@@ -183,7 +183,7 @@
         throw new Error(`Entity ${entity} does not exist!`);
       }
 
-      const { dbName, dbTable, dbVersion, dbKey, dbIndexes, url } =
+      const { dbName, dbTable, dbVersion, key, indexes, url } =
         c_sdk.dbConfig[entity];
 
       const { Village } = c_sdk.types;
@@ -325,14 +325,14 @@
           const db = event.target.result;
 
           let objectStore;
-          if (dbKey.length) {
+          if (key.length) {
             objectStore = db.createObjectStore(dbTable, {
-              keyPath: dbKey,
+              keyPath: key,
             });
 
-            if (dbIndexes.length > 0) {
-              objectStore.createIndex(dbIndexes[0].name, dbIndexes[0].key, {
-                unique: dbIndexes[0].unique,
+            if (indexes.length > 0) {
+              objectStore.createIndex(indexes[0].name, indexes[0].key, {
+                unique: indexes[0].unique,
               });
             }
           } else {
@@ -397,6 +397,7 @@
       }
 
       // decide what to do based on current time and last updated entity time
+      /*
       if (LAST_UPDATED_TIME !== null) {
         if (
           Date.parse(new Date()) >=
@@ -409,6 +410,7 @@
       } else {
         worldData[entity] = await fetchDataAndSave();
       }
+        */
       //TEMP: do it anyway
       worldData[entity] = await fetchDataAndSave();
     },
