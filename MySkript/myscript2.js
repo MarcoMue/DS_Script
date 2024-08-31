@@ -653,7 +653,14 @@ function loadScript(url) {
   window.allIncs = twSDK;
 
   // Load the library script
-  await loadScript(`${scriptConfig.baseScriptUrl}/localStorageAPI.js`);
+  let scriptName = "localStorageAPI.js";
+  await loadScript(`${scriptConfig.baseScriptUrl}/${scriptName}`)
+    .then(() => {
+      console.log(`${scriptName} loaded successfully`);
+    })
+    .catch((error) => {
+      console.error("Error loading script:", error);
+    });
 
   if (typeof c_sdk === "undefined") {
     throw new Error("c_sdk is required for this script to work.");
