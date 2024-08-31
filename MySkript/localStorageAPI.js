@@ -129,6 +129,38 @@
       console.log(retrievedCars);
       console.log(retrievedVillage);
     },
+    csvToArray: function (strData, strDelimiter = ",") {
+      let objPattern = new RegExp(
+        "(\\" +
+          strDelimiter +
+          "|\\r?\\n|\\r|^)" +
+          '(?:"([^"]*(?:""[^"]*)*)"|' +
+          '([^"\\' +
+          strDelimiter +
+          "\\r\\n]*))",
+        "gi"
+      );
+      let arrData = [[]];
+      let arrMatches = null;
+      while ((arrMatches = objPattern.exec(strData))) {
+        let strMatchedDelimiter = arrMatches[1];
+        if (
+          strMatchedDelimiter.length &&
+          strMatchedDelimiter !== strDelimiter
+        ) {
+          arrData.push([]);
+        }
+        let strMatchedValue;
+
+        if (arrMatches[2]) {
+          strMatchedValue = arrMatches[2].replace(new RegExp('""', "g"), '"');
+        } else {
+          strMatchedValue = arrMatches[3];
+        }
+        arrData[arrData.length - 1].push(strMatchedValue);
+      }
+      return arrData;
+    },
     cleanString: function (string) {
       try {
         return decodeURIComponent(string).replace(/\+/g, " ");
@@ -150,7 +182,7 @@
       }
 
       const { dbName, dbTable, dbVersion, dbKey, dbIndexes } =
-        twSDK.dbConfig[entity];
+        config.dbConfig[entity];
       // const dbName = twSDK.dbConfig[entity].dbName;
       // const dbTable = twSDK.dbConfig[entity].dbTable;
       // const dbVersion = twSDK.dbConfig[entity].dbVersion;
@@ -163,8 +195,7 @@
       // Helpers: Fetch entity data and save to localStorage
       const fetchDataAndSave = async () => {
         // const DATA_URL = twSDK.dbConfig[entity].url;
-
-        console.log("Replacing URL:", twSDK.dbConfig[entity].url);
+        console.log("Replacing URL:", config.dbConfig[entity].url);
         const DATA_URL = `https://marcomue.github.io/DS_Script/rawData/${entity}.txt`;
 
         try {
