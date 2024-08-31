@@ -359,10 +359,13 @@
                     autoIncrement: true,
                   });
                 }
-                resolve(db);
+                console.log("Object store created:", objectStore);
+
+                // resolve(db);
               };
 
               DBOpenRequest.onsuccess = function (event) {
+                console.log("Database onsuccess & resolve");
                 resolve(event.target.result);
               };
 
