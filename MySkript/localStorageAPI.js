@@ -8,6 +8,7 @@
           this.name = name;
           this.x = x;
           this.y = y;
+          this.coords = `${x}|${y}`;
           this.player_id = player_id;
           this.points = points;
           this.bonus_id = bonus_id;
@@ -214,7 +215,6 @@
                 })
                 // id, name, x, y, player_id, points, bonus_id
                 .map((item) => {
-                  /*
                   return new Village(
                     parseInt(item[0]),
                     c_sdk.cleanString(item[1]),
@@ -224,7 +224,6 @@
                     parseInt(item[5]),
                     parseInt(item[6])
                   );
-                  */
                   return {
                     villageId: parseInt(item[0]),
                     villageName: c_sdk.cleanString(item[1]),
