@@ -334,6 +334,7 @@
         }
 
         async function saveToIndexedDbStorage(data) {
+          console.time("openDB");
           return new Promise((resolve, reject) => {
             const DBOpenRequest = indexedDB.open(dbName, dbVersion);
 
@@ -359,7 +360,10 @@
               console.timeEnd("openDB");
             };
 
-            DBOpenRequest.onsuccess = function (event) {
+            DBOpenRequest.onsuccess = function () {
+              console.time("putData");
+
+              const db = DBOpenRequest.result;
               const transaction = db.transaction(dbTable, "readwrite");
               const store = transaction.objectStore(dbTable);
 
@@ -379,7 +383,7 @@
 
               c_sdk.updateLastUpdatedTimestamp(entity);
               UI.SuccessMessage("Database updated!");
-              console.timeEnd("openDB");
+              console.timeEnd("putData");
               resolve(DBOpenRequest.result);
             };
 
