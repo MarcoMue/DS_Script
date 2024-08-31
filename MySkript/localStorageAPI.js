@@ -191,14 +191,14 @@
 
       // Helpers: Fetch entity data and save to localStorage
       const fetchDataAndSave = async () => {
-        // const DATA_URL = twSDK.dbConfig[entity].url;
         console.log("Replacing URL:", url);
+        // const DATA_URL = url;
         const DATA_URL = `https://marcomue.github.io/DS_Script/rawData/${entity}.txt`;
 
         try {
           // fetch data
           const response = await jQuery.ajax(DATA_URL);
-          const data = twSDK.csvToArray(response);
+          const data = csvToArray(response);
           let responseData = [];
 
           // prepare data to be saved in db
@@ -224,7 +224,7 @@
 
                   return {
                     villageId: parseInt(item[0]),
-                    villageName: twSDK.cleanString(item[1]),
+                    villageName: cleanString(item[1]),
                     villageX: item[2],
                     villageY: item[3],
                     coords: `${item[2]}|${item[3]}`,
@@ -245,7 +245,7 @@
                 .map((item) => {
                   return {
                     playerId: parseInt(item[0]),
-                    playerName: twSDK.cleanString(item[1]),
+                    playerName: cleanString(item[1]),
                     tribeId: parseInt(item[2]),
                     villages: parseInt(item[3]),
                     points: parseInt(item[4]),
@@ -263,8 +263,8 @@
                 .map((item) => {
                   return {
                     tribeId: parseInt(item[0]),
-                    tribeName: twSDK.cleanString(item[1]),
-                    tribeTag: twSDK.cleanString(item[2]),
+                    tribeName: cleanString(item[1]),
+                    tribeTag: cleanString(item[2]),
                     players: parseInt(item[3]),
                     villages: parseInt(item[4]),
                     points: parseInt(item[5]),
@@ -402,10 +402,7 @@
         ) {
           worldData[entity] = await fetchDataAndSave();
         } else {
-          worldData[entity] = await getAllData(
-            twSDK.dbConfig[entity].dbName,
-            twSDK.dbConfig[entity].dbTable
-          );
+          worldData[entity] = await getAllData(dbName, dbTable);
         }
       } else {
         worldData[entity] = await fetchDataAndSave();
