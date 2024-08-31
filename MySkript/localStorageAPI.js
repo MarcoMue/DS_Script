@@ -50,7 +50,7 @@
           dbTable: "villages",
           key: "villageId",
           indexes: [{ name: "coordIndex", key: "coords", unique: true }],
-          url: this.worldDataVillages,
+          url: dbConfig.worldDataVillages,
         },
         player: {
           dbName: "playersDb",
@@ -58,7 +58,7 @@
           dbTable: "players",
           key: "playerId",
           indexes: [],
-          url: this.worldDataPlayers,
+          url: c_sdk.config.worldDataPlayers,
         },
         ally: {
           dbName: "tribesDb",
@@ -182,7 +182,7 @@
       }
 
       const { dbName, dbTable, dbVersion, dbKey, dbIndexes } =
-        config.dbConfig[entity];
+        c_sdk.config.dbConfig[entity];
       // const dbName = twSDK.dbConfig[entity].dbName;
       // const dbTable = twSDK.dbConfig[entity].dbTable;
       // const dbVersion = twSDK.dbConfig[entity].dbVersion;
