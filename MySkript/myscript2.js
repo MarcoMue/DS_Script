@@ -654,7 +654,9 @@ function loadScript(url) {
 
   // Load the library script
   let scriptName = "localStorageAPI.js";
-  await loadScript(`${scriptConfig.baseScriptUrl}/${scriptName}`)
+  await loadScript(
+    `${scriptConfig.baseScriptUrl}/${scriptName}?` + new Date().getTime()
+  )
     .then(() => {
       console.log(`${scriptName} loaded successfully`);
     })
