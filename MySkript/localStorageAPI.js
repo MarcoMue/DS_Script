@@ -327,9 +327,15 @@
             });
 
             if (indexes.length > 0) {
+              objectStore.createIndex("coordIndex", ["coords"], {
+                unique: true,
+              });
+
+              /*
               objectStore.createIndex(indexes[0].name, indexes[0].key, {
                 unique: indexes[0].unique,
               });
+              */
             }
           } else {
             objectStore = db.createObjectStore(dbTable, {
