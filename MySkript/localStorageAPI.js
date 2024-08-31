@@ -339,13 +339,11 @@
               const DBOpenRequest = indexedDB.open(dbName, dbVersion);
 
               DBOpenRequest.onupgradeneeded = function (event) {
-                const db = event.target.result;
+                const db = DBOpenRequest.result;
 
                 let objectStore;
                 if (key.length) {
-                  objectStore = db.createObjectStore(dbTable, {
-                    keyPath: key,
-                  });
+                  objectStore = db.createObjectStore(dbTable, { keyPath: key });
 
                   if (indexes.length > 0) {
                     indexes.forEach((i) => {
@@ -359,21 +357,22 @@
                     autoIncrement: true,
                   });
                 }
-                console.log("Object store created:", objectStore);
 
-                resolve(db);
+                console.log("Object store created:", objectStore);
               };
 
               DBOpenRequest.onsuccess = function (event) {
-                console.log(DBOpenRequest.result);
-                console.log(event.target.result);
-
                 console.log("Database onsuccess & resolve");
-                resolve(event.target.result);
+                resolve(DBOpenRequest.result);
               };
 
               DBOpenRequest.onerror = function (event) {
-                reject(event.target.errorCode);
+                reject(DBOpenRequest.error);
+              };
+
+              DBOpenRequest.onblocked = function () {
+                console.error("Database open blocked");
+                reject(new Error("Database open blocked"));
               };
             });
           };
@@ -406,6 +405,7 @@
 
           try {
             const db = await openDB();
+
             await clearStore(db);
             await putData(db, data);
             c_sdk.updateLastUpdatedTimestamp(entity);
