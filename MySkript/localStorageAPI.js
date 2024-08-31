@@ -359,6 +359,7 @@
                     autoIncrement: true,
                   });
                 }
+                resolve(db);
               };
 
               DBOpenRequest.onsuccess = function (event) {
