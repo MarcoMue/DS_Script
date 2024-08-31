@@ -1,10 +1,26 @@
 (function () {
   window.c_sdk = {
     types: {
+      // https://forum.die-staemme.de/index.php?threads/weltdaten-und-configs.183996/
       Village: class {
-        constructor(name, age) {
+        constructor(id, name, x, y, player_id, points, bonus_id) {
+          this.id = id;
           this.name = name;
-          this.age = age;
+          this.x = x;
+          this.y = y;
+          this.player_id = player_id;
+          this.points = points;
+          this.bonus_id = bonus_id;
+        }
+      },
+      Player: class {
+        constructor(id, name, ally_id, villages, points, rank) {
+          this.id = id;
+          this.name = name;
+          this.ally_id = ally_id;
+          this.villages = villages;
+          this.points = points;
+          this.rank = rank;
         }
       },
       Person: class {
@@ -21,13 +37,15 @@
       },
     },
     config: {
+      basePath: "https://de228.die-staemme.de",
       worldDataVillages: "/map/village.txt",
       worldDataPlayers: "/map/player.txt",
       worldDataTribes: "/map/ally.txt",
       worldDataConquests: "/map/conquer_extended.txt",
+      worldsettings: "/interface.php?func=get_config",
       dbConfig: {
         village: {
-          dbName: "villagesDb",
+          dbName: "c_villagesDb",
           dbVersion: 1,
           dbTable: "villages",
           key: "villageId",
@@ -60,14 +78,66 @@
         },
       },
     },
-    libraryMethod1: function (data) {
+    storeDataInLocalStorage: function (data) {
       console.log("Library Method 1 called with data:", data);
+      const { Village, Person, Car } = window.c_sdk.types;
+
+      // Create instances of your classes
+      const person1 = new Person("Alice", 30);
+      const person2 = new Person("Bob", 25);
+      const car1 = new Car("Toyota", "Corolla");
+      const car2 = new Car("Honda", "Civic");
+      const village1 = new Village("Village1", 100);
+
+      // Create an object to hold all instances
+      const dataToSave = {
+        persons: [person1, person2],
+        cars: [car1, car2],
+        village: village1,
+      };
+
+      // Serialize the object to a JSON string
+      const jsonString = JSON.stringify(dataToSave);
+
+      // Save the JSON string to localStorage
+      localStorage.setItem("myData", jsonString);
     },
-    libraryMethod2: function (param) {
+    retrieveInstances: function (param) {
       console.log("Library Method 2 called with param:", param);
+
+      // Retrieve the JSON string from localStorage
+      const retrievedJsonString = localStorage.getItem("myData");
+
+      // Deserialize the JSON string back to an object
+      const retrievedData = JSON.parse(retrievedJsonString);
+
+      // Recreate instances of your classes from the retrieved data
+      const retrievedPersons = retrievedData.persons.map(
+        (p) => new Person(p.name, p.age)
+      );
+      const retrievedCars = retrievedData.cars.map(
+        (c) => new Car(c.make, c.model)
+      );
+      const retrievedVillage = new Village(
+        retrievedData.village.name,
+        retrievedData.village.age
+      );
+
+      // Log the retrieved instances to verify
+      console.log(retrievedPersons);
+      console.log(retrievedCars);
+      console.log(retrievedVillage);
+    },
+    cleanString: function (string) {
+      try {
+        return decodeURIComponent(string).replace(/\+/g, " ");
+      } catch (error) {
+        console.error(error, string);
+        return string;
+      }
     },
     updateDB: async function (entity) {
-      console.log("worldDataAPI called with entity:", entity);
+      console.log("IndexedDB called with entity:", entity);
 
       const TIME_INTERVAL = 60 * 60 * 1000; // fetch data every hour
       const LAST_UPDATED_TIME = localStorage.getItem(`${entity}_last_updated`);
@@ -78,11 +148,13 @@
         throw new Error(`Entity ${entity} does not exist!`);
       }
 
-      const dbName = twSDK.dbConfig[entity].dbName;
-      const dbTable = twSDK.dbConfig[entity].dbTable;
-      const dbVersion = twSDK.dbConfig[entity].dbVersion;
-      const dbKey = twSDK.dbConfig[entity].key;
-      const dbIndexes = twSDK.dbConfig[entity].indexes;
+      const { dbName, dbTable, dbVersion, dbKey, dbIndexes } =
+        twSDK.dbConfig[entity];
+      // const dbName = twSDK.dbConfig[entity].dbName;
+      // const dbTable = twSDK.dbConfig[entity].dbTable;
+      // const dbVersion = twSDK.dbConfig[entity].dbVersion;
+      // const dbKey = twSDK.dbConfig[entity].key;
+      // const dbIndexes = twSDK.dbConfig[entity].indexes;
 
       // initial world data
       const worldData = {};
@@ -109,7 +181,18 @@
                     return item;
                   }
                 })
+                // id, name, x, y, player_id, points, bonus_id
                 .map((item) => {
+                  return new Village(
+                    parseInt(item[0]),
+                    cleanString(item[1]),
+                    item[2],
+                    item[3],
+                    parseInt(item[4]),
+                    parseInt(item[5]),
+                    parseInt(item[6])
+                  );
+
                   return {
                     villageId: parseInt(item[0]),
                     villageName: twSDK.cleanString(item[1]),
@@ -298,49 +381,8 @@
       } else {
         worldData[entity] = await fetchDataAndSave();
       }
+      //TEMP: do it anyway
+      worldData[entity] = await fetchDataAndSave();
     },
   };
-
-  const { Village, Person, Car } = window.c_sdk.types;
-
-  // Create instances of your classes
-  const person1 = new Person("Alice", 30);
-  const person2 = new Person("Bob", 25);
-  const car1 = new Car("Toyota", "Corolla");
-  const car2 = new Car("Honda", "Civic");
-  const village1 = new Village("Village1", 100);
-
-  // Create an object to hold all instances
-  const dataToSave = {
-    persons: [person1, person2],
-    cars: [car1, car2],
-    village: village1,
-  };
-
-  // Serialize the object to a JSON string
-  const jsonString = JSON.stringify(dataToSave);
-
-  // Save the JSON string to localStorage
-  localStorage.setItem("myData", jsonString);
-
-  // Retrieve the JSON string from localStorage
-  const retrievedJsonString = localStorage.getItem("myData");
-
-  // Deserialize the JSON string back to an object
-  const retrievedData = JSON.parse(retrievedJsonString);
-
-  // Recreate instances of your classes from the retrieved data
-  const retrievedPersons = retrievedData.persons.map(
-    (p) => new Person(p.name, p.age)
-  );
-  const retrievedCars = retrievedData.cars.map((c) => new Car(c.make, c.model));
-  const retrievedVillage = new Village(
-    retrievedData.village.name,
-    retrievedData.village.age
-  );
-
-  // Log the retrieved instances to verify
-  console.log(retrievedPersons);
-  console.log(retrievedCars);
-  console.log(retrievedVillage);
 })();

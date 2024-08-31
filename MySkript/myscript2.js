@@ -667,8 +667,8 @@ function loadScript(url) {
   }
 
   // Now you can use the library's functions
-  c_sdk.libraryMethod1({ key: "value" });
-  c_sdk.libraryMethod2("Hello, World!");
+  c_sdk.storeDataInLocalStorage({ key: "value" });
+  c_sdk.retrieveInstances("Hello, World!");
 
   let results = [];
   let commands = [];
