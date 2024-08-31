@@ -183,7 +183,8 @@
         throw new Error(`Entity ${entity} does not exist!`);
       }
 
-      const { dbName, dbTable, dbVersion, dbKey, dbIndexes } = dbConfig[entity];
+      const { dbName, dbTable, dbVersion, dbKey, dbIndexes } =
+        c_sdk.dbConfig[entity];
 
       // initial world data
       const worldData = {};
