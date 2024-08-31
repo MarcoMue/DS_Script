@@ -408,8 +408,8 @@
         } else {
           worldData[entity] = await fetchDataAndSave();
         }
-        resolve(worldData[entity]);
         console.timeEnd("fetchAndUpdateDB");
+        resolve(worldData[entity]);
       });
     },
     // Function to search for a record by coords using the index
