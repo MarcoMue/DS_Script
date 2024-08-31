@@ -80,7 +80,7 @@
     },
     storeDataInLocalStorage: function (data) {
       console.log("Library Method 1 called with data:", data);
-      const { Village, Person, Car } = window.c_sdk.types;
+      const { Village, Person, Car } = this.types;
 
       // Create instances of your classes
       const person1 = new Person("Alice", 30);
