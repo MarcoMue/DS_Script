@@ -898,10 +898,10 @@ function loadScript(url) {
   }
 
   async function asyncTestButton() {
-    c_sdk.fetchAndUpdateDB("village");
+    await c_sdk.fetchAndUpdateDB("village");
 
-    console.log(c_sdk.getVillageByCoordinates(452, 479));
-    console.log(c_sdk.getVillageById(42));
+    console.log(await c_sdk.getVillageByCoordinates(452, 479));
+    console.log(await c_sdk.getVillageById(42));
   }
 
   async function openUI() {

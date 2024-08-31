@@ -187,9 +187,6 @@
         c_sdk.dbConfig[entity];
       const { Village } = c_sdk.types;
 
-      // initial world data
-      const worldData = {};
-
       // Helpers: Fetch entity data and save to localStorage
       const fetchDataAndSave = async () => {
         console.log("Replacing URL:", url);
@@ -389,6 +386,8 @@
         });
       }
 
+      // initial world data
+      const worldData = {};
       // decide what to do based on current time and last updated entity time
       if (LAST_UPDATED_TIME !== null) {
         if (
@@ -402,8 +401,6 @@
       } else {
         worldData[entity] = await fetchDataAndSave();
       }
-      //TEMP: do it anyway
-      worldData[entity] = await fetchDataAndSave();
     },
     // Function to search for a record by coords using the index
     // Bad performance
