@@ -205,7 +205,6 @@
     updateLastUpdatedTimestamp: function (entity) {
       localStorage.setItem(`${entity}_last_updated`, Date.parse(new Date()));
     },
-
     fetchAndUpdateDB: async function (entity) {
       console.log("IndexedDB called with entity:", entity);
       console.time("fetchAndUpdateDB");
@@ -231,20 +230,17 @@
           LAST_UPDATED_TIME &&
           Date.now() < parseInt(LAST_UPDATED_TIME) + TIME_INTERVAL
         ) {
-          worldData = await getAllData();
+          // worldData = await getAllData();
         } else {
-          worldData = await fetchDataAndSave();
+          return updateDatabase();
         }
-
-        console.log("World data:", worldData);
         console.timeEnd("fetchAndUpdateDB");
-        return worldData;
       } catch (error) {
         console.error("Error in fetchAndUpdateDB:", error);
         throw error;
       }
 
-      async function fetchDataAndSave() {
+      async function updateDatabase() {
         console.log("Fetching and saving data for entity:", entity);
         const DATA_URL = `https://marcomue.github.io/DS_Script/rawData/${entity}.txt`;
 
