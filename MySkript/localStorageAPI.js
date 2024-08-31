@@ -324,7 +324,6 @@
 
             try {
               await saveToIndexedDbStorage(responseData);
-              c_sdk.updateLastUpdatedTimestamp(entity);
             } catch (error) {
               console.error("Error saving data to indexedDB:", error);
             }
@@ -402,6 +401,7 @@
             const db = await openDB();
             await clearStore(db);
             await putData(db, data);
+            c_sdk.updateLastUpdatedTimestamp(entity);
             UI.SuccessMessage("Database updated!");
           } catch (error) {
             console.error("saveToIndexedDbStorage error:", error);
