@@ -173,6 +173,7 @@
     },
     fetchAndUpdateDB: async function (entity) {
       console.log("IndexedDB called with entity:", entity);
+      console.time("fetchAndUpdateDB");
 
       const TIME_INTERVAL = 60 * 60 * 1000; // fetch data every hour
       const LAST_UPDATED_TIME = localStorage.getItem(`${entity}_last_updated`);
@@ -401,6 +402,7 @@
       } else {
         worldData[entity] = await fetchDataAndSave();
       }
+      console.timeEnd("fetchAndUpdateDB");
     },
     // Function to search for a record by coords using the index
     // Bad performance
@@ -464,6 +466,7 @@
           const getRequest = objectStore.get(villageId);
 
           getRequest.onerror = function (event) {
+            console.timeEnd("getVillageById");
             console.error("Get request error:", event.target.errorCode);
           };
 
@@ -472,6 +475,7 @@
               console.timeEnd("getVillageById");
               resolve(getRequest.result);
             } else {
+              console.timeEnd("getVillageById");
               console.log("No matching record found");
               resolve(null);
             }
