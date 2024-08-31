@@ -214,7 +214,7 @@
                 .map((item) => {
                   return new Village(
                     parseInt(item[0]),
-                    cleanString(item[1]),
+                    c_sdk.cleanString(item[1]),
                     item[2],
                     item[3],
                     parseInt(item[4]),
@@ -224,7 +224,7 @@
 
                   return {
                     villageId: parseInt(item[0]),
-                    villageName: cleanString(item[1]),
+                    villageName: c_sdk.cleanString(item[1]),
                     villageX: item[2],
                     villageY: item[3],
                     coords: `${item[2]}|${item[3]}`,
@@ -245,7 +245,7 @@
                 .map((item) => {
                   return {
                     playerId: parseInt(item[0]),
-                    playerName: cleanString(item[1]),
+                    playerName: c_sdk.cleanString(item[1]),
                     tribeId: parseInt(item[2]),
                     villages: parseInt(item[3]),
                     points: parseInt(item[4]),
@@ -263,8 +263,8 @@
                 .map((item) => {
                   return {
                     tribeId: parseInt(item[0]),
-                    tribeName: cleanString(item[1]),
-                    tribeTag: cleanString(item[2]),
+                    tribeName: c_sdk.cleanString(item[1]),
+                    tribeTag: c_sdk.cleanString(item[2]),
                     players: parseInt(item[3]),
                     villages: parseInt(item[4]),
                     points: parseInt(item[5]),
@@ -311,7 +311,7 @@
 
           return responseData;
         } catch (error) {
-          throw Error(`Error fetching ${DATA_URL}`);
+          throw new Error(`Error fetching data for ${entity}: ${error}`);
         }
       };
 
