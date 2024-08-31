@@ -405,40 +405,42 @@
     // Function to search for a record by coords using the index
     // Bad performance
     getVillageByCoordinates: async function (x, y) {
+      console.time("getVillageByCoordinates");
       return new Promise((resolve, reject) => {
         const { dbName, dbTable, dbVersion } = c_sdk.dbConfig["village"];
-        const DBOpenRequest = indexedDB.open(dbName, dbVersion);
 
-        DBOpenRequest.onerror = function (event) {
-          console.error("Database error:", event.target.errorCode);
-          reject(event.target.errorCode);
-        };
-
-        DBOpenRequest.onsuccess = function (event) {
-          const db = event.target.result;
-          const transaction = db.transaction([dbTable], "readonly");
+        try {
+          const DBOpenRequest = indexedDB.open(dbName, dbVersion);
+          const transaction = DBOpenRequest.transaction([dbTable], "readonly");
           const objectStore = transaction.objectStore(dbTable);
-
           const index = objectStore.index("coordIndex");
           const indeReq = index.get(`${x}|${y}`);
 
           indeReq.onerror = function (event) {
-            console.error("Get request error:", event.target.errorCode);
+            console.error("Database error:", event.target.errorCode);
+            console.timeEnd("getVillageByCoordinates");
             reject(event.target.errorCode);
           };
 
           indeReq.onsuccess = function (event) {
             if (indeReq.result) {
+              console.timeEnd("getVillageByCoordinates");
               resolve(indeReq.result);
             } else {
               console.log("No matching record found");
+              console.timeEnd("getVillageByCoordinates");
               resolve(null);
             }
           };
-        };
+        } catch (error) {
+          console.timeEnd("getVillageByCoordinates");
+          return Promise.reject(error);
+        }
       });
     },
     getVillageById: async function (villageId) {
+      console.time("getVillageById");
+
       return new Promise((resolve, reject) => {
         const { dbName, dbTable, dbVersion } = c_sdk.dbConfig["village"];
         const DBOpenRequest = indexedDB.open(dbName, dbVersion);
@@ -460,6 +462,7 @@
 
           getRequest.onsuccess = function (event) {
             if (getRequest.result) {
+              console.timeEnd("getVillageById");
               resolve(getRequest.result);
             } else {
               console.log("No matching record found");
