@@ -183,7 +183,7 @@
         throw new Error(`Entity ${entity} does not exist!`);
       }
 
-      const { dbName, dbTable, dbVersion, dbKey, dbIndexes } =
+      const { dbName, dbTable, dbVersion, dbKey, dbIndexes, url } =
         c_sdk.dbConfig[entity];
 
       // initial world data
@@ -192,7 +192,7 @@
       // Helpers: Fetch entity data and save to localStorage
       const fetchDataAndSave = async () => {
         // const DATA_URL = twSDK.dbConfig[entity].url;
-        console.log("Replacing URL:", config.dbConfig[entity].url);
+        console.log("Replacing URL:", url);
         const DATA_URL = `https://marcomue.github.io/DS_Script/rawData/${entity}.txt`;
 
         try {
