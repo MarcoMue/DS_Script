@@ -323,8 +323,8 @@
             }
 
             try {
-              saveToIndexedDbStorage(responseData);
-              updateLastUpdatedTimestamp(entity);
+              await saveToIndexedDbStorage(responseData);
+              c_sdk.updateLastUpdatedTimestamp(entity);
             } catch (error) {
               console.error("Error saving data to indexedDB:", error);
             }
@@ -334,54 +334,79 @@
           }
         }
 
-        // Helpers: Save to IndexedDb storage
         async function saveToIndexedDbStorage(data) {
-          const DBOpenRequest = indexedDB.open(dbName, dbVersion);
+          const openDB = () => {
+            return new Promise((resolve, reject) => {
+              const DBOpenRequest = indexedDB.open(dbName, dbVersion);
 
-          DBOpenRequest.onupgradeneeded = function (event) {
-            const db = event.target.result;
+              DBOpenRequest.onupgradeneeded = function (event) {
+                const db = event.target.result;
 
-            let objectStore;
-            if (key.length) {
-              objectStore = db.createObjectStore(dbTable, {
-                keyPath: key,
-              });
-
-              if (indexes.length > 0) {
-                indexes.forEach((i) => {
-                  objectStore.createIndex(i.name, i.key, {
-                    unique: i.unique,
+                let objectStore;
+                if (key.length) {
+                  objectStore = db.createObjectStore(dbTable, {
+                    keyPath: key,
                   });
-                });
-              }
-            } else {
-              objectStore = db.createObjectStore(dbTable, {
-                autoIncrement: true,
-              });
-            }
-          };
 
-          DBOpenRequest.onsuccess = function (event) {
-            const db = event.target.result;
-            const transaction = db.transaction(dbTable, "readwrite");
-            const store = transaction.objectStore(dbTable);
-            store.clear(); // clean store from items before adding new ones
+                  if (indexes.length > 0) {
+                    indexes.forEach((i) => {
+                      objectStore.createIndex(i.name, i.key, {
+                        unique: i.unique,
+                      });
+                    });
+                  }
+                } else {
+                  objectStore = db.createObjectStore(dbTable, {
+                    autoIncrement: true,
+                  });
+                }
+              };
 
-            data.forEach((item) => {
-              store.put(item);
+              DBOpenRequest.onsuccess = function (event) {
+                resolve(event.target.result);
+              };
+
+              DBOpenRequest.onerror = function (event) {
+                reject(event.target.errorCode);
+              };
             });
+          };
 
+          const clearStore = (db) => {
+            return new Promise((resolve, reject) => {
+              const transaction = db.transaction(dbTable, "readwrite");
+              const store = transaction.objectStore(dbTable);
+              const clearRequest = store.clear();
+
+              clearRequest.onsuccess = () => resolve();
+              clearRequest.onerror = (event) => reject(event.target.errorCode);
+            });
+          };
+
+          const putData = (db, data) => {
+            return new Promise((resolve, reject) => {
+              const transaction = db.transaction(dbTable, "readwrite");
+              const store = transaction.objectStore(dbTable);
+
+              data.forEach((item) => {
+                const putRequest = store.put(item);
+                putRequest.onerror = (event) => reject(event.target.errorCode);
+              });
+
+              transaction.oncomplete = () => resolve();
+              transaction.onerror = (event) => reject(event.target.errorCode);
+            });
+          };
+
+          try {
+            const db = await openDB();
+            await clearStore(db);
+            await putData(db, data);
             UI.SuccessMessage("Database updated!");
-          };
-
-          DBOpenRequest.onerror = function (event) {
-            console.error(
-              "onerror saveToIndexedDbStorage:",
-              event.target.errorCode
-            );
-          };
+          } catch (error) {
+            console.error("saveToIndexedDbStorage error:", error);
+          }
         }
-
         // Helpers: Read all data from indexedDB
         async function getAllData() {
           return new Promise((resolve, reject) => {
