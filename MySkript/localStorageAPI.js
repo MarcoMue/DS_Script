@@ -301,8 +301,6 @@
     },
   };
 
-  console.log(Village);
-
   const { Village, Person, Car } = window.c_sdk.types;
 
   // Create instances of your classes
@@ -310,11 +308,13 @@
   const person2 = new Person("Bob", 25);
   const car1 = new Car("Toyota", "Corolla");
   const car2 = new Car("Honda", "Civic");
+  const village1 = new Village("Village1", 100);
 
   // Create an object to hold all instances
   const dataToSave = {
     persons: [person1, person2],
     cars: [car1, car2],
+    village: village1,
   };
 
   // Serialize the object to a JSON string
@@ -334,8 +334,13 @@
     (p) => new Person(p.name, p.age)
   );
   const retrievedCars = retrievedData.cars.map((c) => new Car(c.make, c.model));
+  const retrievedVillage = new Village(
+    retrievedData.village.name,
+    retrievedData.village.age
+  );
 
   // Log the retrieved instances to verify
   console.log(retrievedPersons);
   console.log(retrievedCars);
+  console.log(retrievedVillage);
 })();
