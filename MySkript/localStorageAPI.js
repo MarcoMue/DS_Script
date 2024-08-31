@@ -346,7 +346,7 @@
 
                 if (indexes.length > 0) {
                   indexes.forEach((i) => {
-                    db.objectStore.createIndex(i.name, i.key, {
+                    objectStore.createIndex(i.name, i.key, {
                       unique: i.unique,
                     });
                   });
