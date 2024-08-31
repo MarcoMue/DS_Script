@@ -80,7 +80,7 @@
     },
     storeDataInLocalStorage: function (data) {
       console.log("Library Method 1 called with data:", data);
-      const { Village, Person, Car } = this.types;
+      const { Village, Person, Car } = c_sdk.types;
 
       // Create instances of your classes
       const person1 = new Person("Alice", 30);
@@ -104,7 +104,7 @@
     },
     retrieveInstances: function (param) {
       console.log("Library Method 2 called with param:", param);
-      const { Village, Person, Car } = this.types;
+      const { Village, Person, Car } = c_sdk.types;
 
       // Retrieve the JSON string from localStorage
       const retrievedJsonString = localStorage.getItem("myData");
