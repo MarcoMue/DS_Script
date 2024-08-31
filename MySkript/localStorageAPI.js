@@ -361,10 +361,13 @@
                 }
                 console.log("Object store created:", objectStore);
 
-                // resolve(db);
+                resolve(db);
               };
 
               DBOpenRequest.onsuccess = function (event) {
+                console.log(DBOpenRequest.result);
+                console.log(event.target.result);
+
                 console.log("Database onsuccess & resolve");
                 resolve(event.target.result);
               };
