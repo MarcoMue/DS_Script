@@ -334,74 +334,33 @@
         }
 
         async function saveToIndexedDbStorage(data) {
-          const openDB = () => {
-            console.time("openDB");
-            return new Promise((resolve, reject) => {
-              const DBOpenRequest = indexedDB.open(dbName, dbVersion);
+          return new Promise((resolve, reject) => {
+            const DBOpenRequest = indexedDB.open(dbName, dbVersion);
 
-              DBOpenRequest.onupgradeneeded = function (event) {
-                const db = DBOpenRequest.result;
+            DBOpenRequest.onupgradeneeded = function () {
+              const db = DBOpenRequest.result;
 
-                let objectStore;
-                if (key.length) {
-                  objectStore = db.createObjectStore(dbTable, { keyPath: key });
+              if (key.length) {
+                db.createObjectStore(dbTable, {
+                  keyPath: key,
+                });
 
-                  if (indexes.length > 0) {
-                    indexes.forEach((i) => {
-                      objectStore.createIndex(i.name, i.key, {
-                        unique: i.unique,
-                      });
+                if (indexes.length > 0) {
+                  indexes.forEach((i) => {
+                    db.objectStore.createIndex(i.name, i.key, {
+                      unique: i.unique,
                     });
-                  }
-                } else {
-                  objectStore = db.createObjectStore(dbTable, {
-                    autoIncrement: true,
                   });
                 }
-                console.timeEnd("openDB");
-                console.log("Object store created:", objectStore);
-              };
+              } else {
+                db.createObjectStore(dbTable, {
+                  autoIncrement: true,
+                });
+              }
+              console.timeEnd("openDB");
+            };
 
-              DBOpenRequest.onsuccess = function (event) {
-                console.log("Database onsuccess & resolve");
-                console.timeEnd("openDB");
-                resolve(DBOpenRequest.result);
-              };
-
-              DBOpenRequest.onerror = function (event) {
-                console.timeEnd("openDB");
-                reject(DBOpenRequest.error);
-              };
-
-              DBOpenRequest.onblocked = function () {
-                console.error("Database open blocked");
-                console.timeEnd("openDB");
-                reject(new Error("Database open blocked"));
-              };
-            });
-          };
-
-          const clearStore = (db) => {
-            console.time("clearStore");
-            return new Promise((resolve, reject) => {
-              const transaction = db.transaction(dbTable, "readwrite");
-              const store = transaction.objectStore(dbTable);
-              const clearRequest = store.clear();
-
-              clearRequest.onsuccess = () => {
-                console.timeEnd("clearStore");
-                return resolve();
-              };
-              clearRequest.onerror = (event) => {
-                console.timeEnd("clearStore");
-                return reject(event.target.errorCode);
-              };
-            });
-          };
-
-          const putData = (db, data) => {
-            console.time("putData");
-            return new Promise((resolve, reject) => {
+            DBOpenRequest.onsuccess = function (event) {
               const transaction = db.transaction(dbTable, "readwrite");
               const store = transaction.objectStore(dbTable);
 
@@ -418,21 +377,26 @@
                 console.timeEnd("putData");
                 return reject(event.target.errorCode);
               };
-            });
-          };
 
-          try {
-            console.time("full");
-            const db = await openDB();
-            // await clearStore(db);
-            await putData(db, data);
-            c_sdk.updateLastUpdatedTimestamp(entity);
-            UI.SuccessMessage("Database updated!");
-            console.timeEnd("full");
-          } catch (error) {
-            console.error("saveToIndexedDbStorage error:", error);
-          }
+              c_sdk.updateLastUpdatedTimestamp(entity);
+              UI.SuccessMessage("Database updated!");
+              console.timeEnd("openDB");
+              resolve(DBOpenRequest.result);
+            };
+
+            DBOpenRequest.onerror = function (event) {
+              console.timeEnd("openDB");
+              reject(DBOpenRequest.error);
+            };
+
+            DBOpenRequest.onblocked = function () {
+              console.error("Database open blocked");
+              console.timeEnd("openDB");
+              reject(new Error("Database open blocked"));
+            };
+          });
         }
+
         // Helpers: Read all data from indexedDB
         async function getAllData() {
           return new Promise((resolve, reject) => {
