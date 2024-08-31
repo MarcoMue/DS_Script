@@ -172,239 +172,245 @@
       }
     },
     fetchAndUpdateDB: async function (entity) {
-      console.log("IndexedDB called with entity:", entity);
-      console.time("fetchAndUpdateDB");
+      return new Promise(async (resolve, reject) => {
+        console.log("IndexedDB called with entity:", entity);
+        console.time("fetchAndUpdateDB");
 
-      const TIME_INTERVAL = 60 * 60 * 1000; // fetch data every hour
-      const LAST_UPDATED_TIME = localStorage.getItem(`${entity}_last_updated`);
+        const TIME_INTERVAL = 60 * 60 * 1000; // fetch data every hour
+        const LAST_UPDATED_TIME = localStorage.getItem(
+          `${entity}_last_updated`
+        );
 
-      // check if entity is allowed and can be fetched
-      const allowedEntities = ["village", "player", "ally", "conquer"];
-      if (!allowedEntities.includes(entity)) {
-        throw new Error(`Entity ${entity} does not exist!`);
-      }
+        // check if entity is allowed and can be fetched
+        const allowedEntities = ["village", "player", "ally", "conquer"];
+        if (!allowedEntities.includes(entity)) {
+          reject(`Entity ${entity} is not allowed!`);
+          throw new Error(`Entity ${entity} does not exist!`);
+        }
 
-      const { dbName, dbTable, dbVersion, key, indexes, url } =
-        c_sdk.dbConfig[entity];
-      const { Village } = c_sdk.types;
+        const { dbName, dbTable, dbVersion, key, indexes, url } =
+          c_sdk.dbConfig[entity];
+        const { Village } = c_sdk.types;
 
-      // Helpers: Fetch entity data and save to localStorage
-      const fetchDataAndSave = async () => {
-        console.log("Replacing URL:", url);
-        // const DATA_URL = url;
-        const DATA_URL = `https://marcomue.github.io/DS_Script/rawData/${entity}.txt`;
-
-        try {
-          // fetch data
-          const response = await jQuery.ajax(DATA_URL);
-          const data = c_sdk.csvToArray(response);
-          let responseData = [];
-
-          // prepare data to be saved in db
-          switch (entity) {
-            case "village":
-              responseData = data
-                .filter((item) => {
-                  if (item[0] != "") {
-                    return item;
-                  }
-                })
-                // id, name, x, y, player_id, points, bonus_id
-                .map((item) => {
-                  return new Village(
-                    parseInt(item[0]),
-                    c_sdk.cleanString(item[1]),
-                    item[2],
-                    item[3],
-                    parseInt(item[4]),
-                    parseInt(item[5]),
-                    parseInt(item[6])
-                  );
-                  return {
-                    villageId: parseInt(item[0]),
-                    villageName: c_sdk.cleanString(item[1]),
-                    villageX: item[2],
-                    villageY: item[3],
-                    coord: `${item[2]}|${item[3]}`,
-                    playerId: parseInt(item[4]),
-                    villagePoints: parseInt(item[5]),
-                    villageType: parseInt(item[6]),
-                  };
-                });
-
-              break;
-            case "player":
-              responseData = data
-                .filter((item) => {
-                  if (item[0] != "") {
-                    return item;
-                  }
-                })
-                .map((item) => {
-                  return {
-                    playerId: parseInt(item[0]),
-                    playerName: c_sdk.cleanString(item[1]),
-                    tribeId: parseInt(item[2]),
-                    villages: parseInt(item[3]),
-                    points: parseInt(item[4]),
-                    rank: parseInt(item[5]),
-                  };
-                });
-              break;
-            case "ally":
-              responseData = data
-                .filter((item) => {
-                  if (item[0] != "") {
-                    return item;
-                  }
-                })
-                .map((item) => {
-                  return {
-                    tribeId: parseInt(item[0]),
-                    tribeName: c_sdk.cleanString(item[1]),
-                    tribeTag: c_sdk.cleanString(item[2]),
-                    players: parseInt(item[3]),
-                    villages: parseInt(item[4]),
-                    points: parseInt(item[5]),
-                    allPoints: parseInt(item[6]),
-                    rank: parseInt(item[7]),
-                  };
-                });
-              break;
-            case "conquer":
-              responseData = data
-                .filter((item) => {
-                  if (item[0] != "") {
-                    return item;
-                  }
-                })
-                .map((item) => {
-                  return {
-                    villageId: parseInt(item[0]),
-                    unixTimestamp: parseInt(item[1]),
-                    newPlayerId: parseInt(item[2]),
-                    newPlayerId: parseInt(item[3]),
-                    oldTribeId: parseInt(item[4]),
-                    newTribeId: parseInt(item[5]),
-                    villagePoints: parseInt(item[6]),
-                  };
-                });
-              break;
-            default:
-              return [];
-          }
+        // Helpers: Fetch entity data and save to localStorage
+        async function fetchDataAndSave() {
+          console.log("Replacing URL:", url);
+          // const DATA_URL = url;
+          const DATA_URL = `https://marcomue.github.io/DS_Script/rawData/${entity}.txt`;
 
           try {
-            // save data in db
-            saveToIndexedDbStorage(responseData);
+            // fetch data
+            const response = await jQuery.ajax(DATA_URL);
+            const data = c_sdk.csvToArray(response);
+            let responseData = [];
 
-            // update last updated localStorage item
-            localStorage.setItem(
-              `${entity}_last_updated`,
-              Date.parse(new Date())
-            );
-          } catch (error) {
-            console.error("Error saving data to indexedDB:", error);
-          }
+            // prepare data to be saved in db
+            switch (entity) {
+              case "village":
+                responseData = data
+                  .filter((item) => {
+                    if (item[0] != "") {
+                      return item;
+                    }
+                  })
+                  // id, name, x, y, player_id, points, bonus_id
+                  .map((item) => {
+                    return new Village(
+                      parseInt(item[0]),
+                      c_sdk.cleanString(item[1]),
+                      item[2],
+                      item[3],
+                      parseInt(item[4]),
+                      parseInt(item[5]),
+                      parseInt(item[6])
+                    );
+                    return {
+                      villageId: parseInt(item[0]),
+                      villageName: c_sdk.cleanString(item[1]),
+                      villageX: item[2],
+                      villageY: item[3],
+                      coord: `${item[2]}|${item[3]}`,
+                      playerId: parseInt(item[4]),
+                      villagePoints: parseInt(item[5]),
+                      villageType: parseInt(item[6]),
+                    };
+                  });
 
-          return responseData;
-        } catch (error) {
-          throw new Error(`Error fetching data for ${entity}: ${error}`);
-        }
-      };
-
-      // Helpers: Save to IndexedDb storage
-      async function saveToIndexedDbStorage(data) {
-        const DBOpenRequest = indexedDB.open(dbName, dbVersion);
-
-        DBOpenRequest.onupgradeneeded = function (event) {
-          const db = event.target.result;
-
-          let objectStore;
-          if (key.length) {
-            objectStore = db.createObjectStore(dbTable, {
-              keyPath: key,
-            });
-
-            if (indexes.length > 0) {
-              indexes.forEach((i) => {
-                objectStore.createIndex(i.name, i.key, {
-                  unique: i.unique,
-                });
-              });
+                break;
+              case "player":
+                responseData = data
+                  .filter((item) => {
+                    if (item[0] != "") {
+                      return item;
+                    }
+                  })
+                  .map((item) => {
+                    return {
+                      playerId: parseInt(item[0]),
+                      playerName: c_sdk.cleanString(item[1]),
+                      tribeId: parseInt(item[2]),
+                      villages: parseInt(item[3]),
+                      points: parseInt(item[4]),
+                      rank: parseInt(item[5]),
+                    };
+                  });
+                break;
+              case "ally":
+                responseData = data
+                  .filter((item) => {
+                    if (item[0] != "") {
+                      return item;
+                    }
+                  })
+                  .map((item) => {
+                    return {
+                      tribeId: parseInt(item[0]),
+                      tribeName: c_sdk.cleanString(item[1]),
+                      tribeTag: c_sdk.cleanString(item[2]),
+                      players: parseInt(item[3]),
+                      villages: parseInt(item[4]),
+                      points: parseInt(item[5]),
+                      allPoints: parseInt(item[6]),
+                      rank: parseInt(item[7]),
+                    };
+                  });
+                break;
+              case "conquer":
+                responseData = data
+                  .filter((item) => {
+                    if (item[0] != "") {
+                      return item;
+                    }
+                  })
+                  .map((item) => {
+                    return {
+                      villageId: parseInt(item[0]),
+                      unixTimestamp: parseInt(item[1]),
+                      newPlayerId: parseInt(item[2]),
+                      newPlayerId: parseInt(item[3]),
+                      oldTribeId: parseInt(item[4]),
+                      newTribeId: parseInt(item[5]),
+                      villagePoints: parseInt(item[6]),
+                    };
+                  });
+                break;
+              default:
+                return [];
             }
-          } else {
-            objectStore = db.createObjectStore(dbTable, {
-              autoIncrement: true,
-            });
+
+            try {
+              // save data in db
+              saveToIndexedDbStorage(responseData);
+
+              // update last updated localStorage item
+              localStorage.setItem(
+                `${entity}_last_updated`,
+                Date.parse(new Date())
+              );
+            } catch (error) {
+              console.error("Error saving data to indexedDB:", error);
+            }
+
+            return responseData;
+          } catch (error) {
+            throw new Error(`Error fetching data for ${entity}: ${error}`);
           }
-        };
+        }
 
-        DBOpenRequest.onsuccess = function (event) {
-          const db = event.target.result;
-          const transaction = db.transaction(dbTable, "readwrite");
-          const store = transaction.objectStore(dbTable);
-          store.clear(); // clean store from items before adding new ones
-
-          data.forEach((item) => {
-            store.put(item);
-          });
-
-          UI.SuccessMessage("Database updated!");
-        };
-
-        DBOpenRequest.onerror = function (event) {
-          console.error(
-            "onerror saveToIndexedDbStorage:",
-            event.target.errorCode
-          );
-        };
-      }
-
-      // Helpers: Read all data from indexedDB
-      function getAllData() {
-        return new Promise((resolve, reject) => {
+        // Helpers: Save to IndexedDb storage
+        async function saveToIndexedDbStorage(data) {
           const DBOpenRequest = indexedDB.open(dbName, dbVersion);
 
-          DBOpenRequest.onsuccess = (event) => {
+          DBOpenRequest.onupgradeneeded = function (event) {
             const db = event.target.result;
 
-            const dbQuery = db
-              .transaction(dbTable, "readwrite")
-              .objectStore(dbTable)
-              .getAll();
+            let objectStore;
+            if (key.length) {
+              objectStore = db.createObjectStore(dbTable, {
+                keyPath: key,
+              });
 
-            dbQuery.onsuccess = (event) => {
-              resolve(event.target.result);
+              if (indexes.length > 0) {
+                indexes.forEach((i) => {
+                  objectStore.createIndex(i.name, i.key, {
+                    unique: i.unique,
+                  });
+                });
+              }
+            } else {
+              objectStore = db.createObjectStore(dbTable, {
+                autoIncrement: true,
+              });
+            }
+          };
+
+          DBOpenRequest.onsuccess = function (event) {
+            const db = event.target.result;
+            const transaction = db.transaction(dbTable, "readwrite");
+            const store = transaction.objectStore(dbTable);
+            store.clear(); // clean store from items before adding new ones
+
+            data.forEach((item) => {
+              store.put(item);
+            });
+
+            UI.SuccessMessage("Database updated!");
+          };
+
+          DBOpenRequest.onerror = function (event) {
+            console.error(
+              "onerror saveToIndexedDbStorage:",
+              event.target.errorCode
+            );
+          };
+        }
+
+        // Helpers: Read all data from indexedDB
+        async function getAllData() {
+          return new Promise((resolve, reject) => {
+            const DBOpenRequest = indexedDB.open(dbName, dbVersion);
+
+            DBOpenRequest.onsuccess = (event) => {
+              const db = event.target.result;
+
+              const dbQuery = db
+                .transaction(dbTable, "readwrite")
+                .objectStore(dbTable)
+                .getAll();
+
+              dbQuery.onsuccess = (event) => {
+                resolve(event.target.result);
+              };
+
+              dbQuery.onerror = (event) => {
+                reject(event.target.error);
+              };
             };
 
-            dbQuery.onerror = (event) => {
+            DBOpenRequest.onerror = (event) => {
               reject(event.target.error);
             };
-          };
-
-          DBOpenRequest.onerror = (event) => {
-            reject(event.target.error);
-          };
-        });
-      }
-
-      // initial world data
-      const worldData = {};
-      // decide what to do based on current time and last updated entity time
-      if (LAST_UPDATED_TIME !== null) {
-        if (
-          Date.parse(new Date()) >=
-          parseInt(LAST_UPDATED_TIME) + TIME_INTERVAL
-        ) {
-          worldData[entity] = await fetchDataAndSave();
-        } else {
-          worldData[entity] = await getAllData(dbName, dbTable);
+          });
         }
-      } else {
-        worldData[entity] = await fetchDataAndSave();
-      }
-      console.timeEnd("fetchAndUpdateDB");
+
+        // initial world data
+        const worldData = {};
+        // decide what to do based on current time and last updated entity time
+        if (LAST_UPDATED_TIME !== null) {
+          if (
+            Date.parse(new Date()) >=
+            parseInt(LAST_UPDATED_TIME) + TIME_INTERVAL
+          ) {
+            worldData[entity] = await fetchDataAndSave();
+          } else {
+            worldData[entity] = await getAllData(dbName, dbTable);
+          }
+        } else {
+          worldData[entity] = await fetchDataAndSave();
+        }
+        resolve(worldData[entity]);
+        console.timeEnd("fetchAndUpdateDB");
+      });
     },
     // Function to search for a record by coords using the index
     // Bad performance
