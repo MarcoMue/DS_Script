@@ -104,6 +104,7 @@
     },
     retrieveInstances: function (param) {
       console.log("Library Method 2 called with param:", param);
+      const { Village, Person, Car } = this.types;
 
       // Retrieve the JSON string from localStorage
       const retrievedJsonString = localStorage.getItem("myData");
