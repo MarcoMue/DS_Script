@@ -327,15 +327,16 @@
             });
 
             if (indexes.length > 0) {
-              objectStore.createIndex("coordIndex", ["coords"], {
+              indexes.forEach((i) => {
+                /*
+                objectStore.createIndex(i.name, i.key, {
+                  unique: i.unique,
+                });
+                */
+              });
+              objectStore.createIndex("coordIndex", ["coord"], {
                 unique: true,
               });
-
-              /*
-              objectStore.createIndex(indexes[0].name, indexes[0].key, {
-                unique: indexes[0].unique,
-              });
-              */
             }
           } else {
             objectStore = db.createObjectStore(dbTable, {
