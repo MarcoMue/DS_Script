@@ -405,12 +405,9 @@
               const transaction = db.transaction(dbTable, "readwrite");
               const store = transaction.objectStore(dbTable);
 
+              store.clear();
               data.forEach((item) => {
-                const putRequest = store.put(item);
-                putRequest.onerror = (event) => {
-                  console.timeEnd("putData");
-                  return reject(event.target.errorCode);
-                };
+                store.put(item);
               });
 
               transaction.oncomplete = () => {
@@ -427,7 +424,7 @@
           try {
             console.time("full");
             const db = await openDB();
-            await clearStore(db);
+            // await clearStore(db);
             await putData(db, data);
             c_sdk.updateLastUpdatedTimestamp(entity);
             UI.SuccessMessage("Database updated!");

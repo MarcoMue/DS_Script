@@ -902,12 +902,8 @@ function loadScript(url) {
   }
 
   async function TestButton2() {
-    // console.log(await c_sdk.getVillageByCoordinates(452, 479));
-    // console.log(await c_sdk.getVillageById(42));
-    console.time("worldDataAPI");
-
-    twSDK.villages = await twSDK.worldDataAPI("village");
-    console.timeEnd("worldDataAPI");
+    console.log(await c_sdk.getVillageByCoordinates(452, 479));
+    console.log(await c_sdk.getVillageById(42));
   }
 
   async function openUI() {
