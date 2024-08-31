@@ -343,6 +343,7 @@
               let objectStore;
 
               if (key.length) {
+                console.log("Creating object store with keyPath:", key);
                 objectStore = db.createObjectStore(dbTable, { keyPath: key });
 
                 if (indexes.length > 0) {
@@ -353,11 +354,17 @@
                   });
                 }
               } else {
+                console.log("Creating object store with autoIncrement key");
                 objectStore = db.createObjectStore(dbTable, {
                   autoIncrement: true,
                 });
               }
-              console.timeEnd("openDB");
+
+              // Transaction completed
+              objectStore.transaction.oncompleted = (e) => {
+                console.log("Object store created");
+                console.timeEnd("openDB");
+              };
             };
 
             DBOpenRequest.onsuccess = function () {
