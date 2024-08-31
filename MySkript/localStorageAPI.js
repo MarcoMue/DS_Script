@@ -50,7 +50,7 @@
           dbTable: "villages",
           key: "villageId",
           indexes: [{ name: "coordIndex", key: "coords", unique: true }],
-          url: dbConfig.worldDataVillages,
+          url: c_sdk.config.worldDataVillages,
         },
         player: {
           dbName: "playersDb",
