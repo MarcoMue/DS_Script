@@ -328,14 +328,9 @@
 
             if (indexes.length > 0) {
               indexes.forEach((i) => {
-                /*
                 objectStore.createIndex(i.name, i.key, {
                   unique: i.unique,
                 });
-                */
-              });
-              objectStore.createIndex("coordIndex", ["coord"], {
-                unique: true,
               });
             }
           } else {
