@@ -105,23 +105,23 @@ function loadScript(url) {
 
     await c_sdk.storeDataInIndexedDB("troops", troops, timestamp);
     let lastUpdate = await c_sdk.getResultFromDB();
-
-    tableData.forEach((row) => {
-      row.forEach((col) => {
-        changeColor(col);
-      });
-    });
   }
 
   function handleDropdownChange(selectedValue) {
     console.log("Selected value:", selectedValue);
-    // Add your logic here to handle the selected value
+
+    tableData.forEach((row) => {
+      row.forEach((col) => {
+        changeColor(col, selectedValue);
+      });
+    });
   }
 
   function createDropdown(values) {
     let dropdown = $("<select></select>");
     values.forEach((value) => {
-      let option = $("<option></option>").text(value).val(value);
+      let datetime = new Date(value).toLocaleString();
+      let option = $("<option></option>").text(datetime).val(value);
       dropdown.append(option);
     });
     return dropdown;
@@ -155,14 +155,14 @@ function loadScript(url) {
   }
 
   function changeColor(column) {
-    console.log(column);
+    console.log(column, value);
     let color = "red";
     // Get the current text content of the cell
     let currentText = $(column).text().trim();
 
     // Add the new value with color into the same cell
     $(column).html(
-      `${currentText} <span style="color:${color};">${currentText}</span>`
+      `${currentText} <span style="color:${color};">${value}</span>`
     );
   }
 
