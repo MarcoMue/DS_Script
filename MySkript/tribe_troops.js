@@ -93,6 +93,16 @@ function loadScript(url) {
     let dropdown = createDropdown(dropdownValues);
     insertDropdownIntoDOM(dropdown, handleDropdownChange);
 
+    function handleDropdownChange(selectedValue) {
+      console.log("Selected value:", selectedValue);
+
+      tableData.forEach((row) => {
+        row.forEach((col) => {
+          changeColor(col, selectedValue);
+        });
+      });
+    }
+
     if (DEBUG) {
       console.group("Extracted Table Data");
       console.table(tableData);
@@ -105,16 +115,6 @@ function loadScript(url) {
 
     await c_sdk.storeDataInIndexedDB("troops", troops, timestamp);
     let lastUpdate = await c_sdk.getResultFromDB();
-  }
-
-  function handleDropdownChange(selectedValue) {
-    console.log("Selected value:", selectedValue);
-
-    tableData.forEach((row) => {
-      row.forEach((col) => {
-        changeColor(col, selectedValue);
-      });
-    });
   }
 
   function createDropdown(values) {
