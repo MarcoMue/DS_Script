@@ -532,7 +532,7 @@
       };
 
       function getData() {
-        const transaction = db.transaction(["TroopsDB"], "readwrite");
+        const transaction = db.transaction(["troops"], "readwrite");
 
         // report on the success of the transaction completing, when everything is done
         transaction.oncomplete = (event) => {
