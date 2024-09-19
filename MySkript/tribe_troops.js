@@ -19,67 +19,15 @@ function loadScript(url) {
 (async function () {
   console.log("IIFE called.");
 
-  if (typeof jQuery === "undefined") {
-    throw new Error("jQuery is required for this script to work.");
-  }
-
   var win = typeof unsafeWindow != "undefined" ? unsafeWindow : window;
+  let mode = win.game_data.mode;
+  console.debug("mode", mode);
+
   let scriptConfig = {
     baseScriptUrl: "https://marcomue.github.io/DS_Script/MySkript",
   };
 
-  // Load the library script
-  let scriptName = "localStorageAPI.js";
-  await loadScript(
-    `${scriptConfig.baseScriptUrl}/${scriptName}?` + new Date().getTime()
-  )
-    .then(() => {
-      console.log(`${scriptName} loaded successfully`);
-    })
-    .catch((error) => {
-      console.error("Error loading script:", error);
-    });
-
-  if (typeof c_sdk === "undefined") {
-    throw new Error("c_sdk is required for this script to work.");
-  }
-
-  // Now you can use the library's functions
-  c_sdk.storeDataInLocalStorage({ key: "value" });
-  let xx = c_sdk.retrieveInstances("Hello, World!");
-  console.debug("TribeTroops.js loaded successfully", xx);
-
-  // ------------------------------
-
-  var baseURL = `game.php?screen=ally&mode=members_troops&player_id=`;
-  var playerURLs = [];
-  var player = [];
-  $("input:radio[name=player]").each(function () {
-    playerURLs.push(baseURL + $(this).attr("value"));
-    player.push({
-      id: $(this).attr("value"),
-      name: $(this).parent().text().trim(),
-    });
-  });
-  if (DEBUG) {
-    console.group("Player URLs");
-    console.table(playerURLs);
-    console.groupEnd();
-  }
-
-  let mode = win.game_data.mode;
-  console.debug("mode", mode);
-  if (mode.includes("members")) {
-    $("#ally_content .modemenu td:gt(0) a").each((i, e) => {
-      let selected_player = $('[name*="player_id"] option[selected]').attr(
-        "value"
-      );
-      e.href =
-        selected_player === undefined
-          ? e.href
-          : e.href + "&player_id=" + selected_player;
-    });
-  }
+  await init();
 
   if (mode === "members_troops") {
     let tribeTable = "#ally_content table.vis.w100";
@@ -204,5 +152,29 @@ function loadScript(url) {
 
       return new c_sdk.types.PlayerTotalTroops(timestamp, ...r);
     });
+  }
+
+  async function init() {
+    if (typeof jQuery === "undefined") {
+      throw new Error("jQuery is required for this script to work.");
+    }
+
+    // Load the library script
+    let scriptName = "localStorageAPI.js";
+    await loadScript(
+      `${scriptConfig.baseScriptUrl}/${scriptName}?` + new Date().getTime()
+    )
+      .then(() => {
+        console.log(`${scriptName} loaded successfully`);
+      })
+      .catch((error) => {
+        console.error("Error loading script:", error);
+      });
+
+    if (typeof c_sdk === "undefined") {
+      throw new Error("c_sdk is required for this script to work.");
+    }
+
+    console.debug("TribeTroops.js loaded successfully");
   }
 })();
