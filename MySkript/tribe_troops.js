@@ -84,27 +84,28 @@ function loadScript(url) {
   if (mode === "members_troops") {
     let tribeTable = "#ally_content table.vis.w100";
     let timestamp = new Date().getTime();
-    let result = parseMembersTroopsTable(
-      tribeTable,
-      0,
-      0,
-      timestamp,
-      processColumnData
-    );
+
+    let result = parseMembersTroopsTable(tribeTable, 0, 0);
+    let troops = mapTroopData(timestamp);
 
     if (DEBUG) {
       console.group("Extracted Table Data");
       console.table(result);
       console.groupEnd();
+
+      console.group("Extracted Troop Data");
+      console.table(troops);
+      console.groupEnd();
     }
 
-    // Write res to IndexedDB with the current timestamp as the index
-    // Store the data in localStorage
-    await c_sdk.storeDataInIndexedDB("troops", result, timestamp);
-
-    // Check the most recent timestamp in IndexedDB
+    await c_sdk.storeDataInIndexedDB("troops", troops, timestamp);
     let lastUpdate = await c_sdk.getResultFromDB();
-    parseMembersTroopsTable(tribeTable, 0, 0, timestamp, changeColor);
+
+    rows.forEach((row) => {
+      row.forEach((column) => {
+        changeColor(column);
+      });
+    });
   }
 
   function processColumnData(column) {
@@ -134,9 +135,7 @@ function loadScript(url) {
   function parseMembersTroopsTable(
     selector = tribeTable,
     rowStart,
-    columnStart,
-    timestamp,
-    readColumn
+    columnStart
   ) {
     let rows = $(selector).find("tr");
     let data = [];
@@ -150,19 +149,28 @@ function loadScript(url) {
 
       let columns = $(row).find("td");
       let rowData = [];
+
       for (let j = columnStart; j < columns.length; j++) {
         let column = columns[j];
-        value = readColumn(column);
-        rowData.push(parseInt(value));
+        rowData.push(column);
       }
 
       // no valid playerID found
-      if (!rowData[0]) {
+      if (!rowData[0] || isNaN(rowData[0])) {
         continue;
       }
-
-      data.push(new c_sdk.types.PlayerTotalTroops(timestamp, ...rowData));
+      data.push(rowData);
     }
     return data;
+  }
+
+  function mapTroopData(timestamp) {
+    return rows.map((row) => {
+      let r = row.map((column) => {
+        return processColumnData(column);
+      });
+
+      return new c_sdk.types.PlayerTotalTroops(timestamp, ...r);
+    });
   }
 })();
