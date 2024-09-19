@@ -94,6 +94,7 @@ function loadScript(url) {
     let res = extractTableData(tribeTable, 0, 1);
     console.log(res);
   }
+
   function extractTableData(selector = tribeTable, rowStart, columnStart) {
     let rows = $(selector).find("tr");
     let data = [];
@@ -106,6 +107,8 @@ function loadScript(url) {
 
         // Check if the <td> contains an <a> element
         let link = $(column).find("a");
+        console.log(link);
+
         if (link.length > 0) {
           // If it contains an <a> element, save the href attribute
           value = link.attr("href");
