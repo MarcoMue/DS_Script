@@ -112,7 +112,7 @@
         dbName: "TroopsDB",
         dbVersion: 1,
         dbTable: "troops",
-        key: ["player_id", "read"],
+        key: ["playerId", "createdAt"],
         indexes: [],
         url: null,
       },
@@ -586,7 +586,7 @@
             );
             console.log("xx:", classObj);
 
-            store.put(entry);
+            store.put(classObj);
           });
 
           transaction.oncomplete = () => {
