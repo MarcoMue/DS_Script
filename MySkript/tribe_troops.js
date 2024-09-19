@@ -103,15 +103,13 @@ function loadScript(url) {
       });
     }
 
-    if (DEBUG) {
-      console.group("Extracted Table Data");
-      console.table(tableData);
-      console.groupEnd();
+    console.groupCollapsed("Extracted Table Data");
+    console.table(tableData);
+    console.groupEnd();
 
-      console.group("Extracted Troop Data");
-      console.table(troops);
-      console.groupEnd();
-    }
+    console.groupCollapsed("Extracted Troop Data");
+    console.table(troops);
+    console.groupEnd();
 
     await c_sdk.storeDataInIndexedDB("troops", troops, timestamp);
     let lastUpdate = await c_sdk.getResultFromDB();
