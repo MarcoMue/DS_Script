@@ -70,16 +70,14 @@ function loadScript(url) {
     return values ? JSON.parse(values) : [];
   }
 
-  function changeColor(column, value) {
+  function changeColor(column, comparison) {
     let color = "red";
     // Get the current text content of the cell
     let currentText = $(column).text().trim();
-    $(column).append(`<span style="color:${color};">${value}</span>`);
-
     // Add the new value with color into the same cell
-    // $(column).html(
-    //   `${currentText} <span style="color:${color};">${value}</span>`
-    // );
+    $(column).html(
+      `${currentText} <span style="color:${color};">${comparison}</span>`
+    );
   }
 
   async function parseMembersTroopsTable(timestamp) {
@@ -120,14 +118,16 @@ function loadScript(url) {
 
       playerID = parseInt(playerID);
       rowData.push(playerID);
-      debugger;
       oldTroops = await c_sdk.getResultFromDB(timestamp, playerID);
 
       // skip first element
       for (let j = columnStart + 1; j < columns.length; j++) {
         let column = columns[j];
+        // skip playerID, and timestamp
+        let oldUnit = oldTroops[columnStart + 2];
+
         value = $(column).text().trim();
-        // changeColor(column, selectedValue, playerID);
+        changeColor(column, oldUnit);
         rowData.push(parseInt(value));
       }
 
