@@ -70,10 +70,30 @@
         }
       },
       PlayerTotalTroops: class {
-        constructor(playerId, tribeId, totalTroops) {
+        constructor(
+          playerId,
+          timestamp,
+          spear,
+          sword,
+          axe,
+          spy,
+          light,
+          heavy,
+          ram,
+          catapult,
+          snob
+        ) {
+          this.createdAt = timestamp;
           this.playerId = playerId;
-          this.tribeId = tribeId;
-          this.totalTroops = totalTroops;
+          this.spear = spear;
+          this.sword = sword;
+          this.axe = axe;
+          this.spy = spy;
+          this.light = light;
+          this.heavy = heavy;
+          this.ram = ram;
+          this.catapult = catapult;
+          this.snob = snob;
         }
       },
     },
@@ -551,19 +571,18 @@
           console.log("Data to store:", values);
 
           data.forEach((item) => {
-            // Ensure the item has the composite key fields
-            // item.key = [playerID, timestamp];
-
-            let id = item.shift();
-            console.log("Item:", item);
-
             let entry = {
-              player_id: id,
+              player_id: item[0],
               read: timestamp,
-              speer: item[0],
-              schwert: item[1],
+              speer: item[1],
+              schwert: item[2],
             };
+            console.log("Item:", item);
             console.log("Entry:", entry);
+
+            let classObj = new PlayerTotalTroops(id, timestamp, ...item);
+            console.log("xx:", classObj);
+
             store.put(entry);
           });
 

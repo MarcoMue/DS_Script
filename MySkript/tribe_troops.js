@@ -101,13 +101,15 @@ function loadScript(url) {
       // Write res to IndexedDB with the current timestamp as the index
       await c_sdk.storeDataInIndexedDB(res, currentTime);
       console.log("Data updated successfully.");
-    } 
+    }
 
     // Store the data in localStorage
     let storedData = { timestamp: currentTime, data: res };
     console.log("Stored Data", storedData);
     await c_sdk.storeDataInIndexedDB("troops", storedData);
   }
+
+  
 
   function extractTableData(selector = tribeTable, rowStart, columnStart) {
     let rows = $(selector).find("tr");
