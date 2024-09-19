@@ -53,7 +53,7 @@ function loadScript(url) {
 
   var baseURL = `game.php?screen=ally&mode=members_troops&player_id=`;
   var playerURLs = [];
-
+  var player = [];
   $("input:radio[name=player]").each(function () {
     playerURLs.push(baseURL + $(this).attr("value"));
     player.push({
