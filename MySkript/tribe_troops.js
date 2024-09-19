@@ -66,6 +66,8 @@ function loadScript(url) {
     columnStart = 6;
     columnName = 0;
     rows = $($("table .vis")[2]).find("tr");
+
+    console.log("members own tribe", rows);
   }
 
   let mode = win.game_data.mode;
