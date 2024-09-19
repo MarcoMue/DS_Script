@@ -87,6 +87,9 @@ function loadScript(url) {
     console.table(result);
     console.groupEnd();
 
+    // Check the most recent timestamp in IndexedDB
+    let lastUpdate = await c_sdk.getMostRecentTimestamp();
+
     // If the most recent timestamp is less than 1 hour, don't update
     if (lastUpdate && new Date().getTime() - lastUpdate < 3600000) {
       console.log("Data is up-to-date. No need to update.");
@@ -100,9 +103,6 @@ function loadScript(url) {
     // let storedData = { timestamp: new Date().getTime(), data: res };
     // console.log("Stored Data", storedData);
     await c_sdk.storeDataInIndexedDB("troops", result);
-
-    // Check the most recent timestamp in IndexedDB
-    let lastUpdate = await c_sdk.getMostRecentTimestamp();
   }
 
   function extractMembersTroopsTableData(
