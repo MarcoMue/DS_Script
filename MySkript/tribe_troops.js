@@ -23,6 +23,7 @@ function loadScript(url) {
     throw new Error("jQuery is required for this script to work.");
   }
 
+  var win = typeof unsafeWindow != "undefined" ? unsafeWindow : window;
   let scriptConfig = {
     baseScriptUrl: "https://marcomue.github.io/DS_Script/MySkript",
   };
