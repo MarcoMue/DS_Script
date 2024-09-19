@@ -555,10 +555,8 @@
         console.log("PlayerID:", playerID);
         debugger;
         // const objectStoreRequest = objectStore.get([playerID, timestamp]);
-        const objectStoreRequest = objectStore.get([
-          playerID.toString(),
-          timestamp.toString(),
-        ]);
+
+        const objectStoreRequest = objectStore.get([1731065, 1726779755615]);
 
         objectStoreRequest.onsuccess = (event) => {
           // report the success of our request
