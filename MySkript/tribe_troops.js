@@ -101,9 +101,9 @@ function loadScript(url) {
     await c_sdk.storeDataInIndexedDB("troops", troops, timestamp);
     let lastUpdate = await c_sdk.getResultFromDB();
 
-    rows.forEach((row) => {
-      row.forEach((column) => {
-        changeColor(column);
+    tableData.forEach((row) => {
+      row.forEach((col) => {
+        changeColor(col);
       });
     });
   }
