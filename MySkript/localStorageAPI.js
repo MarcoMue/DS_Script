@@ -575,9 +575,6 @@
       let storageKey = `${entity}_last_updated`;
       let timestampsKey = `${entity}_timestamps`;
 
-      console.log("storageKey", storageKey);
-      console.log("timestampsKey", timestampsKey);
-
       let lastUpdate = localStorage.getItem(storageKey);
       lastUpdate = lastUpdate ? Number(lastUpdate) : null;
 
@@ -589,10 +586,11 @@
       } else {
         console.debug("Data updated successfully.");
         let timestamps = JSON.parse(localStorage.getItem(timestampsKey)) || [];
-        console.log("timestamps", timestamps);
         timestamps.push(timestamp);
-        console.log("timestamps 2", timestamps);
         localStorage.setItem(timestampsKey, JSON.stringify(timestamps));
+
+        let differences = calculateTimeDifferences(timestamps);
+        console.log(differences);
       }
 
       const { dbName, dbTable, dbVersion, key, indexes } =
@@ -650,6 +648,20 @@
           reject(event.target.error);
         };
       });
+    },
+
+    calculateTimeDifferences: function (timestamps) {
+      let differences = [];
+
+      for (let i = 1; i < timestamps.length; i++) {
+        let diffInMs = timestamps[i] - timestamps[i - 1];
+        let diffInSeconds = Math.floor(diffInMs / 1000);
+        let minutes = Math.floor(diffInSeconds / 60);
+        let seconds = diffInSeconds % 60;
+        differences.push({ minutes, seconds });
+      }
+
+      return differences;
     },
   };
 })();
