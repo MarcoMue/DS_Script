@@ -36,6 +36,7 @@ function loadScript(url) {
     let timestamp = new Date().getTime();
 
     table = parseMembersTroopsTable(tribeTable, 0, 0);
+    console.log("table", table);
 
     troops = createTroopObjects(table, timestamp);
 
@@ -155,6 +156,7 @@ function loadScript(url) {
   }
 
   function createTroopObjects(rows, timestamp) {
+    debugger;
     let playerTroops = rows.map((row) => {
       let r = row.map((column) => {
         return processColumnData(column);
