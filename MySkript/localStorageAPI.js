@@ -589,7 +589,7 @@
         timestamps.push(timestamp);
         localStorage.setItem(timestampsKey, JSON.stringify(timestamps));
 
-        let differences = calculateTimeDifferences(timestamps);
+        let differences = c_sdk.calculateTimeDifferences(timestamps);
         console.log(differences);
       }
 
