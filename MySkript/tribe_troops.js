@@ -47,7 +47,7 @@ function loadScript(url) {
   // Now you can use the library's functions
   c_sdk.storeDataInLocalStorage({ key: "value" });
   let xx = c_sdk.retrieveInstances("Hello, World!");
-  console.log("TribeTroops.js loaded successfully", xx);
+  console.debug("TribeTroops.js loaded successfully", xx);
 
   // ------------------------------
 
@@ -61,12 +61,14 @@ function loadScript(url) {
       name: $(this).parent().text().trim(),
     });
   });
-  console.group("Player URLs");
-  console.table(playerURLs);
-  console.groupEnd();
+  if (DEBUG) {
+    console.group("Player URLs");
+    console.table(playerURLs);
+    console.groupEnd();
+  }
 
   let mode = win.game_data.mode;
-  console.log("mode", mode);
+  console.debug("mode", mode);
   if (mode.includes("members")) {
     $("#ally_content .modemenu td:gt(0) a").each((i, e) => {
       let selected_player = $('[name*="player_id"] option[selected]').attr(
@@ -81,32 +83,28 @@ function loadScript(url) {
 
   if (mode === "members_troops") {
     let tribeTable = "#ally_content table.vis.w100";
-    let result = extractMembersTroopsTableData(tribeTable, 0, 0);
+    let timestamp = new Date().getTime();
+    let result = extractMembersTroopsTableData(tribeTable, 0, 0, timestamp);
 
-    console.group("Extracted Table Data");
-    console.table(result);
-    console.groupEnd();
+    if (DEBUG) {
+      console.group("Extracted Table Data");
+      console.table(result);
+      console.groupEnd();
+    }
 
     // Check the most recent timestamp in IndexedDB
     let lastUpdate = await c_sdk.getMostRecentTimestamp();
 
-    // If the most recent timestamp is less than 1 hour, don't update
-    if (lastUpdate && new Date().getTime() - lastUpdate < 3600000) {
-      console.log("Data is up-to-date. No need to update.");
-    } else {
-      // Write res to IndexedDB with the current timestamp as the index
-      await c_sdk.storeDataInIndexedDB(res, new Date().getTime());
-      console.log("Data updated successfully.");
-    }
-
+    // Write res to IndexedDB with the current timestamp as the index
     // Store the data in localStorage
-    await c_sdk.storeDataInIndexedDB("troops", result);
+    await c_sdk.storeDataInIndexedDB("troops", result, timestamp);
   }
 
   function extractMembersTroopsTableData(
     selector = tribeTable,
     rowStart,
-    columnStart
+    columnStart,
+    timestamp
   ) {
     let rows = $(selector).find("tr");
     let data = [];
@@ -140,9 +138,7 @@ function loadScript(url) {
         continue;
       }
 
-      data.push(
-        new c_sdk.types.PlayerTotalTroops(new Date().getTime(), ...rowData)
-      );
+      data.push(new c_sdk.types.PlayerTotalTroops(timestamp, ...rowData));
     }
     return data;
   }

@@ -522,6 +522,9 @@
       });
     },
 
+    // Store timestamps, in localstorage,
+    // resetbutton to clear both
+
     getMostRecentTimestamp: async function (entity) {
       // Let us open our database
       const DBOpenRequest = window.indexedDB.open("TroopsDB", 1);
@@ -567,7 +570,27 @@
       localStorage.setItem(`${entity}_last_updated`, Date.parse(new Date()));
     },
 
-    storeDataInIndexedDB: async function (entity, values) {
+    storeDataInIndexedDB: async function (entity, values, timestamp) {
+      // TODO: add world to key
+      let storageKey = `${entity}_last_updated`;
+      let timestampsKey = `${entity}_timestamps`;
+
+      let lastUpdate = localStorage.getItem(storageKey);
+      lastUpdate = lastUpdate ? Number(lastUpdate) : null;
+
+      // If the most recent timestamp is less than 15min old, do not update
+      if (lastUpdate && new Date().getTime() - lastUpdate < 15 * 60 * 1000) {
+        console.debug("Data is up-to-date. No need to update.");
+        localStorage.setItem(storageKey, lastUpdate);
+        return false;
+      } else {
+        console.debug("Data updated successfully.");
+        let timestamps = JSON.parse(localStorage.getItem(timestampsKey)) || [];
+        timestamps.push(timestamp);
+        // Store the updated array back in localStorage
+        localStorage.setItem(timestampsKey, JSON.stringify(timestamps));
+      }
+
       const { dbName, dbTable, dbVersion, key, indexes } =
         c_sdk.dbConfig[entity];
 
