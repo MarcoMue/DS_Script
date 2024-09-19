@@ -61,7 +61,9 @@ function loadScript(url) {
       name: $(this).parent().text().trim(),
     });
   });
-  console.log(playerURLs);
+  console.group("Player URLs");
+  console.table(playerURLs);
+  console.groupEnd();
 
   let mode = win.game_data.mode;
   console.log("mode", mode);
@@ -80,7 +82,9 @@ function loadScript(url) {
   if (mode === "members_troops") {
     let tribeTable = "#ally_content table.vis.w100";
     let res = extractTableData(tribeTable, 0, 1);
-    console.log(res);
+    console.group("Extracted Table Data");
+    console.table(res);
+    console.groupEnd();
   }
 
   function extractTableData(selector = tribeTable, rowStart, columnStart) {
@@ -95,8 +99,6 @@ function loadScript(url) {
 
         // Check if the <td> contains an <a> element
         let link = $(column).find("a");
-        console.log(link);
-
         if (link.length > 0) {
           // If it contains an <a> element, save the href attribute
           value = link.attr("href");
@@ -104,7 +106,7 @@ function loadScript(url) {
           // Otherwise, save the text content
           value = $(column).text().trim();
         }
-
+        console.log(row, column, link, value);
         rowData.push(value);
       }
       data.push(rowData);
