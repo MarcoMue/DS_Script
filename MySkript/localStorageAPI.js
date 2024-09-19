@@ -539,6 +539,7 @@
           const store = transaction.objectStore(dbTable);
 
           const { timestamp, data } = values;
+          console.log("Data to store:", values);
 
           data.forEach((item) => {
             // Ensure the item has the composite key fields
