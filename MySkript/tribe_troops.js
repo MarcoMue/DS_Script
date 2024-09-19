@@ -88,17 +88,10 @@ function loadScript(url) {
           : e.href + "&player_id=" + selected_player;
     });
   }
-  if (mode === "members_defense") {
-    console.log("members_defense");
-    // allyDeffSum();
-  } else if (mode === "members_troops") {
-    console.log("members_troops");
-    // allyTroopSum();
-  }
 
-  if (mode.includes("members")) {
+  if (mode === "members_troops") {
     let tribeTable = "#ally_content table.vis.w100";
-    let res = extractTableData(tribeTable, 1, 1);
+    let res = extractTableData(tribeTable, 0, 1);
     console.log(res);
   }
   function extractTableData(selector = tribeTable, rowStart, columnStart) {
@@ -110,7 +103,17 @@ function loadScript(url) {
       let rowData = [];
       for (let j = columnStart; j < columns.length; j++) {
         let column = columns[j];
-        let value = $(column).text().trim();
+
+        // Check if the <td> contains an <a> element
+        let link = $(column).find("a");
+        if (link.length > 0) {
+          // If it contains an <a> element, save the href attribute
+          value = link.attr("href");
+        } else {
+          // Otherwise, save the text content
+          value = $(column).text().trim();
+        }
+
         rowData.push(value);
       }
       data.push(rowData);
