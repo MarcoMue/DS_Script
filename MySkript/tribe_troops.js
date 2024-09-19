@@ -74,11 +74,12 @@ function loadScript(url) {
     let color = "red";
     // Get the current text content of the cell
     let currentText = $(column).text().trim();
+    $(column).append(`<span style="color:${color};">${value}</span>`);
 
     // Add the new value with color into the same cell
-    $(column).html(
-      `${currentText} <span style="color:${color};">${value}</span>`
-    );
+    // $(column).html(
+    //   `${currentText} <span style="color:${color};">${value}</span>`
+    // );
   }
 
   function parseMembersTroopsTable(selectedValue) {
