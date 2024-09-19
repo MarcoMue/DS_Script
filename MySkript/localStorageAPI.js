@@ -92,7 +92,7 @@
         dbName: "TroopsDB",
         dbVersion: 1,
         dbTable: "troops",
-        key: ["player_id", "timestamp"],
+        key: ["player_id", "read"],
         indexes: [],
         url: null,
       },
@@ -525,7 +525,7 @@
           // Define the composite key as an array of fields
           if (key) {
             objectStore = db.createObjectStore(dbTable, {
-              keyPath: ["keyA", "keyB"],
+              keyPath: key,
             });
             indexes.forEach((i) =>
               objectStore.createIndex(i.name, i.key, { unique: i.unique })
@@ -554,13 +554,12 @@
             // Ensure the item has the composite key fields
             // item.key = [playerID, timestamp];
 
-            let player_id = item.shift();
+            let id = item.shift();
             console.log("Item:", item);
 
             let entry = {
-              keyA: item[2],
-              keyB: item[3],
-              key: [player_id, timestamp],
+              player_id: id,
+              read: timestamp,
               speer: item[0],
               schwert: item[1],
             };
