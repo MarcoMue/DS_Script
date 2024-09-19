@@ -85,6 +85,28 @@ function loadScript(url) {
     console.group("Extracted Table Data");
     console.table(res);
     console.groupEnd();
+
+    // TODO: write res to indexed DB with the current Timestamp as the index.
+    // check most recent timestamp and compare with current timestamp to decide if to update or not.
+    // if the most recent timestamp is less than 1 hour, don't update.
+
+    // Check the most recent timestamp in IndexedDB
+    let lastUpdate = await c_sdk.getMostRecentTimestamp();
+    let currentTime = new Date().getTime();
+
+    // If the most recent timestamp is less than 1 hour, don't update
+    if (lastUpdate && currentTime - lastUpdate < 3600000) {
+      console.log("Data is up-to-date. No need to update.");
+    } else {
+      // Write res to IndexedDB with the current timestamp as the index
+      await c_sdk.storeDataInIndexedDB(res, currentTime);
+      console.log("Data updated successfully.");
+    }
+
+    // Store the data in localStorage
+    let storedData = { timestamp: currentTime, values: res };
+    console.log("Stored Data", storedData);
+    await c_sdk.storeDataInIndexedDB("troops", storedData);
   }
 
   function extractTableData(selector = tribeTable, rowStart, columnStart) {

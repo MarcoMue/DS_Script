@@ -81,6 +81,14 @@
       worldDataConquests: "/map/conquer_extended.txt",
     },
     dbConfig: {
+      troops: {
+        dbName: "TroopsDB",
+        dbVersion: 1,
+        dbTable: "troops",
+        key: ["player_id", "timestamp"],
+        indexes: [],
+        url: null,
+      },
       village: {
         dbName: "VillagesDB",
         dbVersion: 1,
@@ -483,6 +491,76 @@
               resolve(null);
             }
           };
+        };
+      });
+    },
+
+    getMostRecentTimestamp: async function (entity) {
+      return new Date().getTime();
+      return localStorage.getItem(`${entity}_last_updated`);
+    },
+    setMostRecentTimestamp: async function (entity) {
+      localStorage.setItem(`${entity}_last_updated`, Date.parse(new Date()));
+    },
+
+    storeDataInIndexedDB: async function (entity, values) {
+      console.time("storeDataInIndexedDB");
+      const { dbName, dbTable, dbVersion, key, indexes } =
+        c_sdk.dbConfig[entity];
+
+      const DBOpenRequest = indexedDB.open(dbName, dbVersion);
+
+      return new Promise((resolve, reject) => {
+        DBOpenRequest.onupgradeneeded = function () {
+          const db = DBOpenRequest.result;
+          let objectStore;
+
+          // Define the composite key as an array of fields
+          if (key) {
+            objectStore = db.createObjectStore(dbTable, { keyPath: key });
+            indexes.forEach((i) =>
+              objectStore.createIndex(i.name, i.key, { unique: i.unique })
+            );
+          } else {
+            objectStore = db.createObjectStore(dbTable, {
+              autoIncrement: true,
+            });
+          }
+
+          objectStore.transaction.oncomplete = () => {
+            console.log("Object store created");
+          };
+        };
+
+        DBOpenRequest.onsuccess = function () {
+          console.time("putData");
+          const db = DBOpenRequest.result;
+          const transaction = db.transaction(dbTable, "readwrite");
+          const store = transaction.objectStore(dbTable);
+
+          const { timestamp, data } = values;
+
+          data.forEach((item) => {
+            // Ensure the item has the composite key fields
+            item.key = [item.name, timestamp];
+            console.log("Item:", item);
+            store.put(item);
+          });
+
+          transaction.oncomplete = () => {
+            console.log("Data stored successfully");
+            resolve();
+          };
+
+          transaction.onerror = function (event) {
+            console.error("Transaction error:", event.target.error);
+            reject(event.target.error);
+          };
+        };
+
+        DBOpenRequest.onerror = function (event) {
+          console.error("Database error:", event.target.error);
+          reject(event.target.error);
         };
       });
     },
