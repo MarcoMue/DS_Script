@@ -58,4 +58,34 @@ function loadScript(url) {
   });
 
   console.log(playerURLs);
+
+  if (window.location.href.indexOf("screen=ally&mode=members") > -1) {
+    //members own tribe
+    tribeTable = "#content_value table.vis";
+    rowStart = 3;
+    columnStart = 6;
+    columnName = 0;
+    rows = $($("table .vis")[2]).find("tr");
+  }
+
+  let mode = win.game_data.mode;
+
+  if (mode.includes("members")) {
+    $("#ally_content .modemenu td:gt(0) a").each((i, e) => {
+      let selected_player = $('[name*="player_id"] option[selected]').attr(
+        "value"
+      );
+      e.href =
+        selected_player === undefined
+          ? e.href
+          : e.href + "&player_id=" + selected_player;
+    });
+  }
+  if (mode === "members_defense") {
+    console.log("members_defense");
+    // allyDeffSum();
+  } else if (mode === "members_troops") {
+    console.log("members_troops");
+    // allyTroopSum();
+  }
 })();
