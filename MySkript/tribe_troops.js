@@ -76,7 +76,7 @@ function loadScript(url) {
   }
 
   let mode = win.game_data.mode;
-
+  console.log("mode", mode);
   if (mode.includes("members")) {
     $("#ally_content .modemenu td:gt(0) a").each((i, e) => {
       let selected_player = $('[name*="player_id"] option[selected]').attr(
@@ -94,5 +94,27 @@ function loadScript(url) {
   } else if (mode === "members_troops") {
     console.log("members_troops");
     // allyTroopSum();
+  }
+
+  if (mode.includes("members")) {
+    let tribeTable = "#ally_content table.vis.w100";
+    let res = extractTableData(tribeTable, 1, 1);
+    console.log(res);
+  }
+  function extractTableData(selector = tribeTable, rowStart, columnStart) {
+    let rows = $(selector).find("tr");
+    let data = [];
+    for (let i = rowStart; i < rows.length; i++) {
+      let row = rows[i];
+      let columns = $(row).find("td");
+      let rowData = [];
+      for (let j = columnStart; j < columns.length; j++) {
+        let column = columns[j];
+        let value = $(column).text().trim();
+        rowData.push(value);
+      }
+      data.push(rowData);
+    }
+    return data;
   }
 })();

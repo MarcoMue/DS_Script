@@ -1,3 +1,5 @@
+// TODO rename to storageAPI.js
+
 (function () {
   window.c_sdk = {
     types: {
