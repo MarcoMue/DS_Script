@@ -1,0 +1,41 @@
+{
+   "G1": {
+      "message": "Ankunftszeit:"
+   },
+   "G2": {
+      "message": "Die Anzahl von Dicken:"
+   },
+   "S1": {
+      "message": "Ankunftszeit bezeichnet keinen Tag, sondern die Uhrzeit"
+   },
+   "S2": {
+      "message": "Wenn du auf 'Speichern' klickst, werden die für weitere Angriffe von Adligen eingegebenen Truppen gespeichert"
+   },
+   "S3": {
+      "message": "Der letzte allgemeine Datensatz wird in die neue Karte und der letzte Datensatz in der gegebenen Karte in die alten Karten geladen"
+   },
+   "S4": {
+      "message": "Der Bot aktualisiert die Seite einige Sekunden vor dem Senden und führt die Truppen selbst ein"
+   },
+   "S5": {
+      "message": "Unterschiede beim Senden von ms hängen unter anderem mit der Verzögerung des Servers, deines Internets und deines Computers zusammen"
+   },
+   "S6": {
+      "message": "Kontakt: rgfkit@gmail.com - nur Polnisch oder Englisch"
+   },
+   "S7": {
+      "message": "\u003Cb>Es wird empfohlen, den Bot auf der einzigen Registerkarte im Fenster zu belassen und nicht zu minimieren\u003C/b>"
+   },
+   "app_desc": {
+      "message": "Bot ermöglicht großartige Abzielung von Millisekunden."
+   },
+   "app_title": {
+      "message": "Magische Millisekunden FK - die-staemme.de"
+   },
+   "save": {
+      "message": "Speichere"
+   },
+   "saved": {
+      "message": "Gespeichert"
+   }
+}

@@ -1,0 +1,41 @@
+{
+   "G1": {
+      "message": "Czas dotarcia:"
+   },
+   "G2": {
+      "message": "Ilość grubych:"
+   },
+   "S1": {
+      "message": "Czas dotarcia pomija dni, patrzy tylko na godziny"
+   },
+   "S2": {
+      "message": "Klikając 'Zapisz' zapisujesz jeszcze wprowadzone wojska dodatkowych atakach szlachcica"
+   },
+   "S3": {
+      "message": "W nowej karcie wczytany jest ostatni ogólny zapis, a w starych ostatni w danej karcie"
+   },
+   "S4": {
+      "message": "Bot kilka sekund przed wysłaniem odświeża stronę i sam wprowadzi wojska"
+   },
+   "S5": {
+      "message": "Różnice w wysyłce ms wiążą się m.in. z opóźnieniem serwera, Twojego internetu i Twojego komputera"
+   },
+   "S6": {
+      "message": "Kontakt: rgfkit@gmail.com - tylko polski lub angielski"
+   },
+   "S7": {
+      "message": "\u003Cb>Zalecane zostawić bota w jedynej karcie w oknie i nie minimalizować\u003C/b>"
+   },
+   "app_desc": {
+      "message": "Bot umożliwiający świetne wycelowanie milisekund."
+   },
+   "app_title": {
+      "message": "Magiczne milisekundy FK - Plemiona.pl"
+   },
+   "save": {
+      "message": "Zapisz"
+   },
+   "saved": {
+      "message": "Zapisano"
+   }
+}

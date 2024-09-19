@@ -1,0 +1,41 @@
+{
+   "G1": {
+      "message": "Arrival time:"
+   },
+   "G2": {
+      "message": "Amount of noblemans"
+   },
+   "S1": {
+      "message": "Arrival time ignores days, looks only at hours"
+   },
+   "S2": {
+      "message": "By clicking 'Save' you also save the army with subsequent nobleman's attacks"
+   },
+   "S3": {
+      "message": "The new tab will load the last save of any cards, but the old tabs will load the save from their tabs"
+   },
+   "S4": {
+      "message": "The bot refreshes the page a few seconds before sending and enters troops"
+   },
+   "S5": {
+      "message": "Differences in ms are related to, among others with the delay of the server, your internet and your computer"
+   },
+   "S6": {
+      "message": "Contact: rgfkit@gmail.com - only polish and english"
+   },
+   "S7": {
+      "message": "\u003Cb>It is recommended to leave the bot in the only tab in the window and not minimize\u003C/b>"
+   },
+   "app_desc": {
+      "message": "Send the army down to the second, faster than the enemy"
+   },
+   "app_title": {
+      "message": "Magic milliseconds FK - Tribalwars"
+   },
+   "save": {
+      "message": "Save"
+   },
+   "saved": {
+      "message": "Saved"
+   }
+}
