@@ -142,7 +142,7 @@ function loadScript(url) {
       data.push(rowData);
     }
 
-    console.groupCollapsed("Extracted Table Data");
+    console.group("Extracted Table Data");
     console.table(data);
     console.groupEnd();
 
@@ -158,7 +158,7 @@ function loadScript(url) {
       return new c_sdk.types.PlayerTotalTroops(timestamp, ...r);
     });
 
-    console.groupCollapsed("Extracted Troop Data");
+    console.group("Extracted Troop Data");
     console.table(playerTroops);
     console.groupEnd();
 
