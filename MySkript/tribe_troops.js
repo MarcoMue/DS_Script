@@ -104,7 +104,7 @@ function loadScript(url) {
     }
 
     // Store the data in localStorage
-    let storedData = { timestamp: currentTime, values: res };
+    let storedData = { timestamp: currentTime, data: res };
     console.log("Stored Data", storedData);
     await c_sdk.storeDataInIndexedDB("troops", storedData);
   }
