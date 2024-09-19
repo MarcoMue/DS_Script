@@ -82,8 +82,25 @@ function loadScript(url) {
   if (mode === "members_troops") {
     let tribeTable = "#ally_content table.vis.w100";
     let res = extractTableData(tribeTable, 0, 0);
+
+    let result = res.map((row) => {
+      return new c_sdk.types.PlayerTotalTroops(
+        new Date().getTime(),
+        row[0].split("id=")[1],
+        parseInt(row[1]),
+        parseInt(row[2]),
+        parseInt(row[3]),
+        parseInt(row[4]),
+        parseInt(row[5]),
+        parseInt(row[6]),
+        parseInt(row[7]),
+        parseInt(row[8]),
+        parseInt(row[9])
+      );
+    });
+
     console.group("Extracted Table Data");
-    console.table(res);
+    console.table(result);
     console.groupEnd();
 
     // TODO: write res to indexed DB with the current Timestamp as the index.
@@ -92,24 +109,21 @@ function loadScript(url) {
 
     // Check the most recent timestamp in IndexedDB
     let lastUpdate = await c_sdk.getMostRecentTimestamp();
-    let currentTime = new Date().getTime();
 
     // If the most recent timestamp is less than 1 hour, don't update
-    if (lastUpdate && currentTime - lastUpdate < 3600000) {
+    if (lastUpdate && new Date().getTime() - lastUpdate < 3600000) {
       console.log("Data is up-to-date. No need to update.");
     } else {
       // Write res to IndexedDB with the current timestamp as the index
-      await c_sdk.storeDataInIndexedDB(res, currentTime);
+      await c_sdk.storeDataInIndexedDB(res, new Date().getTime());
       console.log("Data updated successfully.");
     }
 
     // Store the data in localStorage
-    let storedData = { timestamp: currentTime, data: res };
-    console.log("Stored Data", storedData);
-    await c_sdk.storeDataInIndexedDB("troops", storedData);
+    // let storedData = { timestamp: new Date().getTime(), data: res };
+    // console.log("Stored Data", storedData);
+    await c_sdk.storeDataInIndexedDB("troops", result);
   }
-
-  
 
   function extractTableData(selector = tribeTable, rowStart, columnStart) {
     let rows = $(selector).find("tr");

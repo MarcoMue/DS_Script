@@ -531,7 +531,6 @@
     },
 
     storeDataInIndexedDB: async function (entity, values) {
-      console.time("storeDataInIndexedDB");
       const { dbName, dbTable, dbVersion, key, indexes } =
         c_sdk.dbConfig[entity];
 
@@ -562,31 +561,13 @@
         };
 
         DBOpenRequest.onsuccess = function () {
-          console.time("putData");
           const db = DBOpenRequest.result;
           const transaction = db.transaction(dbTable, "readwrite");
           const store = transaction.objectStore(dbTable);
 
-          const { timestamp, data } = values;
           console.log("Data to store:", values);
-
-          data.forEach((item) => {
-            let entry = {
-              read: timestamp,
-              player_id: item[0],
-              speer: item[1],
-              schwert: item[2],
-            };
-            console.log("Item:", item);
-            console.log("Entry:", entry);
-
-            let classObj = new c_sdk.types.PlayerTotalTroops(
-              timestamp,
-              ...item
-            );
-            console.log("xx:", classObj);
-
-            store.put(classObj);
+          values.forEach((item) => {
+            store.put(item);
           });
 
           transaction.oncomplete = () => {
