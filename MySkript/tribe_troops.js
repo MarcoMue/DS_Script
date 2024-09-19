@@ -29,35 +29,16 @@ function loadScript(url) {
 
   await init();
 
-  let table = [];
   let troops = [];
   if (mode === "members_troops") {
-    let tribeTable = "#ally_content table.vis.w100";
     let timestamp = new Date().getTime();
-
-    table = parseMembersTroopsTable(tribeTable, 0, 0);
-    console.log("table", table);
-
-    troops = createTroopObjects(table, timestamp);
+    troops = parseMembersTroopsTable();
+    await c_sdk.storeDataInIndexedDB("troops", troops, timestamp);
 
     // Add the dropdown with values from localStorage
     let dropdownValues = getDropdownValues();
     let dropdown = createDropdown(dropdownValues);
-    insertDropdownIntoDOM(dropdown, handleDropdownChange);
-
-    function handleDropdownChange(selectedValue) {
-      console.log("Selected value:", selectedValue);
-      console.log(table);
-
-      table.forEach((row) => {
-        row.forEach((col) => {
-          changeColor(col, selectedValue);
-        });
-      });
-    }
-
-    await c_sdk.storeDataInIndexedDB("troops", troops, timestamp);
-    let lastUpdate = await c_sdk.getResultFromDB();
+    insertDropdownIntoDOM(dropdown, parseMembersTroopsTable);
   }
 
   function createDropdown(values) {
@@ -89,20 +70,7 @@ function loadScript(url) {
     return values ? JSON.parse(values) : [];
   }
 
-  function processColumnData(column) {
-    // Check if the <td> contains an <a> element
-    let link = $(column).find("a");
-    if (link.length > 0) {
-      // If it contains an <a> element, save the href attribute
-      return link.attr("href").split("id=")[1];
-    } else {
-      // Otherwise, save the text content
-      return $(column).text().trim();
-    }
-  }
-
-  function changeColor(column) {
-    console.log(column, value);
+  function changeColor(column, value) {
     let color = "red";
     // Get the current text content of the cell
     let currentText = $(column).text().trim();
@@ -113,10 +81,15 @@ function loadScript(url) {
     );
   }
 
-  function parseMembersTroopsTable(selector, rowStart, columnStart) {
-    let rows = $(selector).find("tr");
-    let data = [];
+  function parseMembersTroopsTable(selectedValue) {
+    console.log("Selected value:", selectedValue);
 
+    let tribeTable = "#ally_content table.vis.w100";
+    let rowStart = 0;
+    let columnStart = 0;
+
+    let rows = $(tribeTable).find("tr");
+    let data = [];
     for (let i = rowStart; i < rows.length; i++) {
       let row = rows[i];
 
@@ -127,12 +100,31 @@ function loadScript(url) {
 
       let columns = $(row).find("td");
       let rowData = [];
-
       for (let j = columnStart; j < columns.length; j++) {
         let column = columns[j];
-        rowData.push(column);
+
+        // Check if the <td> contains an <a> element
+        let link = $(column).find("a");
+        if (link.length > 0) {
+          // If it contains an <a> element, save the href attribute
+          value = link.attr("href").split("id=")[1];
+        } else {
+          // Otherwise, save the text content
+          value = $(column).text().trim();
+        }
+
+        changeColor(column, selectedValue);
+        rowData.push(parseInt(value));
       }
-      data.push(rowData);
+
+      // no valid playerID found
+      if (!rowData[0]) {
+        continue;
+      }
+
+      data.push(
+        new c_sdk.types.PlayerTotalTroops(new Date().getTime(), ...rowData)
+      );
     }
 
     console.group("Extracted Table Data");
@@ -140,26 +132,6 @@ function loadScript(url) {
     console.groupEnd();
 
     return data;
-  }
-
-  function createTroopObjects(rows, timestamp) {
-    let playerTroops = rows.map((row) => {
-      let r = row.map((column) => {
-        return processColumnData(column);
-      });
-
-      console.log("r", r);
-
-      return new c_sdk.types.PlayerTotalTroops(timestamp, ...r);
-    });
-
-    console.log("playerTroops", playerTroops);
-
-    console.group("Extracted Troop Data");
-    console.table(playerTroops);
-    console.groupEnd();
-
-    return playerTroops;
   }
 
   function timeAgo(timestamp) {
