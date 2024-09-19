@@ -160,8 +160,12 @@ function loadScript(url) {
         return processColumnData(column);
       });
 
+      console.log("r", r);
+
       return new c_sdk.types.PlayerTotalTroops(timestamp, ...r);
     });
+
+    console.log("playerTroops", playerTroops);
 
     console.group("Extracted Troop Data");
     console.table(playerTroops);
