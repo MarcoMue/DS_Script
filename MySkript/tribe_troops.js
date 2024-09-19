@@ -81,23 +81,7 @@ function loadScript(url) {
 
   if (mode === "members_troops") {
     let tribeTable = "#ally_content table.vis.w100";
-    let res = extractTableData(tribeTable, 0, 0);
-
-    let result = res.map((row) => {
-      return new c_sdk.types.PlayerTotalTroops(
-        new Date().getTime(),
-        row[0].split("id=")[1],
-        parseInt(row[1]),
-        parseInt(row[2]),
-        parseInt(row[3]),
-        parseInt(row[4]),
-        parseInt(row[5]),
-        parseInt(row[6]),
-        parseInt(row[7]),
-        parseInt(row[8]),
-        parseInt(row[9])
-      );
-    });
+    let result = extractMembersTroopsTableData(tribeTable, 0, 0);
 
     console.group("Extracted Table Data");
     console.table(result);
@@ -125,12 +109,17 @@ function loadScript(url) {
     await c_sdk.storeDataInIndexedDB("troops", result);
   }
 
-  function extractTableData(selector = tribeTable, rowStart, columnStart) {
+  function extractMembersTroopsTableData(
+    selector = tribeTable,
+    rowStart,
+    columnStart
+  ) {
     let rows = $(selector).find("tr");
     let data = [];
     for (let i = rowStart; i < rows.length; i++) {
       let row = rows[i];
 
+      // Skip header rows
       if ($(row).find("th").length > 0) {
         continue;
       }
@@ -144,15 +133,25 @@ function loadScript(url) {
         let link = $(column).find("a");
         if (link.length > 0) {
           // If it contains an <a> element, save the href attribute
-          value = link.attr("href");
+          value = link.attr("href").split("id=")[1];
+          if (!value) {
+            // TODO: continue with next row
+          }
         } else {
           // Otherwise, save the text content
           value = $(column).text().trim();
         }
-        // console.debug(row, column, link, value);
-        rowData.push(value);
+        rowData.push(parseInt(value));
       }
-      data.push(rowData);
+
+      // no valid playerID found
+      if (!rowData[0]) {
+        continue;
+      }
+
+      data.push(
+        new c_sdk.types.PlayerTotalTroops(new Date().getTime(), ...rowData)
+      );
     }
     return data;
   }
