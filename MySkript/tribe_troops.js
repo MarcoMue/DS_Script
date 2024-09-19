@@ -114,6 +114,11 @@ function loadScript(url) {
     let data = [];
     for (let i = rowStart; i < rows.length; i++) {
       let row = rows[i];
+
+      if ($(row).find("th").length > 0) {
+        continue;
+      }
+
       let columns = $(row).find("td");
       let rowData = [];
       for (let j = columnStart; j < columns.length; j++) {

@@ -69,6 +69,13 @@
           this.model = model;
         }
       },
+      PlayerTotalTroops: class {
+        constructor(playerId, tribeId, totalTroops) {
+          this.playerId = playerId;
+          this.tribeId = tribeId;
+          this.totalTroops = totalTroops;
+        }
+      },
     },
     config: {
       basePath: "https://de228.die-staemme.de",
