@@ -522,9 +522,6 @@
       });
     },
 
-    // Store timestamps, in localstorage,
-    // resetbutton to clear both
-
     getResultFromDB: async function (timestamp, playerID) {
       // Let us open our database
       const DBOpenRequest = window.indexedDB.open("TroopsDB", 1);
@@ -554,6 +551,8 @@
 
         // Make a request to get a record by key from the object store
 
+        console.log("Timestamp:", timestamp);
+        console.log("PlayerID:", playerID);
         const objectStoreRequest = objectStore.get([playerID, timestamp]);
 
         objectStoreRequest.onsuccess = (event) => {
@@ -566,6 +565,7 @@
       }
       return new Date().getTime();
     },
+
     setMostRecentTimestamp: async function (entity) {
       localStorage.setItem(`${entity}_last_updated`, Date.parse(new Date()));
     },
@@ -663,5 +663,8 @@
 
       return differences;
     },
+
+    // TODO:
+    // resetbutton to clear db and localstorage
   };
 })();
