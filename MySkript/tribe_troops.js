@@ -44,6 +44,8 @@ function loadScript(url) {
     function handleDropdownChange(selectedValue) {
       console.log("Selected value:", selectedValue);
 
+      console.log(tableData);
+
       tableData.forEach((row) => {
         row.forEach((col) => {
           changeColor(col, selectedValue);
