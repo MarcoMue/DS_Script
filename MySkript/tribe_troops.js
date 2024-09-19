@@ -41,32 +41,21 @@ function loadScript(url) {
 
   // Now you can use the library's functions
   c_sdk.storeDataInLocalStorage({ key: "value" });
-  c_sdk.retrieveInstances("Hello, World!");
+  let xx = c_sdk.retrieveInstances("Hello, World!");
+  console.log("TribeTroops.js loaded successfully", xx);
 
-  //   openUI();
+  // ------------------------------
 
-  async function openUI() {
-    const html = `<div id="content"></div>`;
-    $("#contentContainer").eq(0).prepend(html);
-    $("#mobileContent").eq(0).prepend(html);
+  var baseURL = `game.php?screen=ally&mode=members_troops&player_id=`;
+  var playerURLs = [];
 
-    await loadHTML("ui.html", "content");
-    Timing.tickHandlers.timers.init();
+  $("input:radio[name=player]").each(function () {
+    playerURLs.push(baseURL + $(this).attr("value"));
+    player.push({
+      id: $(this).attr("value"),
+      name: $(this).parent().text().trim(),
+    });
+  });
 
-    // document
-    //   .getElementById("of")
-    //   .addEventListener("change", () => setMode("members_troops"));
-    // document
-    //   .getElementById("in")
-    //   .addEventListener("change", () => setMode("members_defense"));
-    document.getElementById("run").addEventListener("click", readIncs);
-    document.getElementById("test1").addEventListener("click", TestButton1);
-    document.getElementById("test2").addEventListener("click", TestButton2);
-
-    // document.getElementById('troop_details').addEventListener('click', readCheckboxValue);
-
-    showLastUpdatedDb();
-    setInterval(showLastUpdatedDb, 5000);
-    addRadioControls();
-  }
+  console.log(playerURLs);
 })();
