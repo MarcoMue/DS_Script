@@ -61,19 +61,7 @@ function loadScript(url) {
       name: $(this).parent().text().trim(),
     });
   });
-
   console.log(playerURLs);
-
-  if (window.location.href.indexOf("screen=ally&mode=members") > -1) {
-    //members own tribe
-    tribeTable = "#content_value table.vis";
-    rowStart = 3;
-    columnStart = 6;
-    columnName = 0;
-    rows = $($("table .vis")[2]).find("tr");
-
-    console.log("members own tribe", rows);
-  }
 
   let mode = win.game_data.mode;
   console.log("mode", mode);
