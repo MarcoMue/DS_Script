@@ -67,7 +67,11 @@ function loadScript(url) {
     let dropdown = $("<select></select>");
     values.forEach((value) => {
       let datetime = new Date(value).toLocaleString();
-      let option = $("<option></option>").text(datetime).val(value);
+      let timeAgoText = timeAgo(value);
+
+      let option = $("<option></option>")
+        .text(`${datetime} ${timeAgoText}`)
+        .val(value);
       dropdown.append(option);
     });
     return dropdown;
@@ -152,6 +156,26 @@ function loadScript(url) {
 
       return new c_sdk.types.PlayerTotalTroops(timestamp, ...r);
     });
+  }
+
+  function timeAgo(timestamp) {
+    const now = new Date();
+    const timeDifference = now - new Date(timestamp);
+
+    const seconds = Math.floor(timeDifference / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) {
+      return `${days} day${days > 1 ? "s" : ""} ago`;
+    } else if (hours > 0) {
+      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    } else if (minutes > 0) {
+      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    } else {
+      return `${seconds} second${seconds > 1 ? "s" : ""} ago`;
+    }
   }
 
   async function init() {
