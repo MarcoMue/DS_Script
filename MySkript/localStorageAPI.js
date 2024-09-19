@@ -580,7 +580,11 @@
             console.log("Item:", item);
             console.log("Entry:", entry);
 
-            let classObj = new PlayerTotalTroops(id, timestamp, ...item);
+            let classObj = new c_sdk.types.PlayerTotalTroops(
+              id,
+              timestamp,
+              ...item
+            );
             console.log("xx:", classObj);
 
             store.put(entry);
