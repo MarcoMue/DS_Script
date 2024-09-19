@@ -128,7 +128,7 @@ function loadScript(url) {
   }
 
   function insertDropdownIntoDOM(dropdown, onChangeCallback) {
-    $("#dropdownContainer").append(dropdown);
+    $("#ally_content").append(dropdown);
 
     // Attach change event listener
     dropdown.change(function () {
