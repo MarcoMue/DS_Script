@@ -554,7 +554,7 @@
 
         // Make a request to get a record by key from the object store
 
-        const objectStoreRequest = objectStore.get([1682039, 1726752908027]);
+        const objectStoreRequest = objectStore.get([1731065, 1726769522695]);
 
         objectStoreRequest.onsuccess = (event) => {
           // report the success of our request
@@ -575,6 +575,9 @@
       let storageKey = `${entity}_last_updated`;
       let timestampsKey = `${entity}_timestamps`;
 
+      console.log("storageKey", storageKey);
+      console.log("timestampsKey", timestampsKey);
+
       let lastUpdate = localStorage.getItem(storageKey);
       lastUpdate = lastUpdate ? Number(lastUpdate) : null;
 
@@ -586,8 +589,9 @@
       } else {
         console.debug("Data updated successfully.");
         let timestamps = JSON.parse(localStorage.getItem(timestampsKey)) || [];
+        console.log("timestamps", timestamps);
         timestamps.push(timestamp);
-        // Store the updated array back in localStorage
+        console.log("timestamps 2", timestamps);
         localStorage.setItem(timestampsKey, JSON.stringify(timestamps));
       }
 
