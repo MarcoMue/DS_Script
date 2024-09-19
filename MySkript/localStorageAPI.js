@@ -524,7 +524,9 @@
 
           // Define the composite key as an array of fields
           if (key) {
-            objectStore = db.createObjectStore(dbTable, { keyPath: key });
+            objectStore = db.createObjectStore(dbTable, {
+              keyPath: ["keyA", "keyB"],
+            });
             indexes.forEach((i) =>
               objectStore.createIndex(i.name, i.key, { unique: i.unique })
             );
@@ -552,11 +554,13 @@
             // Ensure the item has the composite key fields
             // item.key = [playerID, timestamp];
 
-            let playerID = item.shift();
+            let player_id = item.shift();
             console.log("Item:", item);
 
             let entry = {
-              key: [playerID, timestamp],
+              keyA: item[2],
+              keyB: item[3],
+              key: [player_id, timestamp],
               speer: item[0],
               schwert: item[1],
             };
