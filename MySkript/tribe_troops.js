@@ -29,12 +29,14 @@ function loadScript(url) {
 
   await init();
 
+  let table = [];
+  let troops = [];
   if (mode === "members_troops") {
     let tribeTable = "#ally_content table.vis.w100";
     let timestamp = new Date().getTime();
 
-    let tableData = parseMembersTroopsTable(tribeTable, 0, 0);
-    let troops = createTroopObjects(tableData, timestamp);
+    table = parseMembersTroopsTable(tribeTable, 0, 0);
+    troops = createTroopObjects(table, timestamp);
 
     // Add the dropdown with values from localStorage
     let dropdownValues = getDropdownValues();
@@ -43,10 +45,9 @@ function loadScript(url) {
 
     function handleDropdownChange(selectedValue) {
       console.log("Selected value:", selectedValue);
+      console.log(table);
 
-      console.log(tableData);
-
-      tableData.forEach((row) => {
+      table.forEach((row) => {
         row.forEach((col) => {
           changeColor(col, selectedValue);
         });
@@ -54,7 +55,7 @@ function loadScript(url) {
     }
 
     console.groupCollapsed("Extracted Table Data");
-    console.table(tableData);
+    console.table(table);
     console.groupEnd();
 
     console.groupCollapsed("Extracted Troop Data");
