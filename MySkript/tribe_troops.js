@@ -82,8 +82,8 @@ function loadScript(url) {
     // );
   }
 
-  function parseMembersTroopsTable(selectedValue) {
-    console.log("Selected value:", selectedValue);
+  async function parseMembersTroopsTable(timestamp) {
+    console.log("Selected value:", timestamp);
 
     let tribeTable = "#ally_content table.vis.w100";
     let rowStart = 0;
@@ -92,6 +92,7 @@ function loadScript(url) {
     let rows = $(tribeTable).find("tr");
     let data = [];
     for (let i = rowStart; i < rows.length; i++) {
+      debugger;
       let row = rows[i];
 
       // Skip header rows
@@ -99,28 +100,32 @@ function loadScript(url) {
         continue;
       }
 
-      let columns = $(row).find("td");
       let rowData = [];
-      for (let j = columnStart; j < columns.length; j++) {
-        let column = columns[j];
+      let playerID;
+      let oldTroops;
 
-        // Check if the <td> contains an <a> element
-        let link = $(column).find("a");
-        if (link.length > 0) {
-          // If it contains an <a> element, save the href attribute
-          value = link.attr("href").split("id=")[1];
+      let columns = $(row).find("td");
+      let playerText = columns.shift(); // Remove the first column
+      let link = $(playerText).find("a");
+
+      if (link.length > 0) {
+        // If it contains an <a> element, save the href attribute
+        playerID = link.attr("href").split("id=")[1];
+        // no valid playerID found
+        if (!playerID) {
+          continue;
         } else {
-          // Otherwise, save the text content
-          value = $(column).text().trim();
+          playerID = parseInt(playerID);
+          rowData.push(playerID);
+          oldTroops = await getResultFromDB(timestamp, playerID);
         }
-
-        changeColor(column, selectedValue);
-        rowData.push(parseInt(value));
       }
 
-      // no valid playerID found
-      if (!rowData[0]) {
-        continue;
+      for (let j = columnStart; j < columns.length; j++) {
+        let column = columns[j];
+        value = $(column).text().trim();
+        // changeColor(column, selectedValue, playerID);
+        rowData.push(parseInt(value));
       }
 
       data.push(

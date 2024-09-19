@@ -525,7 +525,7 @@
     // Store timestamps, in localstorage,
     // resetbutton to clear both
 
-    getResultFromDB: async function (entity) {
+    getResultFromDB: async function (timestamp, playerID) {
       // Let us open our database
       const DBOpenRequest = window.indexedDB.open("TroopsDB", 1);
 
@@ -554,7 +554,7 @@
 
         // Make a request to get a record by key from the object store
 
-        const objectStoreRequest = objectStore.get([1731065, 1726769522695]);
+        const objectStoreRequest = objectStore.get([playerID, timestamp]);
 
         objectStoreRequest.onsuccess = (event) => {
           // report the success of our request
