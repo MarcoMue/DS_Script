@@ -550,7 +550,9 @@
 
           data.forEach((item) => {
             // Ensure the item has the composite key fields
-            item.key = [item.name, timestamp];
+            let playerID = item.shift();
+            item.key = [playerID, timestamp];
+
             console.log("Item:", item);
             store.put(item);
           });
