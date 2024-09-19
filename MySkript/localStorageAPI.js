@@ -550,7 +550,8 @@
         const objectStore = transaction.objectStore("troops");
 
         // Make a request to get a record by key from the object store
-        const objectStoreRequest = objectStore.get(1577394638);
+
+        const objectStoreRequest = objectStore.get([1682039, 1726752908027]);
 
         objectStoreRequest.onsuccess = (event) => {
           // report the success of our request
