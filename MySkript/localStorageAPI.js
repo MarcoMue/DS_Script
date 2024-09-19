@@ -523,8 +523,44 @@
     },
 
     getMostRecentTimestamp: async function (entity) {
+      // Let us open our database
+      const DBOpenRequest = window.indexedDB.open("TroopsDB", 1);
+
+      DBOpenRequest.onsuccess = (event) => {
+        db = DBOpenRequest.result;
+        getData();
+      };
+
+      function getData() {
+        const transaction = db.transaction(["TroopsDB"], "readwrite");
+
+        // report on the success of the transaction completing, when everything is done
+        transaction.oncomplete = (event) => {
+          console.log("Transaction completed.");
+        };
+
+        transaction.onerror = (event) => {
+          console.log(
+            "Transaction not opened due to error: ",
+            transaction.error
+          );
+        };
+
+        // create an object store on the transaction
+        const objectStore = transaction.objectStore("troops");
+
+        // Make a request to get a record by key from the object store
+        const objectStoreRequest = objectStore.get(1577394638);
+
+        objectStoreRequest.onsuccess = (event) => {
+          // report the success of our request
+          console.log("Request successful.");
+
+          const myRecord = objectStoreRequest.result;
+          console.log("Result: ", myRecord);
+        };
+      }
       return new Date().getTime();
-      return localStorage.getItem(`${entity}_last_updated`);
     },
     setMostRecentTimestamp: async function (entity) {
       localStorage.setItem(`${entity}_last_updated`, Date.parse(new Date()));
