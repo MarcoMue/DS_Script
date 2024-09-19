@@ -32,7 +32,7 @@ function loadScript(url) {
   let troops = [];
   if (mode === "members_troops") {
     let timestamp = new Date().getTime();
-    troops = parseMembersTroopsTable();
+    troops = await parseMembersTroopsTable();
     await c_sdk.storeDataInIndexedDB("troops", troops, timestamp);
 
     // Add the dropdown with values from localStorage
@@ -92,7 +92,6 @@ function loadScript(url) {
     let rows = $(tribeTable).find("tr");
     let data = [];
     for (let i = rowStart; i < rows.length; i++) {
-      debugger;
       let row = rows[i];
 
       // Skip header rows
