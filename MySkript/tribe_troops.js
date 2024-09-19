@@ -113,13 +113,10 @@ function loadScript(url) {
     );
   }
 
-  function parseMembersTroopsTable(
-    selector = tribeTable,
-    rowStart,
-    columnStart
-  ) {
+  function parseMembersTroopsTable(selector, rowStart, columnStart) {
     let rows = $(selector).find("tr");
     let data = [];
+
     for (let i = rowStart; i < rows.length; i++) {
       let row = rows[i];
       console.log(row);
@@ -139,6 +136,7 @@ function loadScript(url) {
         console.log(column);
       }
 
+      debugger;
       console.log(rowData);
 
       // no valid playerID found
@@ -156,7 +154,6 @@ function loadScript(url) {
   }
 
   function createTroopObjects(rows, timestamp) {
-    debugger;
     let playerTroops = rows.map((row) => {
       let r = row.map((column) => {
         return processColumnData(column);
