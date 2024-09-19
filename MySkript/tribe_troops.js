@@ -119,7 +119,6 @@ function loadScript(url) {
 
     for (let i = rowStart; i < rows.length; i++) {
       let row = rows[i];
-      console.log(row);
 
       // Skip header rows
       if ($(row).find("th").length > 0) {
@@ -132,16 +131,6 @@ function loadScript(url) {
       for (let j = columnStart; j < columns.length; j++) {
         let column = columns[j];
         rowData.push(column);
-
-        console.log(column);
-      }
-
-      debugger;
-      console.log(rowData);
-
-      // no valid playerID found
-      if (!rowData[0] || isNaN(rowData[0])) {
-        continue;
       }
       data.push(rowData);
     }
