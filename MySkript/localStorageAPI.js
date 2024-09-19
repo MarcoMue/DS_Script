@@ -525,7 +525,7 @@
     // Store timestamps, in localstorage,
     // resetbutton to clear both
 
-    getMostRecentTimestamp: async function (entity) {
+    getResultFromDB: async function (entity) {
       // Let us open our database
       const DBOpenRequest = window.indexedDB.open("TroopsDB", 1);
 
@@ -535,7 +535,7 @@
       };
 
       function getData() {
-        const transaction = db.transaction(["troops"], "readwrite");
+        const transaction = db.transaction(["TroopsDB"], "readwrite");
 
         // report on the success of the transaction completing, when everything is done
         transaction.oncomplete = (event) => {

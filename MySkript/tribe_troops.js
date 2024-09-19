@@ -92,12 +92,12 @@ function loadScript(url) {
       console.groupEnd();
     }
 
-    // Check the most recent timestamp in IndexedDB
-    let lastUpdate = await c_sdk.getMostRecentTimestamp();
-
     // Write res to IndexedDB with the current timestamp as the index
     // Store the data in localStorage
     await c_sdk.storeDataInIndexedDB("troops", result, timestamp);
+
+    // Check the most recent timestamp in IndexedDB
+    let lastUpdate = await c_sdk.getResultFromDB();
   }
 
   function extractMembersTroopsTableData(
