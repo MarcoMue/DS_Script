@@ -32,7 +32,7 @@ function loadScript(url) {
   let troops = [];
   if (mode === "members_troops") {
     let timestamp = new Date().getTime();
-    troops = await parseMembersTroopsTable();
+    troops = await parseMembersTroopsTable(timestamp);
     await c_sdk.storeDataInIndexedDB("troops", troops, timestamp);
 
     // Add the dropdown with values from localStorage
