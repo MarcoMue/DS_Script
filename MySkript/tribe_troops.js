@@ -81,7 +81,7 @@ function loadScript(url) {
 
   if (mode === "members_troops") {
     let tribeTable = "#ally_content table.vis.w100";
-    let res = extractTableData(tribeTable, 0, 1);
+    let res = extractTableData(tribeTable, 0, 0);
     console.group("Extracted Table Data");
     console.table(res);
     console.groupEnd();
@@ -106,7 +106,7 @@ function loadScript(url) {
           // Otherwise, save the text content
           value = $(column).text().trim();
         }
-        console.log(row, column, link, value);
+        // console.debug(row, column, link, value);
         rowData.push(value);
       }
       data.push(rowData);
