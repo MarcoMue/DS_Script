@@ -36,6 +36,7 @@ function loadScript(url) {
     let timestamp = new Date().getTime();
 
     table = parseMembersTroopsTable(tribeTable, 0, 0);
+
     troops = createTroopObjects(table, timestamp);
 
     // Add the dropdown with values from localStorage
@@ -53,14 +54,6 @@ function loadScript(url) {
         });
       });
     }
-
-    console.groupCollapsed("Extracted Table Data");
-    console.table(table);
-    console.groupEnd();
-
-    console.groupCollapsed("Extracted Troop Data");
-    console.table(troops);
-    console.groupEnd();
 
     await c_sdk.storeDataInIndexedDB("troops", troops, timestamp);
     let lastUpdate = await c_sdk.getResultFromDB();
@@ -148,17 +141,28 @@ function loadScript(url) {
       }
       data.push(rowData);
     }
+
+    console.groupCollapsed("Extracted Table Data");
+    console.table(data);
+    console.groupEnd();
+
     return data;
   }
 
   function createTroopObjects(rows, timestamp) {
-    return rows.map((row) => {
+    let playerTroops = rows.map((row) => {
       let r = row.map((column) => {
         return processColumnData(column);
       });
 
       return new c_sdk.types.PlayerTotalTroops(timestamp, ...r);
     });
+
+    console.groupCollapsed("Extracted Troop Data");
+    console.table(playerTroops);
+    console.groupEnd();
+
+    return playerTroops;
   }
 
   function timeAgo(timestamp) {
