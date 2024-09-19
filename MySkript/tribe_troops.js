@@ -84,7 +84,13 @@ function loadScript(url) {
   if (mode === "members_troops") {
     let tribeTable = "#ally_content table.vis.w100";
     let timestamp = new Date().getTime();
-    let result = extractMembersTroopsTableData(tribeTable, 0, 0, timestamp);
+    let result = parseMembersTroopsTable(
+      tribeTable,
+      0,
+      0,
+      timestamp,
+      processColumnData
+    );
 
     if (DEBUG) {
       console.group("Extracted Table Data");
@@ -98,13 +104,39 @@ function loadScript(url) {
 
     // Check the most recent timestamp in IndexedDB
     let lastUpdate = await c_sdk.getResultFromDB();
+    parseMembersTroopsTable(tribeTable, 0, 0, timestamp, changeColor);
   }
 
-  function extractMembersTroopsTableData(
+  function processColumnData(column) {
+    // Check if the <td> contains an <a> element
+    let link = $(column).find("a");
+    if (link.length > 0) {
+      // If it contains an <a> element, save the href attribute
+      return link.attr("href").split("id=")[1];
+    } else {
+      // Otherwise, save the text content
+      return $(column).text().trim();
+    }
+  }
+
+  function changeColor(column) {
+    console.log(column);
+    let color = "red";
+    // Get the current text content of the cell
+    let currentText = $(column).text().trim();
+
+    // Add the new value with color into the same cell
+    $(column).html(
+      `${currentText} <span style="color:${color};">${currentText}</span>`
+    );
+  }
+
+  function parseMembersTroopsTable(
     selector = tribeTable,
     rowStart,
     columnStart,
-    timestamp
+    timestamp,
+    readColumn
   ) {
     let rows = $(selector).find("tr");
     let data = [];
@@ -120,16 +152,7 @@ function loadScript(url) {
       let rowData = [];
       for (let j = columnStart; j < columns.length; j++) {
         let column = columns[j];
-
-        // Check if the <td> contains an <a> element
-        let link = $(column).find("a");
-        if (link.length > 0) {
-          // If it contains an <a> element, save the href attribute
-          value = link.attr("href").split("id=")[1];
-        } else {
-          // Otherwise, save the text content
-          value = $(column).text().trim();
-        }
+        value = readColumn(column);
         rowData.push(parseInt(value));
       }
 
