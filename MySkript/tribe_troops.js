@@ -120,6 +120,7 @@ function loadScript(url) {
 
       playerID = parseInt(playerID);
       rowData.push(playerID);
+      debugger;
       oldTroops = await c_sdk.getResultFromDB(timestamp, playerID);
 
       // skip first element
