@@ -88,6 +88,11 @@ function loadScript(url) {
     let tableData = parseMembersTroopsTable(tribeTable, 0, 0);
     let troops = createTroopObjects(tableData, timestamp);
 
+    // Add the dropdown with values from localStorage
+    let dropdownValues = getDropdownValues();
+    let dropdown = createDropdown(dropdownValues);
+    insertDropdownIntoDOM(dropdown, handleDropdownChange);
+
     if (DEBUG) {
       console.group("Extracted Table Data");
       console.table(tableData);
@@ -106,6 +111,35 @@ function loadScript(url) {
         changeColor(col);
       });
     });
+  }
+
+  function handleDropdownChange(selectedValue) {
+    console.log("Selected value:", selectedValue);
+    // Add your logic here to handle the selected value
+  }
+
+  function createDropdown(values) {
+    let dropdown = $("<select></select>");
+    values.forEach((value) => {
+      let option = $("<option></option>").text(value).val(value);
+      dropdown.append(option);
+    });
+    return dropdown;
+  }
+
+  function insertDropdownIntoDOM(dropdown, onChangeCallback) {
+    $("#dropdownContainer").append(dropdown);
+
+    // Attach change event listener
+    dropdown.change(function () {
+      let selectedValue = $(this).val();
+      onChangeCallback(selectedValue);
+    });
+  }
+
+  function getDropdownValues() {
+    let values = localStorage.getItem("troops_timestamps");
+    return values ? JSON.parse(values) : [];
   }
 
   function processColumnData(column) {
