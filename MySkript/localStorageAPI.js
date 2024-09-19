@@ -71,8 +71,8 @@
       },
       PlayerTotalTroops: class {
         constructor(
-          playerId,
           timestamp,
+          playerId,
           spear,
           sword,
           axe,
@@ -572,8 +572,8 @@
 
           data.forEach((item) => {
             let entry = {
-              player_id: item[0],
               read: timestamp,
+              player_id: item[0],
               speer: item[1],
               schwert: item[2],
             };
@@ -581,7 +581,6 @@
             console.log("Entry:", entry);
 
             let classObj = new c_sdk.types.PlayerTotalTroops(
-              id,
               timestamp,
               ...item
             );
