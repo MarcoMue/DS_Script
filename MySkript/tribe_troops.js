@@ -85,12 +85,12 @@ function loadScript(url) {
     let tribeTable = "#ally_content table.vis.w100";
     let timestamp = new Date().getTime();
 
-    let result = parseMembersTroopsTable(tribeTable, 0, 0);
-    let troops = mapTroopData(timestamp);
+    let tableData = parseMembersTroopsTable(tribeTable, 0, 0);
+    let troops = createTroopObjects(tableData, timestamp);
 
     if (DEBUG) {
       console.group("Extracted Table Data");
-      console.table(result);
+      console.table(tableData);
       console.groupEnd();
 
       console.group("Extracted Troop Data");
@@ -164,7 +164,7 @@ function loadScript(url) {
     return data;
   }
 
-  function mapTroopData(timestamp) {
+  function createTroopObjects(rows, timestamp) {
     return rows.map((row) => {
       let r = row.map((column) => {
         return processColumnData(column);
