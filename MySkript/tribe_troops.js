@@ -105,23 +105,26 @@ function loadScript(url) {
       let oldTroops;
 
       let columns = $(row).find("td");
-      let playerText = columns.shift(); // Remove the first column
-      let link = $(playerText).find("a");
+      let link = $(columns[0]).find("a");
 
       if (link.length > 0) {
         // If it contains an <a> element, save the href attribute
         playerID = link.attr("href").split("id=")[1];
+
         // no valid playerID found
         if (!playerID) {
           continue;
-        } else {
-          playerID = parseInt(playerID);
-          rowData.push(playerID);
-          oldTroops = await getResultFromDB(timestamp, playerID);
         }
+      } else {
+        continue;
       }
 
-      for (let j = columnStart; j < columns.length; j++) {
+      playerID = parseInt(playerID);
+      rowData.push(playerID);
+      oldTroops = await getResultFromDB(timestamp, playerID);
+
+      // skip first element
+      for (let j = columnStart + 1; j < columns.length; j++) {
         let column = columns[j];
         value = $(column).text().trim();
         // changeColor(column, selectedValue, playerID);
