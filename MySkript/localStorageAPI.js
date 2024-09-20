@@ -635,11 +635,14 @@
         const request = store.openCursor();
         request.onsuccess = () => {
           const cursor = request.result;
+          let count = 0;
           if (cursor) {
             if (cursor.key[1] == partialKey) {
               const deleteRequest = cursor.delete();
+
               deleteRequest.onsuccess = () => {
                 console.log(`Deleted record with key ${cursor.key}`);
+                count++;
               };
               deleteRequest.onerror = () => {
                 console.error(
@@ -650,7 +653,7 @@
             }
             cursor.continue();
           } else {
-            resolve();
+            resolve(count);
           }
         };
 
