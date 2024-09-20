@@ -39,12 +39,12 @@ function loadScript(url) {
     troops = await parseMembersTroopsTable(currentTime);
     await c_sdk.storeTroops("troops", troops, currentTime);
 
-    let timeValues = getTimestampValues();
-    if (timeValues.length > 0) {
-      comparisonTimestamp = timeValues[0];
+    let timestampValues = getTimestampValues(currentTime);
+    if (timestampValues.length > 0) {
+      comparisonTimestamp = timestampValues[0];
     }
 
-    let dropdown = createDropdown(timeValues, comparisonTimestamp);
+    let dropdown = createDropdown(timestampValues, comparisonTimestamp);
     insertDropdownIntoDOM(dropdown, parseMembersTroopsTable);
   }
 
@@ -78,9 +78,12 @@ function loadScript(url) {
     });
   }
 
+  /**
+   * @param {Date} [currentTime]
+   */
   function getTimestampValues(currentTime) {
     function removeElementFromArray(array, element) {
-      const index = array.findIndex((item) => item === element);
+      const index = array.findIndex((item) => item == element);
       if (index !== -1) {
         array.splice(index, 1);
       }
@@ -94,7 +97,7 @@ function loadScript(url) {
       return [new Date().getTime()];
     } else {
       values = JSON.parse(values);
-      removeElementFromArray(values, currentTime);
+      removeElementFromArray(values, currentTime.getTime());
       return values;
     }
   }
@@ -118,6 +121,9 @@ function loadScript(url) {
     $(column).append(`<span style="color:${color};">${comparison}</span>`);
   }
 
+  /**
+   * @param {Date} date
+   */
   async function parseMembersTroopsTable(date) {
     console.log("Selected value:", date);
 
@@ -187,6 +193,9 @@ function loadScript(url) {
     return data;
   }
 
+  /**
+   * @param {string} timestamp
+   */
   function timeAgo(timestamp) {
     const now = new Date();
     const timeDifference = now - new Date(timestamp);
