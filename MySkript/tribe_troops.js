@@ -154,16 +154,12 @@ function loadScript(url) {
     }
 
     let color;
-    let sign;
     if (currentCount > prevCount) {
       color = "green";
-      sign = "+";
     } else if (currentCount === prevCount) {
       color = "black";
-      sign = "=";
     } else {
       color = "red";
-      sign = "-";
     }
 
     let newValue = currentCount - prevCount;
@@ -184,8 +180,6 @@ function loadScript(url) {
    * @param {Date} date
    */
   async function parseMembersTroopsTable(date) {
-    console.log("Selected value:", date);
-
     let tribeTable = "#ally_content table.vis.w100";
     let rowStart = 0;
     let columnStart = 0;
@@ -230,8 +224,6 @@ function loadScript(url) {
 
       for (let j = columnStart; j < columns.length; j++) {
         let column = columns[j];
-        console.log("Column:", column);
-
         if (oldTroops) {
           changeColor(column, j, oldTroops);
         }
