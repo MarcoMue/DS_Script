@@ -31,7 +31,6 @@ function loadScript(url) {
 
   let troops = [];
   let currentTime = new Date();
-  let comparisonTimestamp;
   if (mode === "members_troops") {
     troops = await parseMembersTroopsTable(currentTime);
     await c_sdk.storeTroops("troops", troops, currentTime);
@@ -70,11 +69,11 @@ function loadScript(url) {
     return select;
   }
 
-  function insertDropdownIntoDOM(dropdown, onChangeCallback) {
-    $("#ally_content").append(dropdown);
+  function insertDropdownIntoDOM(select, onChangeCallback) {
+    $("#ally_content").append(select);
 
     // Attach change event listener
-    dropdown.change(function () {
+    select.onchange(function () {
       let selectedValue = parseInt($(this).val(), 10);
       onChangeCallback(new Date(selectedValue));
     });
