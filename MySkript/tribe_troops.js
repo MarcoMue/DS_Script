@@ -47,7 +47,7 @@ function loadScript(url) {
     let dropdown = createDropdown(timestampValues, comparisonTimestamp);
     insertDropdownIntoDOM(dropdown, parseMembersTroopsTable);
 
-    let key = 1726863563106;
+    let key = 1726866334233;
     let r = await c_sdk.deleteDataWithPartialKey("troops", key);
     console.log(r);
   }
@@ -207,7 +207,6 @@ function loadScript(url) {
       if (link && link.length > 0) {
         // If it contains an <a> element, save the href attribute
         playerID = link.attr("href").split("id=")[1];
-
         // no valid playerID found
         if (!playerID) {
           continue;
@@ -217,12 +216,13 @@ function loadScript(url) {
         continue;
       }
 
-      playerID = parseInt(playerID);
       rowData.push(playerID);
+      let skip = 1;
 
+      playerID = parseInt(playerID);
       let oldTroops = await c_sdk.readData("troops", date.getTime(), playerID);
 
-      for (let j = columnStart; j < columns.length; j++) {
+      for (let j = columnStart + skip; j < columns.length; j++) {
         let column = columns[j];
         if (oldTroops) {
           changeColor(column, j, oldTroops);
