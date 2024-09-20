@@ -114,10 +114,13 @@
     dbConfig: {
       troops: {
         dbName: "TroopsDB",
-        dbVersion: 1,
+        dbVersion: 2,
         dbTable: "troops",
         key: ["playerId", "createdAt"],
-        indexes: [],
+        indexes: [
+          { name: "time", key: "timestamp" },
+          { name: "id", key: "playerId" },
+        ],
         url: null,
       },
       village: {
