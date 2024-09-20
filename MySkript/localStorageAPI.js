@@ -523,7 +523,6 @@
     },
 
     initDB: async function (entity) {
-      debugger;
       const { dbName, dbTable, dbVersion, key, indexes } =
         c_sdk.dbConfig[entity];
 
@@ -642,7 +641,6 @@
         return false;
       }
 
-      debugger;
       // TODO: add world to key
       let lastUpdateKey = `${entity}_last_updated`;
       let updateTimesKey = `${entity}_timestamps`;
@@ -657,6 +655,18 @@
       }
 
       await c_sdk.storeData(entity, values);
+
+      console.debug("Data updated successfully.");
+      let storedTimes = JSON.parse(localStorage.getItem(updateTimesKey)) || [];
+      storedTimes.push(date.getTime());
+
+      try {
+        localStorage.setItem(updateTimesKey, JSON.stringify(storedTimes));
+        localStorage.setItem(lastUpdateKey, String(date.getTime()));
+      } catch (e) {
+        console.error("Failed to update localStorage:", e);
+        return false;
+      }
     },
 
     calculateTimeDifferences: function (timestamps) {

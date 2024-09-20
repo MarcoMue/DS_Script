@@ -162,14 +162,18 @@ function loadScript(url) {
         playerID
       );
 
+      console.log("oldTroops:", oldTroops);
       // skip first element
       for (let j = columnStart + 1; j < columns.length; j++) {
         let column = columns[j];
-        // skip playerID, and timestamp
-        let oldUnit = oldTroops[columnStart + 2];
+
+        if (oldTroops.length > 0) {
+          // skip playerID, and timestamp
+          let oldUnit = oldTroops[columnStart + 2];
+          changeColor(column, oldUnit);
+        }
 
         let value = $(column).text().trim();
-        changeColor(column, oldUnit);
         rowData.push(parseInt(value));
       }
 
