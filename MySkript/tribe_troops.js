@@ -172,11 +172,11 @@ function loadScript(url) {
 
     let newValue = currentCount - prevCount;
     // Check if the span already exists
-    let span = $(column).find("span.color-span");
+    let span = $(column).find("div.color-span");
     if (span.length === 0) {
       // Append a new span if it doesn't exist
       $(column).append(
-        `<span class="color-span" style="color:${color};">${newValue}</span>`
+        `<div class="color-span" style="color:${color};">${newValue}</div>`
       );
     } else {
       // Update the existing span
