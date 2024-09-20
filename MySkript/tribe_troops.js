@@ -37,35 +37,37 @@ function loadScript(url) {
     await c_sdk.storeTroops("troops", troops, currentTime);
 
     let timestampValues = getTimestampValues(currentTime);
-    if (timestampValues.length > 0) {
-      comparisonTimestamp = timestampValues[0];
-    }
-
-    let dropdown = createDropdown(timestampValues, comparisonTimestamp);
+    let dropdown = createDropdown(timestampValues);
     insertDropdownIntoDOM(dropdown, parseMembersTroopsTable);
 
     // let key = 1726769522695;
     // await c_sdk.deleteTroops("troops", new Date(key));
   }
 
-  function createDropdown(values, initialValue) {
-    let dropdown = $("<select></select>");
-    values.forEach((value) => {
-      let datetime = new Date(value).toLocaleString();
-      let timeAgoText = timeAgo(value);
+  /**
+   * @param {string[]} values
+   */
+  function createDropdown(values) {
+    const select = document.createElement("select");
+    select.className = "styled-select";
 
-      let option = $("<option></option>")
-        .text(`${datetime} ${timeAgoText}`)
-        .val(value);
+    const defaultOption = document.createElement("option");
+    defaultOption.text = "Select";
+    defaultOption.value = "";
+    select.appendChild(defaultOption);
 
-      // Set the option as selected if it matches the initial value
-      if (value === initialValue) {
-        option.attr("selected", "selected");
-      }
+    // Create and append the options
+    values.forEach((timestamp) => {
+      let datetime = new Date(timestamp).toLocaleString();
+      let timeAgoText = timeAgo(timestamp);
 
-      dropdown.append(option);
+      const opt = document.createElement("option");
+      opt.value = timestamp;
+      opt.text = `${datetime} ${timeAgoText}`;
+      select.appendChild(opt);
     });
-    return dropdown;
+
+    return select;
   }
 
   function insertDropdownIntoDOM(dropdown, onChangeCallback) {
@@ -80,10 +82,16 @@ function loadScript(url) {
 
   /**
    * @param {Date} [currentTime]
+   * @returns {string[]}
    */
   function getTimestampValues(currentTime) {
+    /**
+     * @param {string []} array
+     * @param {number} element
+     * @returns {string []}
+     */
     function removeElementFromArray(array, element) {
-      const index = array.findIndex((item) => item == element);
+      const index = array.findIndex((item) => item == element.toString());
       if (index !== -1) {
         array.splice(index, 1);
       }
@@ -94,11 +102,11 @@ function loadScript(url) {
     console.log("Dropdown values:", values);
 
     if (values === null) {
-      return [new Date().getTime()];
+      return [new Date().getTime().toString()];
     } else {
-      values = JSON.parse(values);
-      removeElementFromArray(values, currentTime.getTime());
-      return values;
+      let valuesArray = JSON.parse(values);
+      removeElementFromArray(valuesArray, currentTime.getTime());
+      return valuesArray;
     }
   }
 
