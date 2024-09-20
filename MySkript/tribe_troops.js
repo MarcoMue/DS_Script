@@ -105,6 +105,9 @@ function loadScript(url) {
       return;
     }
 
+    // Get the current text content of the cell
+    let currentText = $(column).text().trim();
+
     let color;
     if (currentText > comparison) {
       color = "green";
@@ -112,8 +115,6 @@ function loadScript(url) {
       color = "red";
     }
 
-    // Get the current text content of the cell
-    let currentText = $(column).text().trim();
     // Add the new value with color into the same cell
     $(column).append(`<span style="color:${color};">${comparison}</span>`);
   }
