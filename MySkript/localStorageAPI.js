@@ -523,12 +523,7 @@
     },
 
     initDB: async function (entity) {
-      // Let us open our database
-      // DBOpenRequest.onsuccess = (event) => {
-      //   db = DBOpenRequest.result;
-      //   getData();
-      // };
-
+      debugger;
       const { dbName, dbTable, dbVersion, key, indexes } =
         c_sdk.dbConfig[entity];
 
