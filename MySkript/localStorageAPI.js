@@ -581,6 +581,11 @@
     },
 
     storeDataInIndexedDB: async function (entity, values, updateTimestamp) {
+      if (typeof updateTimestamp !== "number" || isNaN(updateTimestamp)) {
+        return false;
+      }
+      const date = new Date(updateTimestamp);
+
       debugger;
       // TODO: add world to key
       let lastUpdateKey = `${entity}_last_updated`;
@@ -594,12 +599,18 @@
         return false;
       } else {
         console.debug("Data updated successfully.");
+
         let storedTimes =
           JSON.parse(localStorage.getItem(updateTimesKey)) || [];
-        storedTimes.push(updateTimestamp);
+        storedTimes.push(date.getTime());
 
-        localStorage.setItem(updateTimesKey, JSON.stringify(storedTimes));
-        localStorage.setItem(lastUpdateKey, updateTimestamp);
+        try {
+          localStorage.setItem(updateTimesKey, JSON.stringify(storedTimes));
+          localStorage.setItem(lastUpdateKey, String(date.getTime()));
+        } catch (e) {
+          console.error("Failed to update localStorage:", e);
+          return false;
+        }
 
         // let differences = c_sdk.calculateTimeDifferences(timestamps);
         // console.log(differences);
