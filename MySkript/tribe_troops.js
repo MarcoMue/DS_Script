@@ -50,11 +50,11 @@ function loadScript(url) {
     let count;
     let key = 1726769522695;
 
-    count = await c_sdk.deleteTroops("troops", key);
+    count = await c_sdk.deleteTroops("troops", new Date(key));
     console.log("Deleted rows:", count);
 
     key = 1726769525448;
-    count = await c_sdk.deleteTroops("troops", key);
+    count = await c_sdk.deleteTroops("troops", new Date(key));
     console.log("Deleted rows:", count);
   }
 
