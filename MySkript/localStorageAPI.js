@@ -658,11 +658,11 @@
 
       console.debug("Data updated successfully.");
       let storedTimes = JSON.parse(localStorage.getItem(updateTimesKey)) || [];
-      storedTimes.push(date.getTime());
+      storedTimes.push(updateTime.getTime());
 
       try {
         localStorage.setItem(updateTimesKey, JSON.stringify(storedTimes));
-        localStorage.setItem(lastUpdateKey, String(date.getTime()));
+        localStorage.setItem(lastUpdateKey, String(updateTime.getTime()));
       } catch (e) {
         console.error("Failed to update localStorage:", e);
         return false;
