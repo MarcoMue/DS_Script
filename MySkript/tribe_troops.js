@@ -31,7 +31,10 @@ function loadScript(url) {
 
   let troops = [];
   if (mode === "members_troops") {
+    // TODO 2 different Timestamps for inital load and comparison
     let timestamp = new Date().getTime();
+    console.log("Timestamp:", timestamp);
+
     troops = await parseMembersTroopsTable(timestamp);
     await c_sdk.storeDataInIndexedDB("troops", troops, timestamp);
 
@@ -67,6 +70,8 @@ function loadScript(url) {
 
   function getDropdownValues() {
     let values = localStorage.getItem("troops_timestamps");
+    console.log("Dropdown values:", values);
+
     return values ? JSON.parse(values) : [];
   }
 
