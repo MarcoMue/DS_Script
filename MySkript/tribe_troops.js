@@ -175,6 +175,7 @@ function loadScript(url) {
     if (div.length === 0) {
       if (newValue === 0) {
         div.remove();
+        return;
       }
 
       // Append a new span if it doesn't exist
