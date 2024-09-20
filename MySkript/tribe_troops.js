@@ -169,6 +169,10 @@ function loadScript(url) {
     }
 
     let newValue = currentCount - prevCount;
+
+    if (newValue === 0) {
+      return;
+    }
     // Check if the span already exists
     let span = $(column).find("div.color-span");
     if (span.length === 0) {
