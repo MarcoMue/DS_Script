@@ -115,9 +115,7 @@ function loadScript(url) {
     // Get the current text content of the cell
     let currentText = $(column).text().trim();
     // Add the new value with color into the same cell
-    $(column).html(
-      `${currentText} <span style="color:${color};">${comparison}</span>`
-    );
+    $(column).append(`<span style="color:${color};">${comparison}</span>`);
   }
 
   async function parseMembersTroopsTable(timestamp) {

@@ -551,16 +551,23 @@
 
         // Make a request to get a record by key from the object store
 
-        console.log("Timestamp:", timestamp);
-        console.log("PlayerID:", playerID);
+        // console.log("Timestamp:", timestamp);
+        // console.log("PlayerID:", playerID);
         // debugger;
         // const objectStoreRequest = objectStore.get([playerID, timestamp]);
+        // 1682039, 1726769522695;
+
+        const objectStoreRequest1 = objectStore.get(timestamp);
+        const objectStoreRequest2 = objectStore.get(playerID);
 
         const objectStoreRequest = objectStore.get([playerID, timestamp]);
 
         objectStoreRequest.onsuccess = (event) => {
           // report the success of our request
           console.log("Request successful.");
+
+          console.debug("Result1: ", objectStoreRequest1.result);
+          console.debug("Result2: ", objectStoreRequest2.result);
 
           const myRecord = objectStoreRequest.result;
           console.log("Result: ", myRecord);
@@ -574,6 +581,7 @@
     },
 
     storeDataInIndexedDB: async function (entity, values, timestamp) {
+      debugger;
       // TODO: add world to key
       let storageKey = `${entity}_last_updated`;
       let timestampsKey = `${entity}_timestamps`;
@@ -591,7 +599,6 @@
         let timestamps = JSON.parse(localStorage.getItem(timestampsKey)) || [];
         timestamps.push(timestamp);
         localStorage.setItem(timestampsKey, JSON.stringify(timestamps));
-
         let differences = c_sdk.calculateTimeDifferences(timestamps);
         console.log(differences);
       }
