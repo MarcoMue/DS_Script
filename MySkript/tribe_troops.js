@@ -156,7 +156,11 @@ function loadScript(url) {
 
       playerID = parseInt(playerID);
       rowData.push(playerID);
-      oldTroops = await c_sdk.getResultFromDB(date.getTime(), playerID);
+      oldTroops = await c_sdk.getResultFromDB(
+        "troops",
+        date.getTime(),
+        playerID
+      );
 
       // skip first element
       for (let j = columnStart + 1; j < columns.length; j++) {

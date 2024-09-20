@@ -565,7 +565,7 @@
         const store = transaction.objectStore(dbTable);
         const request = store.get([playerID, timestamp]);
 
-        request.onsuccess = (event) => {
+        request.onsuccess = () => {
           console.log("Request successful.");
 
           console.debug("Result1: ", request.result);
@@ -574,11 +574,11 @@
           const myRecord = request.result;
           console.log("Result: ", myRecord);
 
-          resolve(event.target.result);
+          resolve(request.result);
         };
 
-        request.onerror = (event) => {
-          reject(event.target.error);
+        request.onerror = () => {
+          reject(request.error);
         };
       });
     },
