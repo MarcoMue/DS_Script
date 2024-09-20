@@ -71,7 +71,7 @@ function loadScript(url) {
     $("#ally_content").append(select);
 
     // Attach change event listener
-    select.onchange(function () {
+    select.change(function () {
       let selectedValue = parseInt($(this).val(), 10);
       onChangeCallback(new Date(selectedValue));
     });
