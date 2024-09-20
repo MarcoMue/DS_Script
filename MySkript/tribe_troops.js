@@ -33,9 +33,6 @@ function loadScript(url) {
   let currentTime = new Date();
   let comparisonTimestamp;
   if (mode === "members_troops") {
-    // TODO 2 different Timestamps for inital load and comparison
-    console.log("Timestamp:", currentTime);
-
     troops = await parseMembersTroopsTable(currentTime);
     await c_sdk.storeTroops("troops", troops, currentTime);
 
