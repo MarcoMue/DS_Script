@@ -569,14 +569,6 @@
         const request = store.get([playerID, timestamp]);
 
         request.onsuccess = () => {
-          console.log("Request successful.");
-
-          console.debug("Result1: ", request.result);
-          console.debug("Result2: ", request.result);
-
-          const myRecord = request.result;
-          console.log("Result: ", myRecord);
-
           resolve(request.result);
         };
 
