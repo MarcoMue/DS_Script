@@ -16,6 +16,7 @@ function loadScript(url) {
   });
 }
 
+// Its working !!
 (async function () {
   console.log("IIFE called.");
 
