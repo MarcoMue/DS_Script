@@ -101,7 +101,17 @@ function loadScript(url) {
   }
 
   function changeColor(column, comparison) {
-    let color = "red";
+    if (comparison === undefined) {
+      return;
+    }
+
+    let color;
+    if (currentText > comparison) {
+      color = "green";
+    } else {
+      color = "red";
+    }
+
     // Get the current text content of the cell
     let currentText = $(column).text().trim();
     // Add the new value with color into the same cell
