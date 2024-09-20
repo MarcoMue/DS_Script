@@ -208,6 +208,7 @@ function loadScript(url) {
       if (link && link.length > 0) {
         // If it contains an <a> element, save the href attribute
         playerID = link.attr("href").split("id=")[1];
+        playerID = parseInt(playerID);
         // no valid playerID found
         if (!playerID) {
           continue;
@@ -220,7 +221,6 @@ function loadScript(url) {
       rowData.push(playerID);
       let skip = 1;
 
-      playerID = parseInt(playerID);
       let oldTroops = await c_sdk.readData("troops", date.getTime(), playerID);
 
       if (!oldTroops) {
