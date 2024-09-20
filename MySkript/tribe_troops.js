@@ -106,6 +106,7 @@ function loadScript(url) {
     if (comparison === undefined) {
       return;
     }
+    debugger;
 
     // Get the current text content of the cell
     let currentText = $(column).text().trim();
@@ -143,7 +144,6 @@ function loadScript(url) {
 
       let rowData = [];
       let playerID;
-      let oldTroops;
 
       let columns = $(row).find("td");
       let link = $(columns[0]).find("a");
@@ -162,21 +162,19 @@ function loadScript(url) {
 
       playerID = parseInt(playerID);
       rowData.push(playerID);
-      oldTroops = await c_sdk.getResultFromDB(
+
+      let oldTroops = await c_sdk.getResultFromDB(
         "troops",
         date.getTime(),
         playerID
       );
-
-      console.log("oldTroops:", oldTroops);
       // skip first element
       for (let j = columnStart + 1; j < columns.length; j++) {
         let column = columns[j];
+        console.log("Column:", column);
 
-        if (oldTroops && oldTroops.length > 0) {
-          // skip playerID, and timestamp
-          let oldUnit = oldTroops[columnStart + 2];
-          changeColor(column, oldUnit);
+        if (oldTroops) {
+          changeColor(column, oldTroops);
         }
 
         let value = $(column).text().trim();
