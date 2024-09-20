@@ -74,7 +74,7 @@ function loadScript(url) {
     // Attach change event listener
     dropdown.change(function () {
       let selectedValue = parseInt($(this).val(), 10);
-      onChangeCallback(selectedValue);
+      onChangeCallback(new Date(selectedValue));
     });
   }
 
