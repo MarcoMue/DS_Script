@@ -525,7 +525,7 @@
     getResultFromDB: async function (timestamp, playerID) {
       // Let us open our database
       const DBOpenRequest = window.indexedDB.open("TroopsDB", 1);
-
+      let db;
       DBOpenRequest.onsuccess = (event) => {
         db = DBOpenRequest.result;
         getData();
@@ -577,14 +577,20 @@
     },
 
     setMostRecentTimestamp: async function (entity) {
-      localStorage.setItem(`${entity}_last_updated`, Date.parse(new Date()));
+      localStorage.setItem(
+        `${entity}_last_updated`,
+        String(new Date().getTime())
+      );
     },
 
-    storeDataInIndexedDB: async function (entity, values, updateTimestamp) {
-      if (typeof updateTimestamp !== "number" || isNaN(updateTimestamp)) {
+    storeDataInIndexedDB: async function (
+      /** @type {string} */ entity,
+      /** @type {PlayerTotalTroops[]} */ values,
+      /** @type {Date} */ updateTime
+    ) {
+      if (!(updateTime instanceof Date) || isNaN(updateTime.getTime())) {
         return false;
       }
-      const date = new Date(updateTimestamp);
 
       debugger;
       // TODO: add world to key
@@ -602,11 +608,11 @@
 
         let storedTimes =
           JSON.parse(localStorage.getItem(updateTimesKey)) || [];
-        storedTimes.push(date.getTime());
+        storedTimes.push(updateTime.getTime());
 
         try {
           localStorage.setItem(updateTimesKey, JSON.stringify(storedTimes));
-          localStorage.setItem(lastUpdateKey, String(date.getTime()));
+          localStorage.setItem(lastUpdateKey, String(updateTime.getTime()));
         } catch (e) {
           console.error("Failed to update localStorage:", e);
           return false;

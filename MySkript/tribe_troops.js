@@ -30,11 +30,10 @@ function loadScript(url) {
   await init();
 
   let troops = [];
-  let currentTime;
+  let currentTime = new Date();
   let comparisonTimestamp;
   if (mode === "members_troops") {
     // TODO 2 different Timestamps for inital load and comparison
-    currentTime = new Date().getTime();
     console.log("Timestamp:", currentTime);
 
     troops = await parseMembersTroopsTable(currentTime);
@@ -119,8 +118,8 @@ function loadScript(url) {
     $(column).append(`<span style="color:${color};">${comparison}</span>`);
   }
 
-  async function parseMembersTroopsTable(timestamp) {
-    console.log("Selected value:", timestamp);
+  async function parseMembersTroopsTable(date) {
+    console.log("Selected value:", date);
 
     let tribeTable = "#ally_content table.vis.w100";
     let rowStart = 0;
@@ -157,7 +156,7 @@ function loadScript(url) {
 
       playerID = parseInt(playerID);
       rowData.push(playerID);
-      oldTroops = await c_sdk.getResultFromDB(timestamp, playerID);
+      oldTroops = await c_sdk.getResultFromDB(date, playerID);
 
       // skip first element
       for (let j = columnStart + 1; j < columns.length; j++) {
@@ -165,14 +164,12 @@ function loadScript(url) {
         // skip playerID, and timestamp
         let oldUnit = oldTroops[columnStart + 2];
 
-        value = $(column).text().trim();
+        let value = $(column).text().trim();
         changeColor(column, oldUnit);
         rowData.push(parseInt(value));
       }
 
-      data.push(
-        new c_sdk.types.PlayerTotalTroops(new Date().getTime(), ...rowData)
-      );
+      data.push(new c_sdk.types.PlayerTotalTroops(date.getTime(), ...rowData));
     }
 
     console.group("Extracted Table Data");
