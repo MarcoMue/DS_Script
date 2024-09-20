@@ -666,14 +666,24 @@
       for (let i = 1; i < timestamps.length; i++) {
         let diffInMs = timestamps[i] - timestamps[i - 1];
         let diffInSeconds = Math.floor(diffInMs / 1000);
+
+        let months = Math.floor(diffInSeconds / (30 * 24 * 60 * 60));
+        diffInSeconds %= 30 * 24 * 60 * 60;
+
+        let days = Math.floor(diffInSeconds / (24 * 60 * 60));
+        diffInSeconds %= 24 * 60 * 60;
+
+        let hours = Math.floor(diffInSeconds / (60 * 60));
+        diffInSeconds %= 60 * 60;
+
         let minutes = Math.floor(diffInSeconds / 60);
         let seconds = diffInSeconds % 60;
-        differences.push({ minutes, seconds });
+
+        differences.push({ months, days, hours, minutes, seconds });
       }
 
       return differences;
     },
-
     // TODO:
     // resetbutton to clear db and localstorage
   };
