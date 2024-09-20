@@ -47,15 +47,8 @@ function loadScript(url) {
     let dropdown = createDropdown(timestampValues, comparisonTimestamp);
     insertDropdownIntoDOM(dropdown, parseMembersTroopsTable);
 
-    let count;
-    let key = 1726769522695;
-
-    count = await c_sdk.deleteTroops("troops", new Date(key));
-    console.log("Deleted rows:", count);
-
-    key = 1726769525448;
-    count = await c_sdk.deleteTroops("troops", new Date(key));
-    console.log("Deleted rows:", count);
+    // let key = 1726769522695;
+    // await c_sdk.deleteTroops("troops", new Date(key));
   }
 
   function createDropdown(values, initialValue) {

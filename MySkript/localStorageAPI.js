@@ -733,7 +733,11 @@
         storedTimes = storedTimes.filter(
           (time) => Number(time) !== date.getTime()
         );
-        await c_sdk.deleteDataWithPartialKey("troops", date.getTime());
+        let count = await c_sdk.deleteDataWithPartialKey(
+          "troops",
+          date.getTime()
+        );
+        console.debug(`Deleted ${count} records`);
       } catch (error) {
         console.error("Failed to delete data:", error);
         return false;
