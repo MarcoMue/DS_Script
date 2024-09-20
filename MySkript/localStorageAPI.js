@@ -711,6 +711,32 @@
       }
     },
 
+    deleteTroops: function (
+      /** @type {string} */ entity,
+      /** @type {Date} */ date
+    ) {
+      if (!(date instanceof Date)) {
+        throw new Error("timestamp must be a Date object");
+      }
+
+      let updateTimesKey = `${entity}_timestamps`;
+      let storedTimes;
+
+      try {
+        storedTimes = JSON.parse(localStorage.getItem(updateTimesKey)) || [];
+      } catch (error) {
+        console.error("Failed to parse stored times:", error);
+        storedTimes = [];
+      }
+
+      storedTimes = storedTimes.filter(
+        (time) => Number(time) !== date.getTime()
+      );
+      localStorage.setItem(updateTimesKey, JSON.stringify(storedTimes));
+
+      return true;
+    },
+
     calculateTimeDifferences: function (timestamps) {
       let differences = [];
 
