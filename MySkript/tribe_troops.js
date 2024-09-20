@@ -167,7 +167,7 @@ function loadScript(url) {
       for (let j = columnStart + 1; j < columns.length; j++) {
         let column = columns[j];
 
-        if (oldTroops.length > 0) {
+        if (oldTroops && oldTroops.length > 0) {
           // skip playerID, and timestamp
           let oldUnit = oldTroops[columnStart + 2];
           changeColor(column, oldUnit);
