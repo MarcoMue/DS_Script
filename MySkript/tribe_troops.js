@@ -30,21 +30,26 @@ function loadScript(url) {
   await init();
 
   let troops = [];
+  let currentTime;
+  let comparisonTimestamp;
   if (mode === "members_troops") {
     // TODO 2 different Timestamps for inital load and comparison
-    let timestamp = new Date().getTime();
-    console.log("Timestamp:", timestamp);
+    currentTime = new Date().getTime();
+    console.log("Timestamp:", currentTime);
 
-    troops = await parseMembersTroopsTable(timestamp);
-    await c_sdk.storeDataInIndexedDB("troops", troops, timestamp);
+    troops = await parseMembersTroopsTable(currentTime);
+    await c_sdk.storeDataInIndexedDB("troops", troops, currentTime);
 
-    // Add the dropdown with values from localStorage
-    let dropdownValues = getDropdownValues();
-    let dropdown = createDropdown(dropdownValues);
+    let timeValues = getTimestampValues();
+    if (timeValues.length > 0) {
+      comparisonTimestamp = timeValues[0];
+    }
+
+    let dropdown = createDropdown(timeValues, comparisonTimestamp);
     insertDropdownIntoDOM(dropdown, parseMembersTroopsTable);
   }
 
-  function createDropdown(values) {
+  function createDropdown(values, initialValue) {
     let dropdown = $("<select></select>");
     values.forEach((value) => {
       let datetime = new Date(value).toLocaleString();
@@ -53,6 +58,12 @@ function loadScript(url) {
       let option = $("<option></option>")
         .text(`${datetime} ${timeAgoText}`)
         .val(value);
+
+      // Set the option as selected if it matches the initial value
+      if (value === initialValue) {
+        option.attr("selected", "selected");
+      }
+
       dropdown.append(option);
     });
     return dropdown;
@@ -68,11 +79,25 @@ function loadScript(url) {
     });
   }
 
-  function getDropdownValues() {
+  function getTimestampValues(currentTime) {
+    function removeElementFromArray(array, element) {
+      const index = array.findIndex((item) => item === element);
+      if (index !== -1) {
+        array.splice(index, 1);
+      }
+      return array;
+    }
+
     let values = localStorage.getItem("troops_timestamps");
     console.log("Dropdown values:", values);
 
-    return values ? JSON.parse(values) : [];
+    if (values === null) {
+      return [new Date().getTime()];
+    } else {
+      values = JSON.parse(values);
+      removeElementFromArray(values, currentTime);
+      return values;
+    }
   }
 
   function changeColor(column, comparison) {
