@@ -37,7 +37,7 @@ function loadScript(url) {
     console.log("Timestamp:", currentTime);
 
     troops = await parseMembersTroopsTable(currentTime);
-    await c_sdk.storeDataInIndexedDB("troops", troops, currentTime);
+    await c_sdk.storeTroops("troops", troops, currentTime);
 
     let timeValues = getTimestampValues();
     if (timeValues.length > 0) {
@@ -156,7 +156,7 @@ function loadScript(url) {
 
       playerID = parseInt(playerID);
       rowData.push(playerID);
-      oldTroops = await c_sdk.getResultFromDB(date, playerID);
+      oldTroops = await c_sdk.getResultFromDB(date.getTime(), playerID);
 
       // skip first element
       for (let j = columnStart + 1; j < columns.length; j++) {

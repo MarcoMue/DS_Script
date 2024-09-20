@@ -522,58 +522,113 @@
       });
     },
 
-    getResultFromDB: async function (timestamp, playerID) {
+    initDB: async function (entity) {
       // Let us open our database
-      const DBOpenRequest = window.indexedDB.open("TroopsDB", 1);
-      let db;
-      DBOpenRequest.onsuccess = (event) => {
-        db = DBOpenRequest.result;
-        getData();
-      };
+      // DBOpenRequest.onsuccess = (event) => {
+      //   db = DBOpenRequest.result;
+      //   getData();
+      // };
 
-      function getData() {
-        const transaction = db.transaction(["troops"], "readwrite");
+      const { dbName, dbTable, dbVersion, key, indexes } =
+        c_sdk.dbConfig[entity];
 
-        // report on the success of the transaction completing, when everything is done
-        transaction.oncomplete = (event) => {
-          console.log("Transaction completed.");
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(dbName, dbVersion);
+        request.onupgradeneeded = () => {
+          const db = request.result;
+          if (!db.objectStoreNames.contains(dbTable)) {
+            if (key) {
+              let objectStore = db.createObjectStore(dbTable, {
+                keyPath: key,
+              });
+              indexes.forEach((i) =>
+                objectStore.createIndex(i.name, i.key, { unique: i.unique })
+              );
+            } else {
+              reject("Key is missing!");
+            }
+          }
         };
 
-        transaction.onerror = (event) => {
-          console.log(
-            "Transaction not opened due to error: ",
-            transaction.error
-          );
+        request.onsuccess = () => {
+          resolve(request.result);
         };
 
-        // create an object store on the transaction
-        const objectStore = transaction.objectStore("troops");
+        request.onerror = () => {
+          reject(request.error);
+        };
+      });
+    },
 
-        // Make a request to get a record by key from the object store
+    getResultFromDB: async function (entity, timestamp, playerID) {
+      const db = await c_sdk.initDB(entity);
+      const { dbName, dbTable, dbVersion, key, indexes } =
+        c_sdk.dbConfig[entity];
 
-        // console.log("Timestamp:", timestamp);
-        // console.log("PlayerID:", playerID);
-        // debugger;
-        // const objectStoreRequest = objectStore.get([playerID, timestamp]);
-        // 1682039, 1726769522695;
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([dbTable], "readwrite");
+        const store = transaction.objectStore(dbTable);
+        const request = store.get([playerID, timestamp]);
 
-        const objectStoreRequest1 = objectStore.get(timestamp);
-        const objectStoreRequest2 = objectStore.get(playerID);
-
-        const objectStoreRequest = objectStore.get([playerID, timestamp]);
-
-        objectStoreRequest.onsuccess = (event) => {
-          // report the success of our request
+        request.onsuccess = (event) => {
           console.log("Request successful.");
 
-          console.debug("Result1: ", objectStoreRequest1.result);
-          console.debug("Result2: ", objectStoreRequest2.result);
+          console.debug("Result1: ", request.result);
+          console.debug("Result2: ", request.result);
 
-          const myRecord = objectStoreRequest.result;
+          const myRecord = request.result;
           console.log("Result: ", myRecord);
+
+          resolve(event.target.result);
         };
-      }
-      return new Date().getTime();
+
+        request.onerror = (event) => {
+          reject(event.target.error);
+        };
+      });
+    },
+
+    storeData: async function (entity, data) {
+      const db = await c_sdk.initDB(entity);
+
+      const { dbName, dbTable, dbVersion, key, indexes } =
+        c_sdk.dbConfig[entity];
+
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([dbTable], "readwrite");
+        const store = transaction.objectStore(dbTable);
+
+        // Array to hold promises for each put operation
+        const promises = [];
+
+        console.log("Data to store:", data);
+        data.forEach((item) => {
+          const request = store.put(item);
+          // Create a promise for each request and push it to the array
+          const promise = new Promise((resolve, reject) => {
+            request.onsuccess = () => {
+              resolve(request.result);
+            };
+            request.onerror = () => {
+              reject(request.error);
+            };
+          });
+          promises.push(promise);
+        });
+
+        // Wait for all promises to resolve or reject
+        Promise.all(promises)
+          .then((results) => {
+            resolve(results);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+
+        transaction.onerror = () => {
+          reject(transaction.error);
+        };
+      });
     },
 
     setMostRecentTimestamp: async function (entity) {
@@ -583,7 +638,7 @@
       );
     },
 
-    storeDataInIndexedDB: async function (
+    storeTroops: async function (
       /** @type {string} */ entity,
       /** @type {PlayerTotalTroops[]} */ values,
       /** @type {Date} */ updateTime
@@ -600,83 +655,13 @@
       let lastUpdate = localStorage.getItem(lastUpdateKey);
       lastUpdate = lastUpdate ? Number(lastUpdate) : null;
 
-      if (lastUpdate && new Date().getTime() - lastUpdate < 15 * 60 * 1000) {
+      // TODO: debug change back from 2 to 15min
+      if (lastUpdate && new Date().getTime() - lastUpdate < 2 * 60 * 1000) {
         console.debug("Data is up-to-date. No need to update.");
         return false;
-      } else {
-        console.debug("Data updated successfully.");
-
-        let storedTimes =
-          JSON.parse(localStorage.getItem(updateTimesKey)) || [];
-        storedTimes.push(updateTime.getTime());
-
-        try {
-          localStorage.setItem(updateTimesKey, JSON.stringify(storedTimes));
-          localStorage.setItem(lastUpdateKey, String(updateTime.getTime()));
-        } catch (e) {
-          console.error("Failed to update localStorage:", e);
-          return false;
-        }
-
-        // let differences = c_sdk.calculateTimeDifferences(timestamps);
-        // console.log(differences);
       }
 
-      const { dbName, dbTable, dbVersion, key, indexes } =
-        c_sdk.dbConfig[entity];
-
-      const DBOpenRequest = indexedDB.open(dbName, dbVersion);
-
-      return new Promise((resolve, reject) => {
-        DBOpenRequest.onupgradeneeded = function () {
-          const db = DBOpenRequest.result;
-          let objectStore;
-
-          // Define the composite key as an array of fields
-          if (key) {
-            objectStore = db.createObjectStore(dbTable, {
-              keyPath: key,
-            });
-            indexes.forEach((i) =>
-              objectStore.createIndex(i.name, i.key, { unique: i.unique })
-            );
-          } else {
-            objectStore = db.createObjectStore(dbTable, {
-              autoIncrement: true,
-            });
-          }
-
-          objectStore.transaction.oncomplete = () => {
-            console.log("Object store created");
-          };
-        };
-
-        DBOpenRequest.onsuccess = function () {
-          const db = DBOpenRequest.result;
-          const transaction = db.transaction(dbTable, "readwrite");
-          const store = transaction.objectStore(dbTable);
-
-          console.log("Data to store:", values);
-          values.forEach((item) => {
-            store.put(item);
-          });
-
-          transaction.oncomplete = () => {
-            console.log("Data stored successfully");
-            resolve();
-          };
-
-          transaction.onerror = function (event) {
-            console.error("Transaction error:", event.target.error);
-            reject(event.target.error);
-          };
-        };
-
-        DBOpenRequest.onerror = function (event) {
-          console.error("Database error:", event.target.error);
-          reject(event.target.error);
-        };
-      });
+      await c_sdk.storeData(entity, values);
     },
 
     calculateTimeDifferences: function (timestamps) {
