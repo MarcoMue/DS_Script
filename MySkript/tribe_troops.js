@@ -50,7 +50,7 @@ function loadScript(url) {
     let dropdown = $("<select></select>");
     let inital = $("<option></option>")
       .text(`Select Comparison Time`)
-      .val("")
+      .val(new Date().getTime())
       .attr("selected", "selected");
     dropdown.append(inital);
 

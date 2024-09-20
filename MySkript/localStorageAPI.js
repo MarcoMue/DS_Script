@@ -563,8 +563,7 @@
 
     readData: async function (entity, timestamp, playerID) {
       const db = await c_sdk.initDB(entity);
-      const { dbName, dbTable, dbVersion, key, indexes } =
-        c_sdk.dbConfig[entity];
+      const { dbTable } = c_sdk.dbConfig[entity];
 
       return new Promise((resolve, reject) => {
         const transaction = db.transaction([dbTable], "readwrite");
@@ -576,6 +575,7 @@
         };
 
         request.onerror = () => {
+          console.error("Error reading data:", playerID, timestamp);
           reject(request.error);
         };
       });
@@ -584,8 +584,7 @@
     storeData: async function (entity, data) {
       const db = await c_sdk.initDB(entity);
 
-      const { dbName, dbTable, dbVersion, key, indexes } =
-        c_sdk.dbConfig[entity];
+      const { dbTable } = c_sdk.dbConfig[entity];
 
       return new Promise((resolve, reject) => {
         const transaction = db.transaction([dbTable], "readwrite");
@@ -771,7 +770,5 @@
 
       return differences;
     },
-    // TODO:
-    // resetbutton to clear db and localstorage
   };
 })();
