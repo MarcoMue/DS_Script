@@ -44,29 +44,27 @@ function loadScript(url) {
   }
 
   /**
-   * @param {string[]} values
+   * @param {string[]} timestamps
    */
-  function createDropdown(values) {
-    const select = document.createElement("select");
-    select.className = "styled-select";
+  function createDropdown(timestamps) {
+    let dropdown = $("<select></select>");
+    let inital = $("<option></option>")
+      .text(`Select Comparison Time`)
+      .val("")
+      .attr("selected", "selected");
+    dropdown.append(inital);
 
-    const defaultOption = document.createElement("option");
-    defaultOption.text = "Select";
-    defaultOption.value = "";
-    select.appendChild(defaultOption);
+    timestamps.forEach((value) => {
+      let datetime = new Date(value).toLocaleString();
+      let timeAgoText = timeAgo(value);
 
-    // Create and append the options
-    values.forEach((timestamp) => {
-      let datetime = new Date(timestamp).toLocaleString();
-      let timeAgoText = timeAgo(timestamp);
+      let option = $("<option></option>")
+        .text(`${datetime} ${timeAgoText}`)
+        .val(value);
 
-      const opt = document.createElement("option");
-      opt.value = timestamp;
-      opt.text = `${datetime} ${timeAgoText}`;
-      select.appendChild(opt);
+      dropdown.append(option);
     });
-
-    return select;
+    return dropdown;
   }
 
   function insertDropdownIntoDOM(select, onChangeCallback) {
