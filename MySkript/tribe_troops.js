@@ -102,24 +102,68 @@ function loadScript(url) {
     }
   }
 
-  function changeColor(column, comparison) {
-    if (comparison === undefined) {
+  function changeColor(column, index, troops) {
+    // playerID
+    if (index === 0) {
       return;
     }
-    debugger;
 
     // Get the current text content of the cell
     let currentText = $(column).text().trim();
+    let currentCount = parseInt(currentText);
+
+    let prevCount = 0;
+    switch (index) {
+      case 1:
+        prevCount = troops.spear;
+        break;
+      case 2:
+        prevCount = troops.sword;
+        break;
+      case 3:
+        prevCount = troops.axe;
+        break;
+      case 4:
+        prevCount = troops.spy;
+        break;
+      case 5:
+        prevCount = troops.light;
+        break;
+      case 6:
+        prevCount = troops.heavy;
+        break;
+      case 7:
+        prevCount = troops.ram;
+        break;
+      case 8:
+        prevCount = troops.catapult;
+        break;
+      case 9:
+        prevCount = troops.snob;
+        break;
+      case 10:
+        prevCount = troops.outgoing;
+        break;
+      case 11:
+        prevCount = troops.incoming;
+        break;
+
+      default:
+        prevCount = 0;
+        break;
+    }
 
     let color;
-    if (currentText > comparison) {
+    if (currentCount > prevCount) {
       color = "green";
+    } else if (currentCount === prevCount) {
+      color = "black";
     } else {
       color = "red";
     }
 
     // Add the new value with color into the same cell
-    $(column).append(`<span style="color:${color};">${comparison}</span>`);
+    $(column).append(`<span style="color:${color};">${troops}</span>`);
   }
 
   /**
@@ -148,7 +192,7 @@ function loadScript(url) {
       let columns = $(row).find("td");
       let link = $(columns[0]).find("a");
 
-      if (link.length > 0) {
+      if (link && link.length > 0) {
         // If it contains an <a> element, save the href attribute
         playerID = link.attr("href").split("id=")[1];
 
@@ -157,6 +201,7 @@ function loadScript(url) {
           continue;
         }
       } else {
+        // Not a link
         continue;
       }
 
@@ -168,13 +213,13 @@ function loadScript(url) {
         date.getTime(),
         playerID
       );
-      // skip first element
-      for (let j = columnStart + 1; j < columns.length; j++) {
+
+      for (let j = columnStart; j < columns.length; j++) {
         let column = columns[j];
         console.log("Column:", column);
 
         if (oldTroops) {
-          changeColor(column, oldTroops);
+          changeColor(column, j, oldTroops);
         }
 
         let value = $(column).text().trim();

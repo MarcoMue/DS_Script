@@ -81,7 +81,9 @@
           heavy,
           ram,
           catapult,
-          snob
+          snob,
+          outgoing,
+          incoming
         ) {
           this.createdAt = timestamp;
           this.playerId = playerId;
@@ -94,6 +96,8 @@
           this.ram = ram;
           this.catapult = catapult;
           this.snob = snob;
+          this.outgoing = outgoing;
+          this.incoming = incoming;
         }
       },
     },
