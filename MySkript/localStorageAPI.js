@@ -561,7 +561,7 @@
       });
     },
 
-    getResultFromDB: async function (entity, timestamp, playerID) {
+    readData: async function (entity, timestamp, playerID) {
       const db = await c_sdk.initDB(entity);
       const { dbName, dbTable, dbVersion, key, indexes } =
         c_sdk.dbConfig[entity];
@@ -624,6 +624,46 @@
       });
     },
 
+    deleteDataWithPartialKey: async function (entity, partialKey) {
+      const db = await c_sdk.initDB(entity);
+      const { dbTable } = c_sdk.dbConfig[entity];
+
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([dbTable], "readwrite");
+        const store = transaction.objectStore(dbTable);
+
+        const request = store.openCursor();
+        request.onsuccess = () => {
+          const cursor = request.result;
+          if (cursor) {
+            if (cursor.key[1] == partialKey) {
+              const deleteRequest = cursor.delete();
+              deleteRequest.onsuccess = () => {
+                console.log(`Deleted record with key ${cursor.key}`);
+              };
+              deleteRequest.onerror = () => {
+                console.error(
+                  `Failed to delete record with key ${cursor.key}:`,
+                  request.error
+                );
+              };
+            }
+            cursor.continue();
+          } else {
+            resolve();
+          }
+        };
+
+        request.onerror = () => {
+          reject(request.error);
+        };
+
+        transaction.onerror = () => {
+          reject(transaction.error);
+        };
+      });
+    },
+
     setMostRecentTimestamp: async function (entity) {
       localStorage.setItem(
         `${entity}_last_updated`,
@@ -648,7 +688,7 @@
       lastUpdate = lastUpdate ? Number(lastUpdate) : null;
 
       // TODO: debug change back from 2 to 15min
-      if (lastUpdate && new Date().getTime() - lastUpdate < 2 * 60 * 1000) {
+      if (lastUpdate && new Date().getTime() - lastUpdate < 5 * 60 * 1000) {
         console.debug("Data is up-to-date. No need to update.");
         return false;
       }

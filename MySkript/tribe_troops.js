@@ -46,6 +46,10 @@ function loadScript(url) {
 
     let dropdown = createDropdown(timestampValues, comparisonTimestamp);
     insertDropdownIntoDOM(dropdown, parseMembersTroopsTable);
+
+    let key = 1726863563106;
+    let r = await c_sdk.deleteDataWithPartialKey("troops", key);
+    console.log(r);
   }
 
   function createDropdown(values, initialValue) {
@@ -216,11 +220,7 @@ function loadScript(url) {
       playerID = parseInt(playerID);
       rowData.push(playerID);
 
-      let oldTroops = await c_sdk.getResultFromDB(
-        "troops",
-        date.getTime(),
-        playerID
-      );
+      let oldTroops = await c_sdk.readData("troops", date.getTime(), playerID);
 
       for (let j = columnStart; j < columns.length; j++) {
         let column = columns[j];
@@ -235,9 +235,11 @@ function loadScript(url) {
       data.push(new c_sdk.types.PlayerTotalTroops(date.getTime(), ...rowData));
     }
 
-    console.group("Extracted Table Data");
-    console.table(data);
-    console.groupEnd();
+    if (DEBUG) {
+      console.group("Extracted Table Data");
+      console.table(data);
+      console.groupEnd();
+    }
 
     return data;
   }
