@@ -154,16 +154,30 @@ function loadScript(url) {
     }
 
     let color;
+    let sign;
     if (currentCount > prevCount) {
       color = "green";
+      sign = "+";
     } else if (currentCount === prevCount) {
       color = "black";
+      sign = "=";
     } else {
       color = "red";
+      sign = "-";
     }
 
-    // Add the new value with color into the same cell
-    $(column).append(`<span style="color:${color};">${prevCount}</span>`);
+    let newValue = currentCount - prevCount;
+    // Check if the span already exists
+    let span = $(column).find("span.color-span");
+    if (span.length === 0) {
+      // Append a new span if it doesn't exist
+      $(column).append(
+        `<span class="color-span" style="color:${color};">${newValue}</span>`
+      );
+    } else {
+      // Update the existing span
+      span.css("color", color).text(newValue);
+    }
   }
 
   /**
