@@ -47,9 +47,15 @@ function loadScript(url) {
     let dropdown = createDropdown(timestampValues, comparisonTimestamp);
     insertDropdownIntoDOM(dropdown, parseMembersTroopsTable);
 
-    let key = 1726866334233;
-    let r = await c_sdk.deleteDataWithPartialKey("troops", key);
-    console.log(r);
+    let count;
+    let key = 1726769522695;
+
+    count = await c_sdk.deleteTroops("troops", key);
+    console.log("Deleted rows:", count);
+
+    key = 1726769525448;
+    count = await c_sdk.deleteTroops("troops", key);
+    console.log("Deleted rows:", count);
   }
 
   function createDropdown(values, initialValue) {

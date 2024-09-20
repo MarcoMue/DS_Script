@@ -632,10 +632,10 @@
         const transaction = db.transaction([dbTable], "readwrite");
         const store = transaction.objectStore(dbTable);
 
+        let count = 0;
         const request = store.openCursor();
         request.onsuccess = () => {
           const cursor = request.result;
-          let count = 0;
           if (cursor) {
             if (cursor.key[1] == partialKey) {
               const deleteRequest = cursor.delete();
@@ -711,7 +711,7 @@
       }
     },
 
-    deleteTroops: function (
+    deleteTroops: async function (
       /** @type {string} */ entity,
       /** @type {Date} */ date
     ) {
@@ -729,9 +729,15 @@
         storedTimes = [];
       }
 
-      storedTimes = storedTimes.filter(
-        (time) => Number(time) !== date.getTime()
-      );
+      try {
+        storedTimes = storedTimes.filter(
+          (time) => Number(time) !== date.getTime()
+        );
+        await c_sdk.deleteDataWithPartialKey("troops", date.getTime());
+      } catch (error) {
+        console.error("Failed to delete data:", error);
+        return false;
+      }
       localStorage.setItem(updateTimesKey, JSON.stringify(storedTimes));
 
       return true;
