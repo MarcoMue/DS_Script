@@ -163,7 +163,7 @@ function loadScript(url) {
     }
 
     // Add the new value with color into the same cell
-    $(column).append(`<span style="color:${color};">${troops}</span>`);
+    $(column).append(`<span style="color:${color};">${prevCount}</span>`);
   }
 
   /**
