@@ -223,6 +223,15 @@ function loadScript(url) {
       playerID = parseInt(playerID);
       let oldTroops = await c_sdk.readData("troops", date.getTime(), playerID);
 
+      if (!oldTroops) {
+        console.debug(
+          "No old data found for player",
+          playerID,
+          date,
+          date.getTime()
+        );
+      }
+
       for (let j = columnStart + skip; j < columns.length; j++) {
         let column = columns[j];
         if (oldTroops) {
