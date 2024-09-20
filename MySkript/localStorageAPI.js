@@ -580,27 +580,29 @@
       localStorage.setItem(`${entity}_last_updated`, Date.parse(new Date()));
     },
 
-    storeDataInIndexedDB: async function (entity, values, timestamp) {
+    storeDataInIndexedDB: async function (entity, values, updateTimestamp) {
       debugger;
       // TODO: add world to key
-      let storageKey = `${entity}_last_updated`;
-      let timestampsKey = `${entity}_timestamps`;
+      let lastUpdateKey = `${entity}_last_updated`;
+      let updateTimesKey = `${entity}_timestamps`;
 
-      let lastUpdate = localStorage.getItem(storageKey);
+      let lastUpdate = localStorage.getItem(lastUpdateKey);
       lastUpdate = lastUpdate ? Number(lastUpdate) : null;
 
-      // If the most recent timestamp is less than 15min old, do not update
       if (lastUpdate && new Date().getTime() - lastUpdate < 15 * 60 * 1000) {
         console.debug("Data is up-to-date. No need to update.");
-        localStorage.setItem(storageKey, lastUpdate);
         return false;
       } else {
         console.debug("Data updated successfully.");
-        let timestamps = JSON.parse(localStorage.getItem(timestampsKey)) || [];
-        timestamps.push(timestamp);
-        localStorage.setItem(timestampsKey, JSON.stringify(timestamps));
-        let differences = c_sdk.calculateTimeDifferences(timestamps);
-        console.log(differences);
+        let storedTimes =
+          JSON.parse(localStorage.getItem(updateTimesKey)) || [];
+        storedTimes.push(updateTimestamp);
+
+        localStorage.setItem(updateTimesKey, JSON.stringify(storedTimes));
+        localStorage.setItem(lastUpdateKey, updateTimestamp);
+
+        // let differences = c_sdk.calculateTimeDifferences(timestamps);
+        // console.log(differences);
       }
 
       const { dbName, dbTable, dbVersion, key, indexes } =
