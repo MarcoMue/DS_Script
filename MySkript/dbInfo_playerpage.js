@@ -36,19 +36,10 @@ function loadScript(url) {
   }
 
   await init();
+  addColumnToTable("villages_list");
 
-  // Get all village rows
-  // send request and display result
-  // queue ?
-
-  function logData(data, additionals) {
-    console.log("Database details:", data, additionals);
-  }
-
-  // Call the function to add a column to the table with ID 'villages_list'
-  addColumnToTable("villages_list", "New Header", "New Cell");
-
-  async function addColumnToTable(tableId, headerText, cellText) {
+  const requests = [];
+  async function addColumnToTable(tableId) {
     const $table = $(`#${tableId}`);
 
     if ($table.length) {
@@ -62,15 +53,32 @@ function loadScript(url) {
 
       const $rows = $table.find("> tbody > tr");
       $rows.each(function () {
-        console.log("Row:", this);
+        console.log("Row:", this[2].split("|"));
 
-        let data = showDatabaseDetails(495, 480);
+        // requests.push({ x, y, row });
         const $newCell = $("<td></td>").text(data.defend_report.length);
         $(this).append($newCell);
       });
     } else {
       console.error(`Table with ID "${tableId}" not found.`);
     }
+
+    let currentIndex = 0;
+    const intervalId = setInterval(async () => {
+      if (currentIndex >= requests.length) {
+        clearInterval(intervalId);
+        return;
+      }
+
+      const { x, y, row } = requests[currentIndex];
+      await showDatabaseDetails(x, y, (data) => {
+        let vv = showDatabaseDetails(495, 480);
+
+        updateTableRow(row, data);
+      });
+
+      currentIndex++;
+    }, 200);
   }
 
   async function showDatabaseDetails(x, y) {
