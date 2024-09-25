@@ -60,7 +60,7 @@ function loadScript(url) {
       }
 
       // Add a column to each row in the table body
-      const $rows = $table.find("tbody tr");
+      const $rows = $table.find("> tbody > tr");
       $rows.each(function () {
         const $newCell = $("<td></td>").text(cellText);
         $(this).append($newCell);
