@@ -56,7 +56,7 @@ function loadScript(url) {
         console.log("Row:", this[2].split("|"));
 
         // requests.push({ x, y, row });
-        const $newCell = $("<td></td>").text(data.defend_report.length);
+        const $newCell = $("<td></td>").text(data.village_id);
         $(this).append($newCell);
       });
     } else {
