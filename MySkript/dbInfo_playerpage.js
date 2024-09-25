@@ -40,16 +40,13 @@ function loadScript(url) {
   // Get all village rows
   // send request and display result
   // queue ?
-
-  //   id = "villages_list";
   showDatabaseDetails(496, 481, null, null);
 
   function addColumnToTable(tableId, headerText, cellText) {
     const table = document.getElementById(tableId);
 
     if (table) {
-      const headerRow =
-        table.querySelector("thead tr") || table.querySelector("tr");
+      const headerRow = table.querySelector("thead tr");
       if (headerRow) {
         const newHeaderCell = document.createElement("th");
         newHeaderCell.textContent = headerText;
@@ -61,6 +58,7 @@ function loadScript(url) {
       // Add a column to each row in the table body
       const rows =
         table.querySelectorAll("tbody tr") || table.querySelectorAll("tr");
+
       rows.forEach((row) => {
         const newCell = document.createElement("td");
         newCell.textContent = cellText;
