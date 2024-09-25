@@ -93,6 +93,6 @@ function loadScript(url) {
       throw new Error("c_sdk is required for this script to work.");
     }
 
-    console.debug("TribeTroops.js loaded successfully");
+    console.debug("dbInfo_playerpage.js loaded successfully");
   }
 })();
