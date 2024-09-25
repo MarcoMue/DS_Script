@@ -17,19 +17,59 @@ function loadScript(url) {
 (async function () {
   console.log("IIFE called.");
 
-  var win = typeof unsafeWindow != "undefined" ? unsafeWindow : window;
+  let win = typeof unsafeWindow != "undefined" ? unsafeWindow : window;
   let mode = win.game_data.mode;
-  console.debug("mode", mode);
+  let screen = win.game_data.screen;
+
+  this.key = win.localStorage.getItem("dbkey");
 
   let scriptConfig = {
     baseScriptUrl: "https://marcomue.github.io/DS_Script/MySkript",
   };
 
-  await init();
+  if (!win.premium) {
+    UI.ErrorMessage(
+      "DB-Info kann nur mit aktiven Premium account benutzt werden",
+      3000
+    );
+    return;
+  }
 
-  let troops = [];
-  let currentTime = new Date();
-  if (mode === "members_troops") {
+  await init();
+  showDatabaseDetails(496, 481, null, null);
+
+  async function showDatabaseDetails(x, y, callback, additionals) {
+    var formData = new FormData();
+    formData.append("Key", localStorage.getItem("dbkey"));
+    formData.append("X", x);
+    formData.append("Y", y);
+    var request = new XMLHttpRequest();
+    var url = win.serverConfig.userAPI;
+    request.open("POST", url);
+    request.onreadystatechange = function () {
+      if (this.readyState === XMLHttpRequest.DONE) {
+        if (this.status === 200) {
+          if (this.responseText) {
+            console.log(this.responseText);
+            // callback(JSON.parse(this.responseText), x, y, additionals);
+          } else {
+            UI.ErrorMessage("UserScript DB-Info hatte einen Fehler", 5000);
+            console.log("empty response", this);
+          }
+        } else if (this.status === 403) {
+          UI.ErrorMessage(
+            "Datenbankverbindung fehlgeschlagen. Bitte richtigen Key oder Modus einstellen.",
+            5000
+          );
+        } else {
+          UI.ErrorMessage(
+            "Datenbankverbindung ist nicht verf\u00FCgbar.",
+            5000
+          );
+        }
+      }
+    };
+    request.send(formData);
   }
 
   async function init() {
