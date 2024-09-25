@@ -71,7 +71,7 @@ function loadScript(url) {
     }
   }
 
-  async function showDatabaseDetails(x, y, log, additionals) {
+  async function showDatabaseDetails(x, y, callback, additionals) {
     try {
       const formData = new FormData();
       formData.append("Key", localStorage.getItem("dbkey"));
