@@ -53,12 +53,19 @@ function loadScript(url) {
 
       const $rows = $table.find("> tbody > tr");
       $rows.each(function (rowIndex, row) {
-        const $thirdTd = $(row).find("td").eq(3);
-        console.log("Row:", this, $thirdTd);
+        // Get the third <td> that is a direct child of the row
+        const $thirdTd = $(row).children("td").eq(2);
+        const coordinates = $thirdTd.text().trim();
+        console.log("Coordinates:", coordinates);
 
-        // requests.push({ x, y, row });
-        const $newCell = $("<td></td>").text(rowIndex);
-        $(this).append($newCell);
+        // Queue requests (assuming x and y are coordinates from the row)
+        const coords = coordinates.split("|");
+        const x = coords[0];
+        const y = coords[1];
+        requests.push({ x, y, row: this });
+
+        // const $newCell = $("<td></td>").text(rowIndex);
+        // $(this).append($newCell);
       });
     } else {
       console.error(`Table with ID "${tableId}" not found.`);
