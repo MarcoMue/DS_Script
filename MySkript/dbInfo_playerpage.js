@@ -40,7 +40,7 @@ function loadScript(url) {
   // Get all village rows
   // send request and display result
   // queue ?
-  showDatabaseDetails(496, 481, null, null);
+  showDatabaseDetails(495, 480, null, null);
 
   // Call the function to add a column to the table with ID 'villages_list'
   addColumnToTable("villages_list", "New Header", "New Cell");
@@ -53,13 +53,7 @@ function loadScript(url) {
       const $headerRow =
         $table.find("thead tr").first() || $table.find("tr").first();
       if ($headerRow.length) {
-        // Example usage
-        const data = {
-          typ: "Example Type",
-          datum: "2023-10-01",
-        };
-        extendRow(data, $headerRow);
-        // $headerRow.append($newRow);
+        generateTableHeaders($headerRow);
       } else {
         console.error("Header row not found in the table.");
       }
@@ -88,7 +82,7 @@ function loadScript(url) {
         if (this.status === 200) {
           if (this.responseText) {
             console.log(this.responseText);
-            // callback(JSON.parse(this.responseText), x, y, additionals);
+            return JSON.parse(this.responseText);
           } else {
             UI.ErrorMessage("UserScript DB-Info hatte einen Fehler", 5000);
             console.log("empty response", this);
@@ -109,31 +103,11 @@ function loadScript(url) {
     request.send(formData);
   }
 
-  //   <thead>
-  //    <tr>
-  //     <th>Typ</th>
-  //     <th>Datum</th>
-  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_spear.png"></th>
-  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_sword.png"></th>
-  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_axe.png"></th>
-  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_spy.png"></th>
-  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_light.png"></th>
-  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_heavy.png"></th>
-  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_ram.png"></th>
-  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_catapult.png"></th>
-  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_snob.png"></th>
-  //    </tr>
-  //   </thead>
-
-  function extendRow(data, row) {
-    // Create a new table row
-
-    // Create and append the 'Typ' cell
-    const $typCell = $("<th></th>").text(data.typ);
+  function generateTableHeaders(row) {
+    const $typCell = $("<th></th>").text("Datum");
     row.append($typCell);
 
-    // Create and append the 'Datum' cell
-    const $datumCell = $("<th></th>").text(data.datum);
+    const $datumCell = $("<th></th>").text("Typ");
     row.append($datumCell);
 
     // List of unit image URLs
