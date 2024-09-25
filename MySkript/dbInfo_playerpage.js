@@ -42,35 +42,33 @@ function loadScript(url) {
   // queue ?
   showDatabaseDetails(496, 481, null, null);
 
-  function addColumnToTable(tableId, headerText, cellText) {
-    const table = document.getElementById(tableId);
+  // Call the function to add a column to the table with ID 'villages_list'
+  addColumnToTable("villages_list", "New Header", "New Cell");
 
-    if (table) {
-      const headerRow =
-        table.querySelector("thead tr") || table.querySelector("tr");
-      if (headerRow) {
-        const newHeaderCell = document.createElement("th");
-        newHeaderCell.textContent = headerText;
-        headerRow.appendChild(newHeaderCell);
+  function addColumnToTable(tableId, headerText, cellText) {
+    const $table = $(`#${tableId}`);
+
+    if ($table.length) {
+      // Add a column to the header
+      const $headerRow =
+        $table.find("thead tr").first() || $table.find("tr").first();
+      if ($headerRow.length) {
+        const $newHeaderCell = $("<th></th>").text(headerText);
+        $headerRow.append($newHeaderCell);
       } else {
         console.error("Header row not found in the table.");
       }
 
       // Add a column to each row in the table body
-      const rows =
-        table.querySelectorAll("tbody tr") || table.querySelectorAll("tr");
-      rows.forEach((row) => {
-        const newCell = document.createElement("td");
-        newCell.textContent = cellText;
-        row.appendChild(newCell);
+      const $rows = $table.find("tbody tr");
+      $rows.each(function () {
+        const $newCell = $("<td></td>").text(cellText);
+        $(this).append($newCell);
       });
     } else {
       console.error(`Table with ID "${tableId}" not found.`);
     }
   }
-
-  // Call the function to add a column to the table with ID 'villages_list'
-  addColumnToTable("villages_list", "New Header", "New Cell");
 
   async function showDatabaseDetails(x, y, callback, additionals) {
     var formData = new FormData();
