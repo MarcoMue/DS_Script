@@ -53,7 +53,7 @@ function loadScript(url) {
 
       const $rows = $table.find("> tbody > tr");
       $rows.each(function (rowIndex, row) {
-        const $thirdTd = $(row).find("td").eq(2);
+        const $thirdTd = $(row).find("td").eq(3);
         console.log("Row:", this, $thirdTd);
 
         // requests.push({ x, y, row });
