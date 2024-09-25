@@ -53,7 +53,9 @@ function loadScript(url) {
 
       const $rows = $table.find("> tbody > tr");
       $rows.each(function () {
-        console.log("Row:", this[2].split("|"));
+        console.log("Row:", this);
+        let splited = $(this).find("td:eq(3)").text().split("|");
+        console.log("Splited:", $(this).find("td:eq(3)").text());
 
         // requests.push({ x, y, row });
         const $newCell = $("<td></td>").text(data.village_id);
