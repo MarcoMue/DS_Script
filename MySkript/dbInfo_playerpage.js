@@ -46,7 +46,8 @@ function loadScript(url) {
     const table = document.getElementById(tableId);
 
     if (table) {
-      const headerRow = table.querySelector("thead tr");
+      const headerRow =
+        table.querySelector("thead tr") || table.querySelector("tr");
       if (headerRow) {
         const newHeaderCell = document.createElement("th");
         newHeaderCell.textContent = headerText;
@@ -56,8 +57,8 @@ function loadScript(url) {
       }
 
       // Add a column to each row in the table body
-      const rows = table.querySelectorAll("tbody tr");
-
+      const rows =
+        table.querySelectorAll("tbody tr") || table.querySelectorAll("tr");
       rows.forEach((row) => {
         const newCell = document.createElement("td");
         newCell.textContent = cellText;
