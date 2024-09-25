@@ -53,8 +53,8 @@ function loadScript(url) {
       const $headerRow =
         $table.find("thead tr").first() || $table.find("tr").first();
       if ($headerRow.length) {
-        const $newHeaderCell = $("<th></th>").text(headerText);
-        $headerRow.append($newHeaderCell);
+        const $newRow = generateTableRow(data);
+        $headerRow.append($newRow);
       } else {
         console.error("Header row not found in the table.");
       }
@@ -103,6 +103,66 @@ function loadScript(url) {
     };
     request.send(formData);
   }
+
+  //   <thead>
+  //    <tr>
+  //     <th>Typ</th>
+  //     <th>Datum</th>
+  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_spear.png"></th>
+  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_sword.png"></th>
+  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_axe.png"></th>
+  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_spy.png"></th>
+  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_light.png"></th>
+  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_heavy.png"></th>
+  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_ram.png"></th>
+  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_catapult.png"></th>
+  //     <th><img src="https://dsde.innogamescdn.com/graphic/unit/unit_snob.png"></th>
+  //    </tr>
+  //   </thead>
+
+  function generateTableRow(data) {
+    // Create a new table row
+    const $row = $("<tr></tr>");
+
+    // Create and append the 'Typ' cell
+    const $typCell = $("<td></td>").text(data.typ);
+    $row.append($typCell);
+
+    // Create and append the 'Datum' cell
+    const $datumCell = $("<td></td>").text(data.datum);
+    $row.append($datumCell);
+
+    // List of unit image URLs
+    const unitImages = [
+      "https://dsde.innogamescdn.com/graphic/unit/unit_spear.png",
+      "https://dsde.innogamescdn.com/graphic/unit/unit_sword.png",
+      "https://dsde.innogamescdn.com/graphic/unit/unit_axe.png",
+      "https://dsde.innogamescdn.com/graphic/unit/unit_spy.png",
+      "https://dsde.innogamescdn.com/graphic/unit/unit_light.png",
+      "https://dsde.innogamescdn.com/graphic/unit/unit_heavy.png",
+      "https://dsde.innogamescdn.com/graphic/unit/unit_ram.png",
+      "https://dsde.innogamescdn.com/graphic/unit/unit_catapult.png",
+      "https://dsde.innogamescdn.com/graphic/unit/unit_snob.png",
+    ];
+
+    // Create and append cells for each unit image
+    unitImages.forEach((url, index) => {
+      const $unitCell = $("<td></td>");
+      const $img = $("<img>").attr("src", url);
+      $unitCell.append($img);
+      $row.append($unitCell);
+    });
+
+    return $row;
+  }
+
+  // Example usage
+  const data = {
+    typ: "Example Type",
+    datum: "2023-10-01",
+  };
+
+  const $table = $("#villages_list tbody");
 
   async function init() {
     if (typeof jQuery === "undefined") {
