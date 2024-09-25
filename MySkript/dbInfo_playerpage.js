@@ -56,8 +56,7 @@ function loadScript(url) {
       }
 
       // Add a column to each row in the table body
-      const rows =
-        table.querySelectorAll("tbody tr") || table.querySelectorAll("tr");
+      const rows = table.querySelectorAll("tbody tr");
 
       rows.forEach((row) => {
         const newCell = document.createElement("td");
