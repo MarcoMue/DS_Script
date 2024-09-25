@@ -129,11 +129,11 @@ function loadScript(url) {
     // Create a new table row
 
     // Create and append the 'Typ' cell
-    const $typCell = $("<td></td>").text(data.typ);
+    const $typCell = $("<th></th>").text(data.typ);
     row.append($typCell);
 
     // Create and append the 'Datum' cell
-    const $datumCell = $("<td></td>").text(data.datum);
+    const $datumCell = $("<th></th>").text(data.datum);
     row.append($datumCell);
 
     // List of unit image URLs
@@ -151,7 +151,7 @@ function loadScript(url) {
 
     // Create and append cells for each unit image
     unitImages.forEach((url, index) => {
-      const $unitCell = $("<td></td>");
+      const $unitCell = $("<th></th>");
       const $img = $("<img>").attr("src", url);
       $unitCell.append($img);
       row.append($unitCell);
