@@ -58,8 +58,8 @@ function loadScript(url) {
           typ: "Example Type",
           datum: "2023-10-01",
         };
-        const $newRow = generateTableRow(data);
-        $headerRow.append($newRow);
+        extendRow(data, $headerRow);
+        // $headerRow.append($newRow);
       } else {
         console.error("Header row not found in the table.");
       }
@@ -125,17 +125,16 @@ function loadScript(url) {
   //    </tr>
   //   </thead>
 
-  function generateTableRow(data) {
+  function extendRow(data, row) {
     // Create a new table row
-    const $row = $("<tr></tr>");
 
     // Create and append the 'Typ' cell
     const $typCell = $("<td></td>").text(data.typ);
-    $row.append($typCell);
+    row.append($typCell);
 
     // Create and append the 'Datum' cell
     const $datumCell = $("<td></td>").text(data.datum);
-    $row.append($datumCell);
+    row.append($datumCell);
 
     // List of unit image URLs
     const unitImages = [
@@ -155,10 +154,8 @@ function loadScript(url) {
       const $unitCell = $("<td></td>");
       const $img = $("<img>").attr("src", url);
       $unitCell.append($img);
-      $row.append($unitCell);
+      row.append($unitCell);
     });
-
-    return $row;
   }
 
   async function init() {
