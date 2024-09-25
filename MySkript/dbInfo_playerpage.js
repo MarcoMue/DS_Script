@@ -53,6 +53,11 @@ function loadScript(url) {
       const $headerRow =
         $table.find("thead tr").first() || $table.find("tr").first();
       if ($headerRow.length) {
+        // Example usage
+        const data = {
+          typ: "Example Type",
+          datum: "2023-10-01",
+        };
         const $newRow = generateTableRow(data);
         $headerRow.append($newRow);
       } else {
@@ -155,14 +160,6 @@ function loadScript(url) {
 
     return $row;
   }
-
-  // Example usage
-  const data = {
-    typ: "Example Type",
-    datum: "2023-10-01",
-  };
-
-  const $table = $("#villages_list tbody");
 
   async function init() {
     if (typeof jQuery === "undefined") {
