@@ -40,7 +40,6 @@ function loadScript(url) {
   // Get all village rows
   // send request and display result
   // queue ?
-  showDatabaseDetails(495, 480, logData, null);
 
   function logData(data, additionals) {
     console.log("Database details:", data, additionals);
@@ -63,7 +62,10 @@ function loadScript(url) {
 
       const $rows = $table.find("> tbody > tr");
       $rows.each(function () {
-        const $newCell = $("<td></td>").text(cellText);
+        console.log("Row:", this);
+
+        let data = showDatabaseDetails(495, 480);
+        const $newCell = $("<td></td>").text(data.defend_report.length);
         $(this).append($newCell);
       });
     } else {
@@ -71,7 +73,7 @@ function loadScript(url) {
     }
   }
 
-  async function showDatabaseDetails(x, y, callback, additionals) {
+  async function showDatabaseDetails(x, y) {
     try {
       const formData = new FormData();
       formData.append("Key", localStorage.getItem("dbkey"));
@@ -98,7 +100,7 @@ function loadScript(url) {
 
       const data = await response.json();
       if (data) {
-        callback(data, additionals);
+        return data;
       } else {
         UI.ErrorMessage("UserScript DB-Info hatte einen Fehler", 5000);
         console.log("empty response", response);
