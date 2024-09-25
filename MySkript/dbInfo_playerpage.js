@@ -57,7 +57,7 @@ function loadScript(url) {
         console.log("Row:", this, $thirdTd);
 
         // requests.push({ x, y, row });
-        const $newCell = $("<td></td>").text(data.village_id);
+        const $newCell = $("<td></td>").text(rowIndex);
         $(this).append($newCell);
       });
     } else {
