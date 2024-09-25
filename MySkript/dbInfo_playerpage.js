@@ -43,7 +43,8 @@ function loadScript(url) {
   showDatabaseDetails(495, 480, null, null);
 
   // Call the function to add a column to the table with ID 'villages_list'
-  addColumnToTable("villages_list", "New Header", "New Cell");
+  let data = addColumnToTable("villages_list", "New Header", "New Cell");
+  console.log(data);
 
   function addColumnToTable(tableId, headerText, cellText) {
     const $table = $(`#${tableId}`);
@@ -81,7 +82,6 @@ function loadScript(url) {
       if (this.readyState === XMLHttpRequest.DONE) {
         if (this.status === 200) {
           if (this.responseText) {
-            console.log(this.responseText);
             return JSON.parse(this.responseText);
           } else {
             UI.ErrorMessage("UserScript DB-Info hatte einen Fehler", 5000);
