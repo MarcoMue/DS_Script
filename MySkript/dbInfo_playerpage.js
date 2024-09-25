@@ -36,7 +36,43 @@ function loadScript(url) {
   }
 
   await init();
+
+  // Get all village rows
+  // send request and display result
+  // queue ?
+
+  //   id = "villages_list";
   showDatabaseDetails(496, 481, null, null);
+
+  function addColumnToTable(tableId, headerText, cellText) {
+    const table = document.getElementById(tableId);
+
+    if (table) {
+      const headerRow =
+        table.querySelector("thead tr") || table.querySelector("tr");
+      if (headerRow) {
+        const newHeaderCell = document.createElement("th");
+        newHeaderCell.textContent = headerText;
+        headerRow.appendChild(newHeaderCell);
+      } else {
+        console.error("Header row not found in the table.");
+      }
+
+      // Add a column to each row in the table body
+      const rows =
+        table.querySelectorAll("tbody tr") || table.querySelectorAll("tr");
+      rows.forEach((row) => {
+        const newCell = document.createElement("td");
+        newCell.textContent = cellText;
+        row.appendChild(newCell);
+      });
+    } else {
+      console.error(`Table with ID "${tableId}" not found.`);
+    }
+  }
+
+  // Call the function to add a column to the table with ID 'villages_list'
+  addColumnToTable("villages_list", "New Header", "New Cell");
 
   async function showDatabaseDetails(x, y, callback, additionals) {
     var formData = new FormData();
