@@ -40,17 +40,19 @@ function loadScript(url) {
   // Get all village rows
   // send request and display result
   // queue ?
-  showDatabaseDetails(495, 480, null, null);
+  showDatabaseDetails(495, 480, logData, null);
+
+  function logData(data, additionals) {
+    console.log("Database details:", data, additionals);
+  }
 
   // Call the function to add a column to the table with ID 'villages_list'
-  let data = addColumnToTable("villages_list", "New Header", "New Cell");
-  console.log(data);
+  addColumnToTable("villages_list", "New Header", "New Cell");
 
-  function addColumnToTable(tableId, headerText, cellText) {
+  async function addColumnToTable(tableId, headerText, cellText) {
     const $table = $(`#${tableId}`);
 
     if ($table.length) {
-      // Add a column to the header
       const $headerRow =
         $table.find("thead tr").first() || $table.find("tr").first();
       if ($headerRow.length) {
@@ -59,7 +61,6 @@ function loadScript(url) {
         console.error("Header row not found in the table.");
       }
 
-      // Add a column to each row in the table body
       const $rows = $table.find("> tbody > tr");
       $rows.each(function () {
         const $newCell = $("<td></td>").text(cellText);
@@ -70,37 +71,42 @@ function loadScript(url) {
     }
   }
 
-  async function showDatabaseDetails(x, y, callback, additionals) {
-    var formData = new FormData();
-    formData.append("Key", localStorage.getItem("dbkey"));
-    formData.append("X", x);
-    formData.append("Y", y);
-    var request = new XMLHttpRequest();
-    var url = win.serverConfig.userAPI;
-    request.open("POST", url);
-    request.onreadystatechange = function () {
-      if (this.readyState === XMLHttpRequest.DONE) {
-        if (this.status === 200) {
-          if (this.responseText) {
-            return JSON.parse(this.responseText);
-          } else {
-            UI.ErrorMessage("UserScript DB-Info hatte einen Fehler", 5000);
-            console.log("empty response", this);
-          }
-        } else if (this.status === 403) {
+  async function showDatabaseDetails(x, y, log, additionals) {
+    try {
+      const formData = new FormData();
+      formData.append("Key", localStorage.getItem("dbkey"));
+      formData.append("X", x);
+      formData.append("Y", y);
+
+      const url = win.serverConfig.userAPI;
+      const response = await fetch(url, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        if (response.status === 403) {
           UI.ErrorMessage(
             "Datenbankverbindung fehlgeschlagen. Bitte richtigen Key oder Modus einstellen.",
             5000
           );
         } else {
-          UI.ErrorMessage(
-            "Datenbankverbindung ist nicht verf\u00FCgbar.",
-            5000
-          );
+          UI.ErrorMessage("Datenbankverbindung ist nicht verfügbar.", 5000);
         }
+        return;
       }
-    };
-    request.send(formData);
+
+      const data = await response.json();
+      if (data) {
+        callback(data, additionals);
+      } else {
+        UI.ErrorMessage("UserScript DB-Info hatte einen Fehler", 5000);
+        console.log("empty response", response);
+      }
+    } catch (error) {
+      UI.ErrorMessage("Ein Fehler ist aufgetreten: " + error.message, 5000);
+      console.error("Error fetching database details:", error);
+    }
   }
 
   function generateTableHeaders(row) {
