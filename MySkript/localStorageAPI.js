@@ -529,6 +529,7 @@
       });
     },
 
+    // -- Troop Counter -- Working --
     initDB: async function (entity) {
       const { dbName, dbTable, dbVersion, key, indexes } =
         c_sdk.dbConfig[entity];

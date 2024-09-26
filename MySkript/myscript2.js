@@ -591,10 +591,6 @@ function loadScript(url) {
     throw new Error("c_sdk is required for this script to work.");
   }
 
-  // Now you can use the library's functions
-  c_sdk.storeDataInLocalStorage({ key: "value" });
-  c_sdk.retrieveInstances("Hello, World!");
-
   let results = [];
   let commands = [];
   let targetVillages = [];
@@ -791,8 +787,8 @@ function loadScript(url) {
         pagesToFetch,
         async function (index, data) {
           twSDK.updateProgressBar(index, pagesToFetch.length);
-          console.log("Fetching data for village:", pagesToFetch[index]);
-          console.log("Data:", data);
+          // console.log("Fetching data for village:", pagesToFetch[index]);
+          // console.log("Data:", data);
 
           let $cc = jQuery(data).find(".commands-container");
           if ($cc.length > 0) {
@@ -899,9 +895,6 @@ function loadScript(url) {
 
   async function TestButton1() {
     try {
-      let vv = await c_sdk.fetchAndUpdateDB("village");
-      console.log("Villages:", vv);
-
       console.log(await c_sdk.getVillageByCoordinates(452, 479));
       console.log(await c_sdk.getVillageById(42));
     } catch (error) {
@@ -911,9 +904,6 @@ function loadScript(url) {
 
   async function TestButton2() {
     try {
-      let vv = await c_sdk.fetchAndUpdateDB("village");
-      console.log("Villages:", vv);
-
       console.log(await c_sdk.getVillageById(42));
       console.log(await c_sdk.getVillageByCoordinates(452, 479));
     } catch (error) {
@@ -929,20 +919,15 @@ function loadScript(url) {
     await loadHTML("ui.html", "content");
     Timing.tickHandlers.timers.init();
 
-    // document
-    //   .getElementById("of")
-    //   .addEventListener("change", () => setMode("members_troops"));
-    // document
-    //   .getElementById("in")
-    //   .addEventListener("change", () => setMode("members_defense"));
     document.getElementById("run").addEventListener("click", readIncs);
     document.getElementById("test1").addEventListener("click", TestButton1);
     document.getElementById("test2").addEventListener("click", TestButton2);
 
-    // document.getElementById('troop_details').addEventListener('click', readCheckboxValue);
-
     showLastUpdatedDb();
     setInterval(showLastUpdatedDb, 5000);
     addRadioControls();
+
+    let vv = await c_sdk.fetchAndUpdateDB("village");
+    console.log("Villages:", vv);
   }
 })();
