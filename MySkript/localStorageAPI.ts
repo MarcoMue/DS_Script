@@ -251,7 +251,6 @@
     },
     fetchAndUpdateDB: async function (entity) {
       console.log("IndexedDB called with entity:", entity);
-      console.time("fetchAndUpdateDB");
 
       const TIME_INTERVAL = 60 * 60 * 1000; // fetch data every hour
       const LAST_UPDATED_TIME = localStorage.getItem(`${entity}_last_updated`);
@@ -278,7 +277,6 @@
         } else {
           return updateDatabase();
         }
-        console.timeEnd("fetchAndUpdateDB");
       } catch (error) {
         console.error("Error in fetchAndUpdateDB:", error);
         throw error;
@@ -371,7 +369,6 @@
       }
 
       async function saveToIndexedDbStorage(data) {
-        console.time("openDB");
         const DBOpenRequest = indexedDB.open(dbName, dbVersion);
 
         return new Promise((resolve, reject) => {
@@ -392,12 +389,10 @@
 
             objectStore.transaction.oncomplete = () => {
               console.log("Object store created");
-              console.timeEnd("openDB");
             };
           };
 
           DBOpenRequest.onsuccess = function () {
-            console.time("putData");
             const db = DBOpenRequest.result;
             const transaction = db.transaction(dbTable, "readwrite");
             const store = transaction.objectStore(dbTable);
@@ -406,24 +401,20 @@
             data.forEach((item) => store.put(item));
 
             transaction.oncomplete = () => {
-              console.timeEnd("putData");
               resolve("Data saved to indexedDB");
             };
 
             transaction.onerror = (event) => {
-              console.timeEnd("putData");
               reject(event.target.error);
             };
           };
 
           DBOpenRequest.onerror = function (event) {
-            console.timeEnd("openDB");
             reject(DBOpenRequest.error);
           };
 
           DBOpenRequest.onblocked = function () {
             console.error("Database open blocked");
-            console.timeEnd("openDB");
             reject(new Error("Database open blocked"));
           };
         });
@@ -450,7 +441,6 @@
     },
     // Function to search for a record by coords using the index
     getVillageByCoordinates: async function (x, y) {
-      console.time("getVillageByCoordinates");
       return new Promise((resolve, reject) => {
         const { dbName, dbTable, dbVersion, indexes } =
           c_sdk.dbConfig["village"];
@@ -470,22 +460,16 @@
           const indeReq = index.get(`${x}|${y}`);
 
           indeReq.onerror = function (event) {
-            console.time("getVillageByCoordinates");
-
-            console.timeEnd("getVillageByCoordinates");
-
             console.error("Get request error:", event.target.errorCode);
             reject(event.target.errorCode);
           };
 
           indeReq.onsuccess = function (event) {
             if (indeReq.result) {
-              console.timeEnd("getVillageByCoordinates");
 
               resolve(indeReq.result);
             } else {
               console.log("No matching record found");
-              console.timeEnd("getVillageByCoordinates");
               resolve(null);
             }
           };
@@ -493,8 +477,6 @@
       });
     },
     getVillageById: async function (villageId) {
-      console.time("getVillageById");
-
       return new Promise((resolve, reject) => {
         const { dbName, dbTable, dbVersion } = c_sdk.dbConfig["village"];
         const DBOpenRequest = indexedDB.open(dbName, dbVersion);
@@ -511,16 +493,13 @@
           const getRequest = objectStore.get(villageId);
 
           getRequest.onerror = function (event) {
-            console.timeEnd("getVillageById");
             console.error("Get request error:", event.target.errorCode);
           };
 
           getRequest.onsuccess = function (event) {
             if (getRequest.result) {
-              console.timeEnd("getVillageById");
               resolve(getRequest.result);
             } else {
-              console.timeEnd("getVillageById");
               console.log("No matching record found");
               resolve(null);
             }

@@ -6,10 +6,23 @@ javascript: (() => {
 
     .done(function (script, textStatus) {
       console.log("Script loaded successfully.");
-      console.log(script, textStatus);
+      // console.log(script, textStatus);
     })
     .fail(function (jqxhr, settings, exception) {
       console.error("Failed to load the script.");
-      console.error(jqxhr, settings, exception);
+      // console.error(jqxhr, settings, exception);
+    });
+})();
+
+// TODO replace with ./dist Version
+
+javascript: (function () {
+  const timestamp = new Date().getTime();
+  $.getScript("https://localhost:8443/MySkript/read_all_incs.js?" + timestamp)
+    .done(function (script, textStatus) {
+      console.log("Script loaded successfully.");
+    })
+    .fail(function (jqxhr, settings, exception) {
+      console.error("Failed to load the script.");
     });
 })();

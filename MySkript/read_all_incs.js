@@ -21,7 +21,8 @@ function loadScript(url) {
   }
 
   let scriptConfig = {
-    baseScriptUrl: "https://marcomue.github.io/DS_Script/MySkript",
+    baseScriptUrl: "https://localhost:8443/dist/",
+    baseHTMLUrl: "https://localhost:8443/UI/",
     scriptData: {
       prefix: "getIncsForPlayer",
       name: "Get Incs for Player",
@@ -596,7 +597,7 @@ function loadScript(url) {
   openUI();
 
   async function loadHTML(url, elementId) {
-    let fullurl = `${scriptConfig.baseScriptUrl}/${url}`;
+    let fullurl = `${scriptConfig.baseHTMLUrl}/${url}`;
     try {
       const response = await fetch(fullurl);
       if (!response.ok) {
@@ -767,7 +768,7 @@ function loadScript(url) {
     console.log("readIncs called.");
     let commandIDs = [];
 
-    async function fetchPages(targetVillages) {
+    async function fetchVillagePages(targetVillages) {
       let pages = await Promise.all(
         targetVillages.map(async (village) => {
           console.log("Fetching village:", village);
@@ -780,7 +781,7 @@ function loadScript(url) {
       pages = pages.filter((url) => url !== null);
       return pages;
     }
-    const pagesToFetch = await fetchPages(targetVillages);
+    const pagesToFetch = await fetchVillagePages(targetVillages);
 
     if (pagesToFetch.length) {
       twSDK.startProgressBar(pagesToFetch.length);
@@ -794,7 +795,6 @@ function loadScript(url) {
             .find("h2")
             .text();
 
-          let commandID;
           // .commands-container or #commands_outgoings
           let $cc = $(villagePageHtml).find("#commands_outgoings");
 
@@ -803,8 +803,8 @@ function loadScript(url) {
 
             // Get all command IDs
             $firstTable.find(".quickedit-out").each(function () {
-              commandID = $(this).attr("data-id");
-              commandIDs.push(commandID);
+              console.log("Command ID:", $(this).attr("data-id"));
+              commandIDs.push($(this).attr("data-id"));
             });
 
             // Add a new column to the table
@@ -813,75 +813,115 @@ function loadScript(url) {
               $("#myTable").append($row);
               $(".widget-command-timer").addClass("timer");
             });
-
-            // Add a divider row with a td element
-            let $dividerRow = $("<tr>").addClass("divider-row");
-            let $dividerCell = $("<td>")
-              .attr("colspan", $firstTable.find("tr:first td").length)
-              .text(villageName);
-            $dividerRow.append($dividerCell);
-            $("#myTable").append($dividerRow);
-
-            //#region read Troop Details
-            const troopDetailsCheckbox =
-              document.getElementById("troop_details");
-            const isChecked = troopDetailsCheckbox.checked;
-
-            if (isChecked) {
-              let timerId = setInterval(function () {
-                if (commandIDs.length > 0) {
-                  let item = commandIDs.shift();
-                  console.log("Processing:", item);
-                  jQuery
-                    .ajax({
-                      url: `/game.php?screen=info_command&ajax=details&id=${item}`,
-                      dataType: "json",
-                    })
-                    .done((response) => {
-                      const { no_authorization } = response;
-                      if (no_authorization) {
-                        console.error(`Error:`, villagePageHtml);
-                      } else {
-                        console.log(response);
-                        results.push(response);
-                      }
-                    })
-                    .fail((textStatus, errorThrown) => {
-                      console.error(
-                        `Request failed: ${textStatus}, ${errorThrown}`
-                      );
-                    });
-                } else {
-                  // Step 4: Clear the interval when the array is empty
-                  clearInterval(timerId);
-                  console.log("All items processed.");
-                }
-              }, 400);
-            }
-            //#endregion
           }
-          // const incomingRows = jQuery(htmlDoc).find(
-          //   "#incomings_table tbody tr.nowrap"
-          // );
-          // jQuery("#incomings_table tbody:last-child").append(incomingRows);
-          // jQuery('#incomings_table tbody tr:not(".nowrap"):eq(1)')
-          //   .detach()
-          //   .appendTo("#incomings_table tbody:last-child");
         },
 
-        function () {
+        async function () {
           // initIncomingsOverview();
           UI.SuccessMessage("All villages fetched!");
           Timing.tickHandlers.timers.initTimers("widget-command-timer");
+          console.log(commandIDs);
+          await fetchAttackDetails(commandIDs);
         },
         function (error) {
           UI.ErrorMessage("Error fetching incomings page!");
           console.error(`${scriptInfo} Error:`, error);
         }
       );
+
+      // const troopDetailsCheckbox = document.getElementById("troop_details");
+      // const isChecked = troopDetailsCheckbox.checked;
+      // if (isChecked) {
+      //   let timerId = setInterval(function () {
+      //     if (commandIDs.length > 0) {
+      //       let item = commandIDs.shift();
+      //       console.log("Processing:", item);
+
+      //       let attackinfo = fetchAttackDetails(item);
+
+      //       jQuery
+      //         .ajax({
+      //           url: `/game.php?screen=info_command&ajax=details&id=${item}`,
+      //           dataType: "json",
+      //         })
+      //         .done((response) => {
+      //           const { no_authorization } = response;
+      //           if (no_authorization) {
+      //             console.error(`Error:`, villagePageHtml);
+      //           } else {
+      //             console.log(response);
+      //             results.push(response);
+      //           }
+      //         })
+      //         .fail((textStatus, errorThrown) => {
+      //           console.error(`Request failed: ${textStatus}, ${errorThrown}`);
+      //         });
+      //     } else {
+      //       // Step 4: Clear the interval when the array is empty
+      //       clearInterval(timerId);
+      //       console.log("All items processed.");
+      //     }
+      //   }, 400);
+      // }
     } else {
       UI.ErrorMessage("No villages to fetch!");
     }
+  }
+
+  async function fetchAttackDetails(commandIds) {
+    async function fetchDetails(commands) {
+      let pages = await Promise.all(
+        commands.map(async (id) => {
+          console.log("Fetching Command:", id);
+          return `/game.php?screen=info_command&id=${id}`;
+        })
+      );
+
+      pages = pages.filter((url) => url !== null);
+      return pages;
+    }
+    const pagesToFetch = await fetchDetails(commandIds);
+    console.log("Details to fetch:", pagesToFetch);
+
+    let units = [];
+    twSDK.startProgressBar(pagesToFetch.length);
+    twSDK.getAll(
+      pagesToFetch,
+      async function (index, data) {
+        twSDK.updateProgressBar(index, pagesToFetch.length);
+
+        let $units = $(data).find(
+          "#content_value > table:nth-of-type(2) > tbody > tr:nth-child(2)"
+        );
+        console.log("Data:", $units);
+        units.push($units);
+      },
+
+      async function () {
+        // initIncomingsOverview();
+
+        $("#myTable tbody tr").each(function (index) {
+          // Get the td elements from $units
+          let $unitTds = units[index].find("td");
+          // Append each td from $units to the current row
+          $(this).append($unitTds.clone());
+        });
+
+        UI.SuccessMessage("All Details fetched!");
+      },
+      function (error) {
+        UI.ErrorMessage("Error fetching detail pages!");
+        console.error(`${scriptInfo} Error:`, error);
+      }
+    );
+
+    // const incomingRows = jQuery(htmlDoc).find(
+    //   "#incomings_table tbody tr.nowrap"
+    // );
+    // jQuery("#incomings_table tbody:last-child").append(incomingRows);
+    // jQuery('#incomings_table tbody tr:not(".nowrap"):eq(1)')
+    //   .detach()
+    //   .appendTo("#incomings_table tbody:last-child");
   }
 
   async function TestButton1() {
@@ -919,8 +959,6 @@ function loadScript(url) {
     addRadioControls();
 
     let vv = await c_sdk.fetchAndUpdateDB("village");
-    console.log("Villages:", vv);
-
     Lib.loggy("UI loaded.");
   }
 })();
