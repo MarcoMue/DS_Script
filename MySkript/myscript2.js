@@ -596,7 +596,7 @@ function loadScript(url) {
   let targetVillages = [];
   openUI();
 
-  async function loadHTML(url) {
+  async function loadHTML(url, elementId) {
     let fullurl = `${scriptConfig.baseScriptUrl}/${url}`;
     try {
       const response = await fetch(fullurl);
@@ -604,7 +604,7 @@ function loadScript(url) {
         throw new Error("Network response was not ok");
       }
       const htmlContent = await response.text();
-      document.getElementById("content").innerHTML = htmlContent;
+      document.getElementById(elementId).innerHTML = htmlContent;
     } catch (error) {
       console.error("Error loading HTML:", error);
     }
@@ -929,5 +929,7 @@ function loadScript(url) {
 
     let vv = await c_sdk.fetchAndUpdateDB("village");
     console.log("Villages:", vv);
+
+    Lib.loggy("UI loaded.");
   }
 })();

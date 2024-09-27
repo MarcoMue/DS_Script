@@ -773,3 +773,9 @@
     },
   };
 })();
+
+const Lib = {
+  loggy: function (value) {
+    console.log("Hello from the library", value);
+  },
+};
