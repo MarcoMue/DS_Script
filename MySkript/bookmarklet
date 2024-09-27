@@ -1,13 +1,15 @@
 javascript: (() => {
   const timestamp = new Date().getTime();
 
-  $.getScript(
-    "https://marcomue.github.io/DS_Script/MySkript/myscript2.js?" + timestamp
-  )
+  $.getScript("https://localhost:8443/MySkript/myscript2.js?" + timestamp)
+  // "https://marcomue.github.io/DS_Script/MySkript/myscript2.js?" + timestamp
+
     .done(function (script, textStatus) {
       console.log("Script loaded successfully.");
+      console.log(script, textStatus);
     })
     .fail(function (jqxhr, settings, exception) {
       console.error("Failed to load the script.");
+      console.error(jqxhr, settings, exception);
     });
 })();
