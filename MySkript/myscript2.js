@@ -789,6 +789,11 @@ function loadScript(url) {
         async function (villageIndex, villagePageHtml) {
           twSDK.updateProgressBar(villageIndex, pagesToFetch.length);
 
+          let villageName = $(villagePageHtml)
+            .find("#content_value")
+            .find("h2")
+            .text();
+
           let commandID;
           // .commands-container or #commands_outgoings
           let $cc = $(villagePageHtml).find("#commands_outgoings");
@@ -809,7 +814,12 @@ function loadScript(url) {
               $(".widget-command-timer").addClass("timer");
             });
 
+            // Add a divider row with a td element
             let $dividerRow = $("<tr>").addClass("divider-row");
+            let $dividerCell = $("<td>")
+              .attr("colspan", $firstTable.find("tr:first td").length)
+              .text(villageName);
+            $dividerRow.append($dividerCell);
             $("#myTable").append($dividerRow);
 
             //#region read Troop Details
