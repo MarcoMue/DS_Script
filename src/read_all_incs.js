@@ -1,14 +1,13 @@
-if (typeof DEBUG !== "boolean") DEBUG = false;
-// TODO init and load DB for villages and players / tribes
-// TODO: use Bundler to load all files
-
 // Function to dynamically load a script
+/**
+ * @param {string} url
+ */
 function loadScript(url) {
   return new Promise((resolve, reject) => {
     const script = document.createElement("script");
     script.src = url;
-    script.onload = resolve;
-    script.onerror = reject;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error(`Failed to load script ${url}`));
     document.head.appendChild(script);
   });
 }
@@ -21,7 +20,7 @@ function loadScript(url) {
   }
 
   let scriptConfig = {
-    baseScriptUrl: "https://localhost:8443/dist/",
+    baseScriptUrl: "https://localhost:8443/src/",
     baseHTMLUrl: "https://localhost:8443/UI/",
     scriptData: {
       prefix: "getIncsForPlayer",
@@ -31,70 +30,6 @@ function loadScript(url) {
       authorUrl: "",
       helpLink: "",
     },
-    translations: {
-      en_DK: {
-        "Get Incs for Player": "Get Incs for Player",
-        Help: "Help",
-        "There was an error!": "There was an error!",
-        "Script must be executed from Player Info screen!":
-          "Script must be executed from Player Info screen!",
-        Fetching: "Fetching",
-        "Fetching incomings for each village...":
-          "Fetching incomings for each village...",
-        "Error fetching village incomings!":
-          "Error fetching village incomings!",
-        "Total Attacks:": "Total Attacks:",
-        "Total Large Attacks:": "Total Large Attacks:",
-        "Total Noble Attacks:": "Total Noble Attacks:",
-        "Total Villages:": "Total Villages:",
-        "Average attacks per village:": "Average attacks per village:",
-        "Could not find villages being attacked!":
-          "Could not find villages being attacked!",
-        "Player:": "Player:",
-        Village: "Village",
-        Coords: "Coords",
-        "Total Medium Attacks:": "Total Medium Attacks:",
-        "Total Small Attacks:": "Total Small Attacks:",
-        Players: "Players",
-        "You can't sort elements if any one is a descendant of another.":
-          "You can't sort elements if any one is a descendant of another.",
-        "sort this column": "sort this column",
-      },
-      fr_FR: {
-        "Get Incs for Player":
-          "Récupérer les attaques entrantes pour le Joueur",
-        Help: "Aide",
-        "There was an error!": "There was an error!",
-        "Script must be executed from Player Info screen!":
-          "Le script doit être executé depuis le profil d'un joueur!",
-        Fetching: "Chargement",
-        "Fetching incomings for each village...":
-          "Chargement des ordres pour chaque village ...",
-        "Error fetching village incomings!":
-          "Erreur dans le chargement des ordres!",
-        "Total Attacks:": "Total - Attaque envoyées:",
-        "Total Large Attacks:": "Total - Attaque de grande envergure:",
-        "Total Noble Attacks:": "Total - Attaque de noble:",
-        "Total Villages:": "Total - Villages:",
-        "Average attacks per village:": "Moyenne - Attaque par village:",
-        "Could not find villages being attacked!":
-          "Impossible de trouver les villages attaqués!",
-        "Player:": "Joueur:",
-        Village: "Village",
-        Coords: "Coordonnées",
-        "Total Medium Attacks:": "Total - Attaque de moyenne envergure:",
-        "Total Small Attacks:": "Total - Attaque de petite envergure::",
-        Players: "Joueurs",
-        "You can't sort elements if any one is a descendant of another.":
-          "You can't sort elements if any one is a descendant of another.",
-        "sort this column": "sort this column",
-      },
-    },
-    allowedMarkets: [],
-    allowedScreens: [],
-    allowedModes: [],
-    isDebug: DEBUG,
-    enableCountApi: true,
   };
   let scriptInfo = `${scriptConfig.scriptData.prefix} ${scriptConfig.scriptData.name} ${scriptConfig.scriptData.version}`;
   let twSDK = {
@@ -105,7 +40,6 @@ function loadScript(url) {
     allowedScreens: [],
     allowedModes: [],
     enableCountApi: true,
-    isDebug: false,
     isMobile: jQuery("#mobileHeader").length > 0,
     delayBetweenRequests: 200,
     // helper variables
@@ -133,7 +67,7 @@ function loadScript(url) {
         dbTable: "villages",
         key: "villageId",
         indexes: [{ name: "coordIndex", key: "coords", unique: true }],
-        url: this.worldDataVillages,
+        url: "/map/village.txt",
       },
       player: {
         dbName: "playersDb",
@@ -141,7 +75,7 @@ function loadScript(url) {
         dbTable: "players",
         key: "playerId",
         indexes: [],
-        url: this.worldDataPlayers,
+        url: "/map/player.txt",
       },
       ally: {
         dbName: "tribesDb",
@@ -149,7 +83,7 @@ function loadScript(url) {
         dbTable: "tribes",
         key: "tribeId",
         indexes: [],
-        url: this.worldDataTribes,
+        url: "/map/ally.txt",
       },
       conquer: {
         dbName: "conquerDb",
@@ -157,7 +91,7 @@ function loadScript(url) {
         dbTable: "conquer",
         key: "",
         indexes: [],
-        url: this.worldDataConquests,
+        url: "/map/conquer_extended.txt",
       },
     },
     // functions
@@ -193,12 +127,12 @@ function loadScript(url) {
       }
       return arrData;
     },
-    cleanString: function (string) {
+    cleanString: function (str) {
       try {
-        return decodeURIComponent(string).replace(/\+/g, " ");
+        return decodeURIComponent(str).replace(/\+/g, " ");
       } catch (error) {
-        console.error(error, string);
-        return string;
+        console.error(error, str);
+        return str;
       }
     },
     worldDataAPI: async function (entity) {
@@ -574,28 +508,31 @@ function loadScript(url) {
       }
     },
   };
-  window.allIncs = twSDK;
 
   // Load the library script
-  let scriptName = "localStorageAPI.js";
+  let scriptName = "storageAPI.js";
   await loadScript(
     `${scriptConfig.baseScriptUrl}/${scriptName}?` + new Date().getTime()
   )
     .then(() => {
-      console.log(`${scriptName} loaded successfully`);
+      console.log(`${scriptName} loaded s
+        uccessfully`);
     })
     .catch((error) => {
       console.error("Error loading script:", error);
     });
 
-  if (typeof c_sdk === "undefined") {
-    throw new Error("c_sdk is required for this script to work.");
+  if (typeof Lib === "undefined") {
+    throw new Error("Lib is required for this script to work.");
   }
 
-  let results = [];
   let targetVillages = [];
   openUI();
 
+  /**
+   * @param {string} url
+   * @param {string} elementId
+   */
   async function loadHTML(url, elementId) {
     let fullurl = `${scriptConfig.baseHTMLUrl}/${url}`;
     try {
@@ -637,6 +574,9 @@ function loadScript(url) {
     document.getElementById("timeAgo").textContent = timeAgo;
   }
 
+  /**
+   * @param {string} input
+   */
   function parseBool(input) {
     if (typeof input === "string") {
       return input.toLowerCase() === "true";
@@ -690,10 +630,10 @@ function loadScript(url) {
       };
 
       planObjects.push(planObject);
-      if (DEBUG) console.debug(`Plan object ${i} created: `, planObject);
+      if (false) console.debug(`Plan object ${i} created: `, planObject);
     }
 
-    if (DEBUG) console.debug(`Plan objects created: `, planObjects);
+    if (false) console.debug(`Plan objects created: `, planObjects);
     return planObjects;
   }
 
@@ -773,7 +713,7 @@ function loadScript(url) {
         targetVillages.map(async (village) => {
           console.log("Fetching village:", village);
           let [x, y] = village.split("|");
-          let res = await c_sdk.getVillageByCoordinates(x, y);
+          let res = await Lib.getVillageByCoordinates(x, y);
           return `/game.php?screen=info_village&id=${res.id}`;
         })
       );
@@ -893,7 +833,6 @@ function loadScript(url) {
         let $units = $(data).find(
           "#content_value > table:nth-of-type(2) > tbody > tr:nth-child(2)"
         );
-        console.log("Data:", $units);
         units.push($units);
       },
 
@@ -926,8 +865,8 @@ function loadScript(url) {
 
   async function TestButton1() {
     try {
-      console.log(await c_sdk.getVillageByCoordinates(452, 479));
-      console.log(await c_sdk.getVillageById(42));
+      console.log(await Lib.getVillageByCoordinates(452, 479));
+      console.log(await Lib.getVillageById(42));
     } catch (error) {
       console.error("An error occurred:", error);
     }
@@ -935,8 +874,8 @@ function loadScript(url) {
 
   async function TestButton2() {
     try {
-      console.log(await c_sdk.getVillageById(42));
-      console.log(await c_sdk.getVillageByCoordinates(452, 479));
+      console.log(await Lib.getVillageById(42));
+      console.log(await Lib.getVillageByCoordinates(452, 479));
     } catch (error) {
       console.error("An error occurred:", error);
     }
@@ -958,7 +897,7 @@ function loadScript(url) {
     setInterval(showLastUpdatedDb, 5000);
     addRadioControls();
 
-    let vv = await c_sdk.fetchAndUpdateDB("village");
+    let vv = await Lib.fetchAndUpdateDB("village");
     Lib.loggy("UI loaded.");
   }
 })();

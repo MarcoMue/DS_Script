@@ -1,8 +1,8 @@
 javascript: (() => {
   const timestamp = new Date().getTime();
 
-  $.getScript("https://localhost:8443/MySkript/read_all_incs.js?" + timestamp)
-    // "https://marcomue.github.io/DS_Script/MySkript/read_all_incs.js?" + timestamp
+  $.getScript("https://localhost:8443/src/read_all_incs.js?" + timestamp)
+    // "https://marcomue.github.io/DS_Script/src/read_all_incs.js?" + timestamp
 
     .done(function (script, textStatus) {
       console.log("Script loaded successfully.");
@@ -18,7 +18,7 @@ javascript: (() => {
 
 javascript: (function () {
   const timestamp = new Date().getTime();
-  $.getScript("https://localhost:8443/MySkript/read_all_incs.js?" + timestamp)
+  $.getScript("https://localhost:8443/src/read_all_incs.js?" + timestamp)
     .done(function (script, textStatus) {
       console.log("Script loaded successfully.");
     })

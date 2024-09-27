@@ -1,5 +1,3 @@
-if (typeof DEBUG !== "boolean") DEBUG = false;
-
 /**
  * Dynamically loads a JavaScript file by creating a script element and appending it to the document head.
  *
@@ -10,8 +8,8 @@ function loadScript(url) {
   return new Promise((resolve, reject) => {
     const script = document.createElement("script");
     script.src = url;
-    script.onload = resolve;
-    script.onerror = reject;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error(`Failed to load script ${url}`));
     document.head.appendChild(script);
   });
 }
@@ -25,7 +23,7 @@ function loadScript(url) {
   console.debug("mode", mode);
 
   let scriptConfig = {
-    baseScriptUrl: "https://marcomue.github.io/DS_Script/MySkript",
+    baseScriptUrl: "https://marcomue.github.io/DS_Script/src",
   };
 
   await init();
@@ -34,14 +32,14 @@ function loadScript(url) {
   let currentTime = new Date();
   if (mode === "members_troops") {
     troops = await parseMembersTroopsTable(currentTime);
-    await c_sdk.storeTroops("troops", troops, currentTime);
+    await Lib.storeTroops("troops", troops, currentTime);
 
     let timestampValues = getTimestampValues(currentTime);
     let dropdown = createDropdown(timestampValues);
     insertDropdownIntoDOM(dropdown, parseMembersTroopsTable);
 
     // let key = 1726769522695;
-    // await c_sdk.deleteTroops("troops", new Date(key));
+    // await Lib.deleteTroops("troops", new Date(key));
   }
 
   /**
@@ -228,7 +226,7 @@ function loadScript(url) {
       rowData.push(playerID);
       let skip = 1;
 
-      let oldTroops = await c_sdk.readData("troops", date.getTime(), playerID);
+      let oldTroops = await Lib.readData("troops", date.getTime(), playerID);
 
       if (!oldTroops) {
         console.debug(
@@ -249,7 +247,7 @@ function loadScript(url) {
         rowData.push(parseInt(value));
       }
 
-      data.push(new c_sdk.types.PlayerTotalTroops(date.getTime(), ...rowData));
+      data.push(new Lib.types.PlayerTotalTroops(date.getTime(), ...rowData));
     }
 
     if (DEBUG) {
@@ -301,8 +299,8 @@ function loadScript(url) {
         console.error("Error loading script:", error);
       });
 
-    if (typeof c_sdk === "undefined") {
-      throw new Error("c_sdk is required for this script to work.");
+    if (typeof Lib === "undefined") {
+      throw new Error("Lib is required for this script to work.");
     }
 
     console.debug("TribeTroops.js loaded successfully");

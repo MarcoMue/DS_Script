@@ -24,7 +24,7 @@ function loadScript(url) {
   this.key = win.localStorage.getItem("dbkey");
 
   let scriptConfig = {
-    baseScriptUrl: "https://marcomue.github.io/DS_Script/MySkript",
+    baseScriptUrl: "https://marcomue.github.io/DS_Script/src",
   };
 
   if (!win.premium) {
@@ -162,7 +162,7 @@ function loadScript(url) {
     }
 
     // Load the library script
-    let scriptName = "localStorageAPI.js";
+    let scriptName = "storageAPI.js";
     await loadScript(
       `${scriptConfig.baseScriptUrl}/${scriptName}?` + new Date().getTime()
     )
@@ -173,8 +173,8 @@ function loadScript(url) {
         console.error("Error loading script:", error);
       });
 
-    if (typeof c_sdk === "undefined") {
-      throw new Error("c_sdk is required for this script to work.");
+    if (typeof Lib === "undefined") {
+      throw new Error("Lib is required for this script to work.");
     }
 
     console.debug("dbInfo_playerpage.js loaded successfully");
