@@ -592,7 +592,6 @@ function loadScript(url) {
   }
 
   let results = [];
-  let commands = [];
   let targetVillages = [];
   openUI();
 
@@ -772,7 +771,9 @@ function loadScript(url) {
       let pages = await Promise.all(
         targetVillages.map(async (village) => {
           console.log("Fetching village:", village);
-          return `/game.php?screen=info_village&id=${village[0]}`;
+          let [x, y] = village.split("|");
+          let res = await c_sdk.getVillageByCoordinates(x, y);
+          return `/game.php?screen=info_village&id=${res.id}`;
         })
       );
 
@@ -785,52 +786,31 @@ function loadScript(url) {
       twSDK.startProgressBar(pagesToFetch.length);
       twSDK.getAll(
         pagesToFetch,
-        async function (index, data) {
-          twSDK.updateProgressBar(index, pagesToFetch.length);
-          // console.log("Fetching data for village:", pagesToFetch[index]);
-          // console.log("Data:", data);
+        async function (villageIndex, villagePageHtml) {
+          twSDK.updateProgressBar(villageIndex, pagesToFetch.length);
 
-          let $cc = jQuery(data).find(".commands-container");
+          let commandID;
+          // .commands-container or #commands_outgoings
+          let $cc = $(villagePageHtml).find("#commands_outgoings");
+
           if ($cc.length > 0) {
-            $cc
-              .find("table")
-              .first()
-              .find(".quickedit-out")
-              .each(function () {
-                let commandID = $(this).attr("data-id");
-                commandIDs.push(commandID);
-              });
+            let $firstTable = $cc.find("table").first();
 
-            $cc
-              .find("table")
-              .first()
-              .find(".command-row")
-              .each(function () {
-                // Select the current row
-                let $row = $(this);
+            // Get all command IDs
+            $firstTable.find(".quickedit-out").each(function () {
+              commandID = $(this).attr("data-id");
+              commandIDs.push(commandID);
+            });
 
-                $row.append(
-                  `<td class="command-cell">Command ID: ${$row.attr(
-                    "data-id"
-                  )}</td>`
-                );
+            // Add a new column to the table
+            $firstTable.find(".command-row").each(function () {
+              let $row = $(this);
+              $("#myTable").append($row);
+              $(".widget-command-timer").addClass("timer");
+            });
 
-                // Create a new element to insert before the row
-                let $newElement = $(
-                  `<td class="command-cell">Village: ${targetVillages[index]}</td>`
-                );
-                // Insert the new element before the row
-                $row.before($newElement);
-
-                // Push the modified row to the commands array
-                commands.push($row);
-
-                // Append the modified row to #myTable
-                $("#myTable").append($row);
-              });
-
-            $(".widget-command-timer").addClass("timer");
-            Timing.tickHandlers.timers.initTimers("widget-command-timer");
+            let $dividerRow = $("<tr>").addClass("divider-row");
+            $("#myTable").append($dividerRow);
 
             //#region read Troop Details
             const troopDetailsCheckbox =
@@ -850,7 +830,7 @@ function loadScript(url) {
                     .done((response) => {
                       const { no_authorization } = response;
                       if (no_authorization) {
-                        console.error(`Error:`, data);
+                        console.error(`Error:`, villagePageHtml);
                       } else {
                         console.log(response);
                         results.push(response);
@@ -882,6 +862,7 @@ function loadScript(url) {
         function () {
           // initIncomingsOverview();
           UI.SuccessMessage("All villages fetched!");
+          Timing.tickHandlers.timers.initTimers("widget-command-timer");
         },
         function (error) {
           UI.ErrorMessage("Error fetching incomings page!");
