@@ -138,7 +138,6 @@ const Lib = {
     worldDataTribes: "/map/ally.txt",
     worldDataConquests: "/map/conquer_extended.txt",
   },
-  // TODO: find new names, collides with twsdk
   dbConfig: {
     troops: {
       dbName: "TroopsDB",

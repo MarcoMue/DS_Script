@@ -12,6 +12,9 @@ function loadScript(url) {
   });
 }
 
+// User Input
+if (typeof DEBUG !== "boolean") DEBUG = false;
+
 (async function () {
   //#region setup
   if (typeof jQuery === "undefined") {
@@ -41,7 +44,6 @@ function loadScript(url) {
     enableCountApi: true,
     isMobile: jQuery("#mobileHeader").length > 0,
     delayBetweenRequests: 200,
-    coordsRegex: /\d{1,3}\|\d{1,3}/g,
     dateTimeMatch:
       /(?:[A-Z][a-z]{2}\s+\d{1,2},\s*\d{0,4}\s+|today\s+at\s+|tomorrow\s+at\s+)\d{1,2}:\d{2}:\d{2}:?\.?\d{0,3}/,
     // https://forum.die-staemme.de/index.php?threads/weltdaten-und-configs.183996/#post-4378479
@@ -215,11 +217,13 @@ function loadScript(url) {
   //#endregion setup
 
   // Start the script
+
+  let targetVillages = new Set();
+  let workbenchCommands = [];
+  const objectMap = new Map();
+
   openUI();
   await Lib.initAllDBs();
-
-  let targetVillages = [];
-  let workbenchCommands = [];
 
   /**
    * Asynchronously loads HTML content from a specified URL and inserts it into a specified DOM element.
@@ -249,13 +253,22 @@ function loadScript(url) {
     const coordRadio = document.getElementById("coord");
     const wbRadio = document.getElementById("wb");
     if (coordRadio.checked) {
-      targetVillages = readVillageCoords(event.target.value);
+      targetVillages = extractUniqueCoordinates(event.target.value);
     } else if (wbRadio.checked) {
-      let results = readWorkbenchExport(event.target.value);
-      workbenchCommands = results;
-      targetVillages = extractVillages(results);
+      workbenchCommands = readWorkbenchExport(event.target.value);
+      targetVillages = extractVillages(workbenchCommands);
     } else {
       alert("Please select a mode.");
+    }
+
+    if (workbenchCommands.length > 0) {
+      targetVillages = [];
+      workbenchCommands.forEach(async (command) => {
+        let id = command.targetVillageId;
+        let village = await Lib.getVillageById(id);
+        // console.log(village.player_id, village.name);
+        targetVillages.push(village.coord);
+      });
     }
   }
 
@@ -388,36 +401,35 @@ function loadScript(url) {
   }
 
   /**
-   * @param {string} text
+   * Extracts unique coordinate matches from the given text and stores them in a Set.
+   *
+   * @param {string} text - The input text to search for coordinates.
+   * @returns {Set<string>} A Set containing unique coordinate matches.
    */
-  function readVillageCoords(text) {
-    const results = text.match(twSDK.coordsRegex);
-    document.getElementById("resultCount").innerText = `Results found: ${
-      results ? results.length : 0
-    }`;
+  function extractUniqueCoordinates(text) {
+    const pattern = /(\d{1,4})\|(\d{1,4})/g;
+    const uniqueCoordinates = new Set();
 
-    return results || [];
+    for (const match of text.matchAll(pattern)) {
+      uniqueCoordinates.add(match[0]);
+    }
+
+    return uniqueCoordinates;
   }
 
   /**
-   * @param {any[]} results
+   * @param {WorkbenchCommands[]} results
+   * @returns {Promise<Set<any>>} A Promise that resolves to a Set of unique villages.
    */
-  function extractVillages(results) {
+  async function extractVillages(results) {
     console.log("extractVillages called.");
-    let villages = [];
-    results.forEach(async (result) => {
-      let v = await Lib.getVillageById(result.originVillageId);
-      //ID 0: 4941
-      //NAME 1: "006"
-      //X 2: "499"
-      //Y 3: "489"
-      //? 4: 1577266935
-      //? 5: 4172
-      //Bonustype 6: 6
-      // console.log("Village 1:", v1, v2);
-      villages.push(v);
-    });
-    return villages;
+
+    // Use Promise.all to resolve all async calls concurrently
+    const villagePromises = results.map((result) =>
+      Lib.getVillageById(result.targetVillageId)
+    );
+    const villagesArray = await Promise.all(villagePromises);
+    return new Set(villagesArray);
   }
 
   function addRadioControls() {
@@ -431,13 +443,13 @@ function loadScript(url) {
     let commandIDs = [];
 
     async function fetchVillagePages(targetVillages) {
-      if (targetVillages.length === 0) {
+      if (targetVillages.size === 0) {
         UI.ErrorMessage("No villages to fetch!");
         return;
       }
 
       let pages = await Promise.all(
-        targetVillages.map(async (village) => {
+        Array.from(targetVillages).map(async (village) => {
           console.log("Fetching village:", village);
           let [x, y] = village.split("|");
           let res = await Lib.getVillageByCoordinates(x, y);
@@ -489,8 +501,11 @@ function loadScript(url) {
           Timing.tickHandlers.timers.initTimers("widget-command-timer");
           console.log(commandIDs);
 
-          const isChecked = troopDetailsCheckbox.checked;
-          if (isChecked) {
+          const troopDetailsCheckbox = document.getElementById(
+            "troopDetailsCheckbox"
+          );
+
+          if (troopDetailsCheckbox.checked) {
             await fetchAttackDetails(commandIDs);
           }
         },
@@ -551,25 +566,17 @@ function loadScript(url) {
   }
 
   async function TestButton1() {
+    console.log("TestButton1 called.");
+    console.log(targetVillages);
+    console.log(workbenchCommands);
+  }
+
+  async function TestButton2() {
     try {
       console.log(await Lib.getVillageByCoordinates(452, 479));
       console.log(await Lib.getVillageById(42));
     } catch (error) {
       console.error("An error occurred:", error);
-    }
-  }
-
-  function TestButton2() {
-    if (workbenchCommands.length > 0) {
-      console.log("Workbench Commands:", workbenchCommands);
-
-      targetVillages = [];
-      workbenchCommands.forEach(async (command) => {
-        let id = command.targetVillageId;
-        let village = await Lib.getVillageById(id);
-        console.log(village.player_id, village.name);
-        targetVillages.push(village.coord);
-      });
     }
   }
 
