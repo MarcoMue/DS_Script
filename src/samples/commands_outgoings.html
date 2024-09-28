@@ -1,0 +1,80 @@
+<div
+  id="commands_outgoings"
+  class="commands-container"
+  data-type="towards_village"
+  data-village="2654"
+  data-commands="1"
+>
+  <table class="vis" style="width: 100%">
+    <tbody>
+      <tr>
+        <th width="52%">
+          Eigene Befehle
+          <span class="commands-command-count"> (1) </span>
+        </th>
+        <th width="33%">Ankunft</th>
+        <th width="15%">Ankunft in</th>
+      </tr>
+
+      <tr class="command-row">
+        <td>
+          <span class="quickedit-out" data-id="60296620" data-ignore-icons="1">
+            <span class="quickedit-content">
+              <a
+                href="/game.php?village=23128&amp;screen=info_command&amp;id=60296620&amp;type=other"
+              >
+                <span class="icon-container">
+                  <span
+                    class="commandicon-ally command_hover_details"
+                    data-command-id="60296620"
+                    data-icon-hint="Kleiner Angriff (1-1000 Truppen) (Befehl eines Stammesmitglieds / Freundes)"
+                    data-command-type="attack"
+                    data-title=""
+                  >
+                    <img
+                      src="https://dsde.innogamescdn.com/asset/b39ce940/graphic/command/attack_small.png"
+                      alt=""
+                    /> </span
+                  ><span
+                    class="command_hover_details"
+                    data-command-id="60296620"
+                    data-icon-hint="Enthält Späher"
+                    data-command-type="attack"
+                    data-title=""
+                  >
+                    <img
+                      src="https://dsde.innogamescdn.com/asset/b39ce940/graphic/command/spy.png"
+                      alt=""
+                    />
+                  </span>
+                </span>
+                <span class="quickedit-label">
+                  DieseZwei: 042 Po das hässliche Entlein
+                </span>
+              </a>
+            </span>
+          </span>
+        </td>
+
+        <td>heute um 22:22:56</td>
+
+        <td>
+          <span class="" data-endtime="1727554976">1:34:04</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <script>
+    $(function () {
+      $(".quickedit-out").QuickEdit({
+        show_icons: false,
+        url: TribalWars.buildURL("POST", "info_command", {
+          ajaxaction: "edit_own_comment",
+          id: "__ID__",
+        }),
+      });
+      Command.init();
+    });
+  </script>
+</div>

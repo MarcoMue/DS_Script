@@ -13,6 +13,11 @@ if (typeof UI === "undefined") {
 
 const Lib = {
   // https://forum.die-staemme.de/index.php?threads/weltdaten-und-configs.183996/
+  /**
+   * @typedef {Object} Village
+   * @property {number} id - The ID of the village.
+   * @property {string} coord - The coordinates of the village.
+   */
   Village: class {
     constructor(id, name, x, y, player_id, points, bonus_id) {
       this.id = id;
@@ -67,37 +72,6 @@ const Lib = {
     }
   },
   PlayerTotalTroops: class {
-    constructor(
-      timestamp,
-      playerId,
-      spear,
-      sword,
-      axe,
-      spy,
-      light,
-      heavy,
-      ram,
-      catapult,
-      snob,
-      outgoing,
-      incoming
-    ) {
-      this.createdAt = timestamp;
-      this.playerId = playerId;
-      this.spear = spear;
-      this.sword = sword;
-      this.axe = axe;
-      this.spy = spy;
-      this.light = light;
-      this.heavy = heavy;
-      this.ram = ram;
-      this.catapult = catapult;
-      this.snob = snob;
-      this.outgoing = outgoing;
-      this.incoming = incoming;
-    }
-  },
-  WorkbenchCommands: class {
     constructor(
       timestamp,
       playerId,
@@ -435,8 +409,8 @@ const Lib = {
   // Somewhat broken
   // Function to search for a record by coords using the index
   getVillageByCoordinates: async function (
-    /** @type {number} */ x,
-    /** @type {number} */ y
+    /** @type {number | string} */ x,
+    /** @type {number | string} */ y
   ) {
     return new Promise((resolve, reject) => {
       const { dbName, dbTable, dbVersion, indexes } = Lib.dbConfig["village"];

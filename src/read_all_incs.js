@@ -12,9 +12,6 @@ function loadScript(url) {
   });
 }
 
-// User Input
-if (typeof DEBUG !== "boolean") DEBUG = false;
-
 (async function () {
   //#region setup
   if (typeof jQuery === "undefined") {
@@ -186,7 +183,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
           .get(urls[numDone])
           .done((data) => {
             try {
-              onLoad(numDone, data);
+              onLoad(numDone, data, urls[numDone]);
               ++numDone;
               loadNext();
             } catch (e) {
@@ -216,11 +213,10 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
   }
   //#endregion setup
 
-  // Start the script
-
-  let targetVillages = new Set();
+  /** @type {Map<number, {x: number, y:number}>} */
+  let targetVillages = new Map();
   let workbenchCommands = [];
-  const objectMap = new Map();
+  const realIncs = new Map();
 
   openUI();
   await Lib.initAllDBs();
@@ -247,28 +243,20 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
     }
   }
 
-  function handleInputChange(event) {
+  async function handleInputChange(event) {
     console.log("handleInputChange called.");
 
     const coordRadio = document.getElementById("coord");
     const wbRadio = document.getElementById("wb");
     if (coordRadio.checked) {
-      targetVillages = extractUniqueCoordinates(event.target.value);
+      targetVillages = await extractUniqueCoordinates(event.target.value);
+      console.log(targetVillages);
     } else if (wbRadio.checked) {
       workbenchCommands = readWorkbenchExport(event.target.value);
-      targetVillages = extractVillages(workbenchCommands);
+      targetVillages = await findTargetVillages(workbenchCommands);
+      console.log("handleInputChange", targetVillages);
     } else {
       alert("Please select a mode.");
-    }
-
-    if (workbenchCommands.length > 0) {
-      targetVillages = [];
-      workbenchCommands.forEach(async (command) => {
-        let id = command.targetVillageId;
-        let village = await Lib.getVillageById(id);
-        // console.log(village.player_id, village.name);
-        targetVillages.push(village.coord);
-      });
     }
   }
 
@@ -333,7 +321,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
    * Converts a WB plan string into an array of plan objects.
    *
    * @param {string} plan - The WB plan string to convert.
-   * @returns {Array<Lib>} An array of plan objects.
+   * @returns {Array<object>} An array of plan objects.
    *
    * Each plan object contains the following properties:
    * - {string} commandId - The command ID.
@@ -404,14 +392,17 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
    * Extracts unique coordinate matches from the given text and stores them in a Set.
    *
    * @param {string} text - The input text to search for coordinates.
-   * @returns {Set<string>} A Set containing unique coordinate matches.
+   * @returns {Promise<Map<object>>} A Set containing unique coordinate matches.
    */
-  function extractUniqueCoordinates(text) {
+  async function extractUniqueCoordinates(text) {
     const pattern = /(\d{1,4})\|(\d{1,4})/g;
-    const uniqueCoordinates = new Set();
+    const uniqueCoordinates = new Map();
 
     for (const match of text.matchAll(pattern)) {
-      uniqueCoordinates.add(match[0]);
+      let xycoords = match[0];
+      let [x, y] = xycoords.split("|");
+      let res = await Lib.getVillageByCoordinates(x, y);
+      uniqueCoordinates.set(res.id, { x, y });
     }
 
     return uniqueCoordinates;
@@ -419,17 +410,20 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
 
   /**
    * @param {WorkbenchCommands[]} results
-   * @returns {Promise<Set<any>>} A Promise that resolves to a Set of unique villages.
+   * @returns {Promise<Map<number, {x: number, y: number}>>} A Promise that resolves to a Map of village IDs to village coordinates.
    */
-  async function extractVillages(results) {
-    console.log("extractVillages called.");
-
-    // Use Promise.all to resolve all async calls concurrently
+  async function findTargetVillages(results) {
     const villagePromises = results.map((result) =>
       Lib.getVillageById(result.targetVillageId)
     );
-    const villagesArray = await Promise.all(villagePromises);
-    return new Set(villagesArray);
+    const villages = await Promise.all(villagePromises);
+
+    const villageMap = new Map();
+    villages.forEach((village) => {
+      villageMap.set(village.id, { x: village.x, y: village.y });
+    });
+
+    return villageMap;
   }
 
   function addRadioControls() {
@@ -439,52 +433,69 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
   }
 
   async function readIncs() {
-    console.log("readIncs called.");
-    let commandIDs = [];
-
+    /**
+     * Fetches the village pages for the given set of target villages.
+     * @param {Map<number, {x: number, y: number}>} targetVillages - A map of village IDs to village coordinates.
+     * @returns {Promise<string[]>} A promise that resolves to an array of village page URLs.
+     */
     async function fetchVillagePages(targetVillages) {
       if (targetVillages.size === 0) {
         UI.ErrorMessage("No villages to fetch!");
-        return;
+        return [];
       }
 
-      let pages = await Promise.all(
-        Array.from(targetVillages).map(async (village) => {
-          console.log("Fetching village:", village);
-          let [x, y] = village.split("|");
-          let res = await Lib.getVillageByCoordinates(x, y);
-          return `/game.php?screen=info_village&id=${res.id}`;
-        })
-      );
+      try {
+        const pages = await Promise.all(
+          Array.from(targetVillages.keys()).map((id) => {
+            return `/game.php?screen=info_village&id=${id}`;
+          })
+        );
 
-      pages = pages.filter((url) => url !== null);
-      return pages;
+        return pages;
+      } catch (error) {
+        console.error("Error fetching village pages:", error);
+        UI.ErrorMessage("Failed to fetch village pages.");
+        return [];
+      }
     }
-    const pagesToFetch = await fetchVillagePages(targetVillages);
 
+    const pagesToFetch = await fetchVillagePages(targetVillages);
     if (pagesToFetch.length) {
       twSDK.startProgressBar(pagesToFetch.length);
       twSDK.getAll(
         pagesToFetch,
-        async function (villageIndex, villagePageHtml) {
-          twSDK.updateProgressBar(villageIndex, pagesToFetch.length);
+        async function (
+          /** @type {number} */ index,
+          /** @type {string} */ villagePageHtml,
+          /** @type {string} */ url
+        ) {
+          twSDK.updateProgressBar(index, pagesToFetch.length);
+          console.log("Fetching Village:", url);
 
           let villageName = $(villagePageHtml)
             .find("#content_value")
             .find("h2")
             .text();
+          console.log("Village Name:", villageName);
 
           // .commands-container or #commands_outgoings
           let $cc = $(villagePageHtml).find("#commands_outgoings");
+          console.log("Command Container:", $cc);
 
           if ($cc.length > 0) {
             let $firstTable = $cc.find("table").first();
 
             // Get all command IDs
             $firstTable.find(".quickedit-out").each(function () {
-              console.log("Command ID:", $(this).attr("data-id"));
-              commandIDs.push($(this).attr("data-id"));
+              let id = $(this).attr("data-id");
+              realIncs.set(id, { id });
             });
+
+            // Add a new row with just one column to the table
+            let $newRow = $("<tr>");
+            let $newCol = $("<td>").text(villageName);
+            $newRow.append($newCol);
+            $("#myTable").append($newRow);
 
             // Add a new column to the table
             $firstTable.find(".command-row").each(function () {
@@ -499,14 +510,12 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
           // initIncomingsOverview();
           UI.SuccessMessage("All villages fetched!");
           Timing.tickHandlers.timers.initTimers("widget-command-timer");
-          console.log(commandIDs);
-
           const troopDetailsCheckbox = document.getElementById(
             "troopDetailsCheckbox"
           );
 
           if (troopDetailsCheckbox.checked) {
-            await fetchAttackDetails(commandIDs);
+            await fetchAttackDetails(realIncs);
           }
         },
         function (error) {
@@ -519,10 +528,13 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
     }
   }
 
-  async function fetchAttackDetails(commandIds) {
-    async function fetchDetails(commands) {
+  /**
+   * @param {Map<number, object>} commands
+   */
+  async function fetchAttackDetails(commands) {
+    async function buildUrls(commandIDs) {
       let pages = await Promise.all(
-        commands.map(async (id) => {
+        Array.from(commandIDs.keys()).map(async (id) => {
           console.log("Fetching Command:", id);
           return `/game.php?screen=info_command&id=${id}`;
         })
@@ -531,7 +543,7 @@ if (typeof DEBUG !== "boolean") DEBUG = false;
       pages = pages.filter((url) => url !== null);
       return pages;
     }
-    const pagesToFetch = await fetchDetails(commandIds);
+    const pagesToFetch = await buildUrls(commands);
 
     let units = [];
     twSDK.startProgressBar(pagesToFetch.length);
