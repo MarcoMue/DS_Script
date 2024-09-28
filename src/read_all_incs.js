@@ -499,41 +499,6 @@ function loadScript(url) {
           console.error(`${scriptInfo} Error:`, error);
         }
       );
-
-      // const troopDetailsCheckbox = document.getElementById("troop_details");
-      // const isChecked = troopDetailsCheckbox.checked;
-      // if (isChecked) {
-      //   let timerId = setInterval(function () {
-      //     if (commandIDs.length > 0) {
-      //       let item = commandIDs.shift();
-      //       console.log("Processing:", item);
-
-      //       let attackinfo = fetchAttackDetails(item);
-
-      //       jQuery
-      //         .ajax({
-      //           url: `/game.php?screen=info_command&ajax=details&id=${item}`,
-      //           dataType: "json",
-      //         })
-      //         .done((response) => {
-      //           const { no_authorization } = response;
-      //           if (no_authorization) {
-      //             console.error(`Error:`, villagePageHtml);
-      //           } else {
-      //             console.log(response);
-      //             results.push(response);
-      //           }
-      //         })
-      //         .fail((textStatus, errorThrown) => {
-      //           console.error(`Request failed: ${textStatus}, ${errorThrown}`);
-      //         });
-      //     } else {
-      //       // Step 4: Clear the interval when the array is empty
-      //       clearInterval(timerId);
-      //       console.log("All items processed.");
-      //     }
-      //   }, 400);
-      // }
     } else {
       UI.ErrorMessage("No villages to fetch!");
     }
