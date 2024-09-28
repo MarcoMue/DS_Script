@@ -1,3 +1,16 @@
+// Check if the UI library is loaded
+if (typeof UI === "undefined") {
+  console.error("UI library is not loaded.");
+
+  // Define a placeholder UI object
+  var UI = {
+    SuccessMessage: function (message) {
+      console.log("Placeholder SuccessMessage: " + message);
+    },
+    // Add other placeholder methods as needed
+  };
+}
+
 const Lib = {
   // https://forum.die-staemme.de/index.php?threads/weltdaten-und-configs.183996/
   Village: class {
@@ -94,6 +107,7 @@ const Lib = {
     worldDataTribes: "/map/ally.txt",
     worldDataConquests: "/map/conquer_extended.txt",
   },
+  // TODO: find new names, collides with twsdk
   dbConfig: {
     troops: {
       dbName: "TroopsDB",
@@ -108,7 +122,7 @@ const Lib = {
     },
     village: {
       dbName: "VillagesDB",
-      dbVersion: 1,
+      dbVersion: 2,
       dbTable: "villages",
       key: "id",
       indexes: [{ name: "coordIndex", key: "coord", unique: true }],
@@ -116,7 +130,7 @@ const Lib = {
     },
     player: {
       dbName: "PlayerDB",
-      dbVersion: 1,
+      dbVersion: 2,
       dbTable: "players",
       key: "id",
       indexes: [],
@@ -124,7 +138,7 @@ const Lib = {
     },
     tribe: {
       dbName: "TribesDB",
-      dbVersion: 1,
+      dbVersion: 2,
       dbTable: "tribes",
       key: "id",
       indexes: [],
@@ -132,62 +146,26 @@ const Lib = {
     },
     conquer: {
       dbName: "conquerDb",
-      dbVersion: 1,
+      dbVersion: 2,
       dbTable: "conquer",
       key: "villageId",
       indexes: [],
       url: "/map/conquer_extended.txt",
     },
   },
-  storeDataInLocalStorage: function () {
-    // Create instances of your classes
-    const person1 = new Person("Alice", 30);
-    const person2 = new Person("Bob", 25);
-    const car1 = new Car("Toyota", "Corolla");
-    const car2 = new Car("Honda", "Civic");
-    const village1 = new Village("Village1", 100);
 
-    // Create an object to hold all instances
-    const dataToSave = {
-      persons: [person1, person2],
-      cars: [car1, car2],
-      village: village1,
-    };
-
-    // Serialize the object to a JSON string
-    const jsonString = JSON.stringify(dataToSave);
-
-    // Save the JSON string to localStorage
-    localStorage.setItem("myData", jsonString);
+  initAllDBs: async function () {
+    const promises = [
+      Lib.initDB("troops"),
+      Lib.initDB("village"),
+      Lib.initDB("player"),
+      Lib.initDB("tribe"),
+      Lib.initDB("conquer"),
+    ];
+    return Promise.all(promises);
   },
-  retrieveInstances: function (param) {
-    console.log("retrieveInstances called with param:", param);
-    const { Village, Person, Car } = Lib;
 
-    // Retrieve the JSON string from localStorage
-    const retrievedJsonString = localStorage.getItem("myData");
-
-    // Deserialize the JSON string back to an object
-    const retrievedData = JSON.parse(retrievedJsonString);
-
-    // Recreate instances of your classes from the retrieved data
-    const retrievedPersons = retrievedData.persons.map(
-      (p) => new Person(p.name, p.age)
-    );
-    const retrievedCars = retrievedData.cars.map(
-      (c) => new Car(c.make, c.model)
-    );
-    const retrievedVillage = new Village(
-      retrievedData.village.name,
-      retrievedData.village.age
-    );
-
-    // Log the retrieved instances to verify
-    console.log(retrievedPersons);
-    console.log(retrievedCars);
-    console.log(retrievedVillage);
-  },
-  csvToArray: function (strData, strDelimiter = ",") {
+  csvToArray: function (/** @type {string} */ strData, strDelimiter = ",") {
     let objPattern = new RegExp(
       "(\\" +
         strDelimiter +
@@ -216,18 +194,18 @@ const Lib = {
     }
     return arrData;
   },
-  cleanString: function (string) {
+  cleanString: function (/** @type {string} */ str) {
     try {
-      return decodeURIComponent(string).replace(/\+/g, " ");
+      return decodeURIComponent(str).replace(/\+/g, " ");
     } catch (error) {
-      console.error(error, string);
-      return string;
+      console.error(error, str);
+      return str;
     }
   },
-  updateLastUpdatedTimestamp: function (entity) {
-    localStorage.setItem(`${entity}_last_updated`, Date.parse(new Date()));
+  updateLastUpdatedTimestamp: function (/** @type {string} */ entity) {
+    localStorage.setItem(`${entity}_last_updated`, new Date().toDateString());
   },
-  fetchAndUpdateDB: async function (entity) {
+  fetchAndUpdateDB: async function (/** @type {string} */ entity) {
     console.log("IndexedDB called with entity:", entity);
 
     const TIME_INTERVAL = 60 * 60 * 1000; // fetch data every hour
@@ -250,7 +228,7 @@ const Lib = {
         LAST_UPDATED_TIME &&
         Date.now() < parseInt(LAST_UPDATED_TIME) + TIME_INTERVAL
       ) {
-        // worldData = await getAllData();
+        worldData = await getAllData();
       } else {
         return updateDatabase();
       }
@@ -259,12 +237,15 @@ const Lib = {
       throw error;
     }
 
-    async function updateDatabase() {
+    /**
+     * @param {string} [url]
+     */
+    async function updateDatabase(url) {
       console.log("Fetching and saving data for entity:", entity);
       const DATA_URL = `https://marcomue.github.io/DS_Script/rawData/${entity}.txt`;
 
       try {
-        const response = await jQuery.ajax(DATA_URL);
+        const response = await jQuery.ajax(url || DATA_URL);
         const data = Lib.csvToArray(response);
         const responseData = mapDataToEntity(data);
 
@@ -382,7 +363,7 @@ const Lib = {
           };
 
           transaction.onerror = (event) => {
-            reject(event.target.error);
+            reject(DBOpenRequest.error);
           };
         };
 
@@ -416,31 +397,35 @@ const Lib = {
       });
     }
   },
+
+  // Somewhat broken
   // Function to search for a record by coords using the index
-  getVillageByCoordinates: async function (x, y) {
+  getVillageByCoordinates: async function (
+    /** @type {number} */ x,
+    /** @type {number} */ y
+  ) {
     return new Promise((resolve, reject) => {
       const { dbName, dbTable, dbVersion, indexes } = Lib.dbConfig["village"];
-
       const DBOpenRequest = indexedDB.open(dbName, dbVersion);
 
-      DBOpenRequest.onerror = function (event) {
-        console.error("Database error:", event.target.errorCode);
-        reject(event.target.errorCode);
+      DBOpenRequest.onerror = function () {
+        console.error("Database error:", DBOpenRequest.error);
+        reject(DBOpenRequest.error);
       };
 
-      DBOpenRequest.onsuccess = function (event) {
-        const db = event.target.result;
+      DBOpenRequest.onsuccess = function () {
+        const db = DBOpenRequest.result;
         const transaction = db.transaction([dbTable], "readonly");
         const objectStore = transaction.objectStore(dbTable);
         const index = objectStore.index(indexes[0].name);
         const indeReq = index.get(`${x}|${y}`);
 
-        indeReq.onerror = function (event) {
-          console.error("Get request error:", event.target.errorCode);
-          reject(event.target.errorCode);
+        indeReq.onerror = function () {
+          console.error("Get request error:", DBOpenRequest.error);
+          reject(DBOpenRequest.error);
         };
 
-        indeReq.onsuccess = function (event) {
+        indeReq.onsuccess = function () {
           if (indeReq.result) {
             resolve(indeReq.result);
           } else {
@@ -451,7 +436,6 @@ const Lib = {
       };
     });
   },
-
   getVillageById: async function (villageId) {
     return new Promise((resolve, reject) => {
       const { dbName, dbTable, dbVersion } = Lib.dbConfig["village"];
@@ -484,9 +468,19 @@ const Lib = {
     });
   },
 
-  // -- Troop Counter -- Working --
-  initDB: async function (entity) {
-    const { dbName, dbTable, dbVersion, key, indexes } = Lib.dbConfig[entity];
+  initDB: async function (
+    /** @type {"troops" | "village" | "player" | "tribe" | "conquer"} */ entity
+  ) {
+    const allowedEntities = ["troops", "village", "player", "tribe", "conquer"];
+    if (!allowedEntities.includes(entity)) {
+      throw new Error(
+        `Invalid entity: ${entity}. Allowed entities are: ${allowedEntities.join(
+          ", "
+        )}`
+      );
+    }
+
+    const { dbName, dbTable, dbVersion, key, indexes } = this.dbConfig[entity];
 
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(dbName, dbVersion);
@@ -516,7 +510,11 @@ const Lib = {
     });
   },
 
-  readData: async function (entity, timestamp, playerID) {
+  readData: async function (
+    /** @type {string} */ entity,
+    /** @type {number} */ timestamp,
+    /** @type {number} */ playerID
+  ) {
     const db = await Lib.initDB(entity);
     const { dbTable } = Lib.dbConfig[entity];
 
@@ -698,11 +696,11 @@ const Lib = {
     return true;
   },
 
-  calculateTimeDifferences: function (timestamps) {
+  calculateTimeDifferences: function (/** @type {string } */ timestamps) {
     let differences = [];
 
     for (let i = 1; i < timestamps.length; i++) {
-      let diffInMs = timestamps[i] - timestamps[i - 1];
+      let diffInMs = Number(timestamps[i]) - Number(timestamps[i - 1]);
       let diffInSeconds = Math.floor(diffInMs / 1000);
 
       let months = Math.floor(diffInSeconds / (30 * 24 * 60 * 60));
@@ -721,9 +719,5 @@ const Lib = {
     }
 
     return differences;
-  },
-
-  loggy: function (value) {
-    console.log("Hello from the library", value);
   },
 };

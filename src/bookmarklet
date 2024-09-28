@@ -14,8 +14,6 @@ javascript: (() => {
     });
 })();
 
-// TODO replace with ./dist Version
-
 javascript: (function () {
   const timestamp = new Date().getTime();
   $.getScript("https://localhost:8443/src/read_all_incs.js?" + timestamp)

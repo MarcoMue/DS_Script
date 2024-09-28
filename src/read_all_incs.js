@@ -528,6 +528,7 @@ function loadScript(url) {
 
   let targetVillages = [];
   openUI();
+  console.log(await Lib.initAllDBs());
 
   /**
    * @param {string} url
@@ -688,11 +689,17 @@ function loadScript(url) {
 
   async function addRadioControls() {
     document
-      .getElementById("loadPlannerBtn")
-      .addEventListener("click", async function () {
+      .getElementById("urlvalue")
+      .addEventListener("change", function (event) {
+        const text = event.target.value;
+        const results = text.match(/\d{3}\|\d{3}/g); // Match patterns like 123|456
+        const count = results ? results.length : 0;
+        document.getElementById(
+          "resultCount"
+        ).innerText = `Results found: ${count}`;
+
         const coordRadio = document.getElementById("coord");
         const wbRadio = document.getElementById("wb");
-
         if (coordRadio.checked) {
           targetVillages = readVillageCoords();
         } else if (wbRadio.checked) {
@@ -898,6 +905,5 @@ function loadScript(url) {
     addRadioControls();
 
     let vv = await Lib.fetchAndUpdateDB("village");
-    Lib.loggy("UI loaded.");
   }
 })();
