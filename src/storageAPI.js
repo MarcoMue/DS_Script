@@ -97,6 +97,37 @@ const Lib = {
       this.incoming = incoming;
     }
   },
+  WorkbenchCommands: class {
+    constructor(
+      timestamp,
+      playerId,
+      spear,
+      sword,
+      axe,
+      spy,
+      light,
+      heavy,
+      ram,
+      catapult,
+      snob,
+      outgoing,
+      incoming
+    ) {
+      this.createdAt = timestamp;
+      this.playerId = playerId;
+      this.spear = spear;
+      this.sword = sword;
+      this.axe = axe;
+      this.spy = spy;
+      this.light = light;
+      this.heavy = heavy;
+      this.ram = ram;
+      this.catapult = catapult;
+      this.snob = snob;
+      this.outgoing = outgoing;
+      this.incoming = incoming;
+    }
+  },
   config: {
     basePath: "https://de228.die-staemme.de",
     worldInfoInterface: "/interface.php?func=get_config",
@@ -155,13 +186,17 @@ const Lib = {
   },
 
   initAllDBs: async function () {
+    const allowedEntities = ["village", "player", "tribe", "conquer"];
     const promises = [
       Lib.initDB("troops"),
-      Lib.initDB("village"),
-      Lib.initDB("player"),
-      Lib.initDB("tribe"),
-      Lib.initDB("conquer"),
+      ...allowedEntities.map((entity) => Lib.initDB(entity)),
     ];
+
+    const updatePromises = allowedEntities.map((entity) =>
+      Lib.fetchAndUpdateDB(entity)
+    );
+    promises.push(...updatePromises);
+
     return Promise.all(promises);
   },
 
