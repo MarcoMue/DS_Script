@@ -476,14 +476,24 @@ function loadScript(url) {
             .find("#content_value")
             .find("h2")
             .text();
-          console.log("Village Name:", villageName);
+
+          // Define the base selector for the village details table
+          const baseSelector =
+            "#content_value > table > tbody > tr > td:nth-child(1) > table:nth-child(1) > tbody";
+
+          let playerElement = $(villagePageHtml).find(
+            `${baseSelector} > tr:nth-child(5) > td:nth-child(2)`
+          );
+
+          let tribeElement = $(villagePageHtml).find(
+            `${baseSelector} > tr:nth-child(6) > td:nth-child(2)`
+          );
 
           // .commands-container or #commands_outgoings
-          let $cc = $(villagePageHtml).find("#commands_outgoings");
-          console.log("Command Container:", $cc);
+          let $outgoings = $(villagePageHtml).find("#commands_outgoings");
 
-          if ($cc.length > 0) {
-            let $firstTable = $cc.find("table").first();
+          if ($outgoings.length > 0) {
+            let $firstTable = $outgoings.find("table").first();
 
             // Get all command IDs
             $firstTable.find(".quickedit-out").each(function () {
@@ -491,11 +501,12 @@ function loadScript(url) {
               realIncs.set(id, { id });
             });
 
-            // Add a new row with just one column to the table
-            let $newRow = $("<tr>");
-            let $newCol = $("<td>").text(villageName);
-            $newRow.append($newCol);
-            $("#myTable").append($newRow);
+            let $targetRow = $("<tr>");
+            let $village = $("<th>").text(villageName);
+            $targetRow.append($village);
+            $targetRow.append(playerElement.clone());
+            $targetRow.append(tribeElement.clone());
+            $("#myTable").append($targetRow);
 
             // Add a new column to the table
             $firstTable.find(".command-row").each(function () {
