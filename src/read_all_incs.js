@@ -472,6 +472,8 @@ function loadScript(url) {
           twSDK.updateProgressBar(index, pagesToFetch.length);
           console.log("Fetching Village:", url);
 
+          let cmds = [];
+
           let villageName = $(villagePageHtml)
             .find("#content_value")
             .find("h2")
@@ -498,6 +500,7 @@ function loadScript(url) {
             // Get all command IDs
             $firstTable.find(".quickedit-out").each(function () {
               let id = $(this).attr("data-id");
+              cmds.push({ key: Number(id), value: {} });
               realIncs.set(id, { id });
             });
 
