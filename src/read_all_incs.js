@@ -51,41 +51,6 @@ function loadScript(url) {
     worldDataPlayers: "/map/player.txt",
     worldDataTribes: "/map/ally.txt",
     worldDataConquests: "/map/conquer_extended.txt",
-    lastUpdated: localStorage.getItem("village_last_updated"),
-    dbConfig: {
-      village: {
-        dbName: "villagesDb",
-        dbVersion: 1,
-        dbTable: "villages",
-        key: "villageId",
-        indexes: [{ name: "coordIndex", key: "coords", unique: true }],
-        url: "/map/village.txt",
-      },
-      player: {
-        dbName: "playersDb",
-        dbVersion: 1,
-        dbTable: "players",
-        key: "playerId",
-        indexes: [],
-        url: "/map/player.txt",
-      },
-      ally: {
-        dbName: "tribesDb",
-        dbVersion: 1,
-        dbTable: "tribes",
-        key: "tribeId",
-        indexes: [],
-        url: "/map/ally.txt",
-      },
-      conquer: {
-        dbName: "conquerDb",
-        dbVersion: 1,
-        dbTable: "conquer",
-        key: "",
-        indexes: [],
-        url: "/map/conquer_extended.txt",
-      },
-    },
     csvToArray: function (strData, strDelimiter = ",") {
       let objPattern = new RegExp(
         "(\\" +
@@ -258,42 +223,6 @@ function loadScript(url) {
     } else {
       alert("Please select a mode.");
     }
-  }
-
-  /**
-   * Updates the HTML elements with the last updated date and the time elapsed since the last update.
-   *
-   * This function calculates the time difference between the current date and the last updated date
-   * from the `twSDK.lastUpdated` timestamp. It then formats the last updated date and the time elapsed
-   * in a human-readable format and updates the corresponding HTML elements with these values.
-   *
-   * @function
-   */
-  function showLastUpdatedDb() {
-    const lastUpdatedDate = new Date(Number(twSDK.lastUpdated));
-    const now = new Date();
-    const timeDifference = now.getTime() - lastUpdatedDate.getTime();
-    const formattedDate = lastUpdatedDate.toLocaleString();
-
-    const seconds = Math.floor(timeDifference / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    let timeAgo;
-    if (days > 0) {
-      timeAgo = `${days} day${days > 1 ? "s" : ""}`;
-    } else if (hours > 0) {
-      timeAgo = `${hours} hour${hours > 1 ? "s" : ""}`;
-    } else if (minutes > 0) {
-      timeAgo = `${minutes} minute${minutes > 1 ? "s" : ""}`;
-    } else {
-      timeAgo = `${seconds} second${seconds > 1 ? "s" : ""}`;
-    }
-
-    // Update the HTML
-    document.getElementById("lastUpdatedDate").textContent = formattedDate;
-    document.getElementById("timeAgo").textContent = timeAgo;
   }
 
   /**
@@ -598,12 +527,7 @@ function loadScript(url) {
   }
 
   async function TestButton2() {
-    try {
-      console.log(await Lib.getVillageByCoordinates(452, 479));
-      console.log(await Lib.getVillageById(42));
-    } catch (error) {
-      console.error("An error occurred:", error);
-    }
+    await Lib.initAllDBs();
   }
 
   async function openUI() {
@@ -618,8 +542,7 @@ function loadScript(url) {
     document.getElementById("test1").addEventListener("click", TestButton1);
     document.getElementById("test2").addEventListener("click", TestButton2);
 
-    showLastUpdatedDb();
-    setInterval(showLastUpdatedDb, 5000);
+    setInterval(Lib.showLastUpdatedDb, 5000);
     addRadioControls();
   }
 })();

@@ -125,7 +125,7 @@ const Lib = {
       url: null,
     },
     village: {
-      dbName: "VillagesDB",
+      dbName: "mm_VillagesDB",
       dbVersion: 2,
       dbTable: "villages",
       key: "id",
@@ -133,7 +133,7 @@ const Lib = {
       url: "/map/village.txt",
     },
     player: {
-      dbName: "PlayerDB",
+      dbName: "mm_PlayerDB",
       dbVersion: 2,
       dbTable: "players",
       key: "id",
@@ -141,7 +141,7 @@ const Lib = {
       url: "/map/player.txt",
     },
     tribe: {
-      dbName: "TribesDB",
+      dbName: "mm_TribesDB",
       dbVersion: 2,
       dbTable: "tribes",
       key: "id",
@@ -149,7 +149,7 @@ const Lib = {
       url: "/map/ally.txt",
     },
     conquer: {
-      dbName: "conquerDb",
+      dbName: "mm_ConquerDB",
       dbVersion: 2,
       dbTable: "conquer",
       key: "villageId",
@@ -211,179 +211,53 @@ const Lib = {
     }
   },
   updateLastUpdatedTimestamp: function (/** @type {string} */ entity) {
-    localStorage.setItem(`${entity}_last_updated`, new Date().toDateString());
+    localStorage.setItem(`db_last_updated`, new Date().toISOString());
   },
+
   fetchAndUpdateDB: async function (/** @type {string} */ entity) {
     console.log("IndexedDB called with entity:", entity);
 
     const TIME_INTERVAL = 60 * 60 * 1000; // fetch data every hour
-    const LAST_UPDATED_TIME = localStorage.getItem(`${entity}_last_updated`);
-    const allowedEntities = ["village", "player", "tribe", "conquer"];
+    const LAST_UPDATED_TIME = localStorage.getItem("db_last_updated");
 
     // Check if entity is allowed
+    const allowedEntities = ["village", "player", "tribe", "conquer"];
     if (!allowedEntities.includes(entity)) {
       console.error(`Entity ${entity} is not allowed!`);
       throw new Error(`Entity ${entity} does not exist!`);
     }
 
-    const { dbName, dbTable, dbVersion, key, indexes } = Lib.dbConfig[entity];
-    const { Village, Player, Tribe, Conquer } = Lib;
+    const { dbName, dbTable, dbVersion, url } = Lib.dbConfig[entity];
+    // let url = "https://localhost:8443/static" + temp;
 
     try {
       // Decide whether to fetch new data or get from IndexedDB
       let worldData;
       if (
         LAST_UPDATED_TIME &&
-        Date.now() < parseInt(LAST_UPDATED_TIME) + TIME_INTERVAL
+        Date.now() < new Date(LAST_UPDATED_TIME).getTime() + TIME_INTERVAL
       ) {
+        console.log("Using existing Data");
         worldData = await getAllData();
       } else {
-        return updateDatabase();
+        console.log("Fetching and saving data for entity:", entity);
+        try {
+          const response = await jQuery.ajax(url);
+          const data = this.csvToArray(response);
+          const responseData = this.mapDataToEntity(data, entity);
+          await Lib.storeData(entity, responseData, true);
+
+          Lib.updateLastUpdatedTimestamp(entity);
+          UI.SuccessMessage("Database updated!");
+          return responseData;
+        } catch (error) {
+          console.error(`Error fetching data for ${entity}:`, error);
+          throw new Error(`Error fetching data for ${entity}: ${error}`);
+        }
       }
     } catch (error) {
       console.error("Error in fetchAndUpdateDB:", error);
       throw error;
-    }
-
-    /**
-     * @param {string} [url]
-     */
-    async function updateDatabase(url) {
-      console.log("Fetching and saving data for entity:", entity);
-      const DATA_URL = `https://marcomue.github.io/DS_Script/rawData/${entity}.txt`;
-
-      try {
-        const response = await jQuery.ajax(url || DATA_URL);
-        const data = Lib.csvToArray(response);
-        const responseData = mapDataToEntity(data);
-
-        await saveToIndexedDbStorage(responseData);
-        Lib.updateLastUpdatedTimestamp(entity);
-        UI.SuccessMessage("Database updated!");
-        return responseData;
-      } catch (error) {
-        console.error(`Error fetching data for ${entity}:`, error);
-        throw new Error(`Error fetching data for ${entity}: ${error}`);
-      }
-    }
-
-    function mapDataToEntity(data) {
-      switch (entity) {
-        case "village":
-          return data
-            .filter((item) => item[0] !== "")
-            .map(
-              (item) =>
-                new Village(
-                  parseInt(item[0]),
-                  Lib.cleanString(item[1]),
-                  item[2],
-                  item[3],
-                  parseInt(item[4]),
-                  parseInt(item[5]),
-                  parseInt(item[6])
-                )
-            );
-        case "player":
-          return data
-            .filter((item) => item[0] !== "")
-            .map(
-              (item) =>
-                new Player(
-                  parseInt(item[0]),
-                  Lib.cleanString(item[1]),
-                  parseInt(item[2]),
-                  parseInt(item[3]),
-                  parseInt(item[4]),
-                  parseInt(item[5])
-                )
-            );
-        case "tribe":
-          return data
-            .filter((item) => item[0] !== "")
-            .map(
-              (item) =>
-                new Tribe(
-                  parseInt(item[0]),
-                  Lib.cleanString(item[1]),
-                  Lib.cleanString(item[2]),
-                  parseInt(item[3]),
-                  parseInt(item[4]),
-                  parseInt(item[5]),
-                  parseInt(item[6]),
-                  parseInt(item[7])
-                )
-            );
-        case "conquer":
-          return data
-            .filter((item) => item[0] !== "")
-            .map(
-              (item) =>
-                new Conquer(
-                  parseInt(item[0]),
-                  parseInt(item[1]),
-                  parseInt(item[2]),
-                  parseInt(item[3]),
-                  parseInt(item[4]),
-                  parseInt(item[5]),
-                  parseInt(item[6])
-                )
-            );
-        default:
-          return [];
-      }
-    }
-
-    async function saveToIndexedDbStorage(data) {
-      const DBOpenRequest = indexedDB.open(dbName, dbVersion);
-
-      return new Promise((resolve, reject) => {
-        DBOpenRequest.onupgradeneeded = function () {
-          const db = DBOpenRequest.result;
-          let objectStore;
-
-          if (key) {
-            objectStore = db.createObjectStore(dbTable, { keyPath: key });
-            indexes.forEach((i) =>
-              objectStore.createIndex(i.name, i.key, { unique: i.unique })
-            );
-          } else {
-            objectStore = db.createObjectStore(dbTable, {
-              autoIncrement: true,
-            });
-          }
-
-          objectStore.transaction.oncomplete = () => {
-            console.log("Object store created");
-          };
-        };
-
-        DBOpenRequest.onsuccess = function () {
-          const db = DBOpenRequest.result;
-          const transaction = db.transaction(dbTable, "readwrite");
-          const store = transaction.objectStore(dbTable);
-
-          store.clear();
-          data.forEach((item) => store.put(item));
-
-          transaction.oncomplete = () => {
-            resolve("Data saved to indexedDB");
-          };
-
-          transaction.onerror = (event) => {
-            reject(DBOpenRequest.error);
-          };
-        };
-
-        DBOpenRequest.onerror = function (event) {
-          reject(DBOpenRequest.error);
-        };
-
-        DBOpenRequest.onblocked = function () {
-          console.error("Database open blocked");
-          reject(new Error("Database open blocked"));
-        };
-      });
     }
 
     async function getAllData() {
@@ -406,7 +280,6 @@ const Lib = {
     }
   },
 
-  // Somewhat broken
   // Function to search for a record by coords using the index
   getVillageByCoordinates: async function (
     /** @type {number | string} */ x,
@@ -491,9 +364,9 @@ const Lib = {
     const { dbName, dbTable, dbVersion, key, indexes } = this.dbConfig[entity];
 
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(dbName, dbVersion);
-      request.onupgradeneeded = () => {
-        const db = request.result;
+      const DBOpenRequest = indexedDB.open(dbName, dbVersion);
+      DBOpenRequest.onupgradeneeded = () => {
+        const db = DBOpenRequest.result;
         if (!db.objectStoreNames.contains(dbTable)) {
           if (key) {
             let objectStore = db.createObjectStore(dbTable, {
@@ -508,12 +381,12 @@ const Lib = {
         }
       };
 
-      request.onsuccess = () => {
-        resolve(request.result);
+      DBOpenRequest.onsuccess = () => {
+        resolve(DBOpenRequest.result);
       };
 
-      request.onerror = () => {
-        reject(request.error);
+      DBOpenRequest.onerror = () => {
+        reject(DBOpenRequest.error);
       };
     });
   },
@@ -542,23 +415,21 @@ const Lib = {
     });
   },
 
-  storeData: async function (entity, data) {
-    const db = await Lib.initDB(entity);
-
+  storeData: async function (entity, data, clear = false) {
     const { dbTable } = Lib.dbConfig[entity];
+    const db = await Lib.initDB(entity);
 
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([dbTable], "readwrite");
       const store = transaction.objectStore(dbTable);
+      if (clear) {
+        store.clear();
+      }
 
-      // Array to hold promises for each put operation
-      const promises = [];
-
-      console.log("Data to store:", data);
-      data.forEach((item) => {
+      console.debug("Data to store:", data);
+      const promises = data.map((item) => {
         const request = store.put(item);
-        // Create a promise for each request and push it to the array
-        const promise = new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
           request.onsuccess = () => {
             resolve(request.result);
           };
@@ -566,17 +437,16 @@ const Lib = {
             reject(request.error);
           };
         });
-        promises.push(promise);
       });
 
-      // Wait for all promises to resolve or reject
-      Promise.all(promises)
-        .then((results) => {
+      transaction.oncomplete = async () => {
+        try {
+          const results = await Promise.all(promises);
           resolve(results);
-        })
-        .catch((error) => {
+        } catch (error) {
           reject(error);
-        });
+        }
+      };
 
       transaction.onerror = () => {
         reject(transaction.error);
@@ -728,4 +598,119 @@ const Lib = {
 
     return differences;
   },
+
+  mapDataToEntity: function (
+    /** @type {any[]} */ data,
+    /** @type {string} */ entity
+  ) {
+    switch (entity) {
+      case "village":
+        return data
+          .filter((item) => item[0] !== "")
+          .map(
+            (item) =>
+              new Lib.Village(
+                parseInt(item[0]),
+                Lib.cleanString(item[1]),
+                item[2],
+                item[3],
+                parseInt(item[4]),
+                parseInt(item[5]),
+                parseInt(item[6])
+              )
+          );
+      case "player":
+        return data
+          .filter((item) => item[0] !== "")
+          .map(
+            (item) =>
+              new Lib.Player(
+                parseInt(item[0]),
+                Lib.cleanString(item[1]),
+                parseInt(item[2]),
+                parseInt(item[3]),
+                parseInt(item[4]),
+                parseInt(item[5])
+              )
+          );
+      case "tribe":
+        return data
+          .filter((item) => item[0] !== "")
+          .map(
+            (item) =>
+              new Lib.Tribe(
+                parseInt(item[0]),
+                Lib.cleanString(item[1]),
+                Lib.cleanString(item[2]),
+                parseInt(item[3]),
+                parseInt(item[4]),
+                parseInt(item[5]),
+                parseInt(item[6]),
+                parseInt(item[7])
+              )
+          );
+      case "conquer":
+        return data
+          .filter((item) => item[0] !== "")
+          .map(
+            (item) =>
+              new Lib.Conquer(
+                parseInt(item[0]),
+                parseInt(item[1]),
+                parseInt(item[2]),
+                parseInt(item[3]),
+                parseInt(item[4]),
+                parseInt(item[5]),
+                parseInt(item[6])
+              )
+          );
+      default:
+        return [];
+    }
+  },
+  /**
+   * Updates the HTML elements with the last updated date and the time elapsed since the last update.
+   *
+   * This function calculates the time difference between the current date and the last updated date
+   * from the `twSDK.lastUpdated` timestamp. It then formats the last updated date and the time elapsed
+   * in a human-readable format and updates the corresponding HTML elements with these values.
+   *
+   * @function
+   */
+  showLastUpdatedDb: function () {
+    const lastUpdatedDate = new Date(localStorage.getItem(`$db_last_updated`));
+    const now = new Date();
+    const timeDifference = now.getTime() - lastUpdatedDate.getTime();
+    const formattedDate = lastUpdatedDate.toLocaleString();
+
+    const seconds = Math.floor(timeDifference / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    let timeAgo;
+    if (days > 0) {
+      timeAgo = `${days} day${days > 1 ? "s" : ""}`;
+    } else if (hours > 0) {
+      timeAgo = `${hours} hour${hours > 1 ? "s" : ""}`;
+    } else if (minutes > 0) {
+      timeAgo = `${minutes} minute${minutes > 1 ? "s" : ""}`;
+    } else {
+      timeAgo = `${seconds} second${seconds > 1 ? "s" : ""}`;
+    }
+
+    // Update the HTML
+    document.getElementById("lastUpdatedDate").textContent = formattedDate;
+    document.getElementById("timeAgo").textContent = timeAgo;
+  },
 };
+
+// [
+//   "202",
+//   "011+Expansion",
+//   "482",
+//   "504",
+//   "831449",
+//   "9995",
+//   "0"
+// ]

@@ -23,7 +23,7 @@ function loadScript(url) {
   console.debug("mode", mode);
 
   let scriptConfig = {
-    baseScriptUrl: "https://marcomue.github.io/DS_Script/src",
+    // baseScriptUrl: "https://marcomue.github.io/DS_Script/src",
   };
 
   await init();

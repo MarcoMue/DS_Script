@@ -1,0 +1,56 @@
+// ==UserScript==
+// @name         SingleScav
+// @version      0.1
+// @description  SingleScav
+// @author       Hasbulla Party Collection
+// @match        https://*.die-staemme.de/game.php?*&screen=place&mode=scavenge
+// @match        https://*.die-staemme.de/game.php?*&screen=place&mode=scavenge&*
+// @grant        unsafeWindow
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    var win = typeof unsafeWindow != 'undefined' ? unsafeWindow : window;
+
+    win.$.ajaxSetup({ cache: true });
+    win.$.getScript('https://media.innogames.com/com_DS_DE/Scriptdatenbank/userscript_main/470_raubzug_schicken_osse-thehebel97.js');
+
+    var delay = Math.floor(Math.random() * (15000 - 10000 + 1)) + 10000;
+    var clickdelay = delay;
+
+    window.onload = function() {
+        var button = document.querySelector('button.SendScavenger.btn');
+        if (button) {
+            setTimeout(function() {
+                button.click();
+            }, delay);
+            var assignedIdCount = assignUniqueIdsToButtons();
+            for (let i = assignedIdCount; i >= 1; i--) {
+                clickdelay = clickdelay + Math.floor(Math.random() * (4000 - 2000 + 1)) + 2000;
+                setTimeout(function() {
+                    clickButtonWithId(i.toString());
+                }, clickdelay);
+            }
+        }
+    };
+
+    function assignUniqueIdsToButtons() {
+        var buttons = document.querySelectorAll('.btn.btn-default.free_send_button');
+        var count = 0;
+        buttons.forEach((button, index) => {
+            var uniqueId = (index + 1);
+            button.id = uniqueId;
+            count++;
+        });
+        return count;
+    }
+
+    function clickButtonWithId(id) {
+        var button = document.getElementById(id);
+        button.click();
+    }
+
+    setInterval(function(){location.reload();}, Math.floor(Math.random() * (900000 - 600000 + 1)) + 600000);
+
+})();
