@@ -723,5 +723,3 @@ const Lib = {
     document.getElementById("timeAgo").textContent = timeAgo;
   },
 };
-
-export default Lib;

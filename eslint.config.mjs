@@ -9,7 +9,7 @@ export default [
   {
     files: ["**/*.test.js"], // Apply Jest settings to test files
     languageOptions: {
-      globals: globals.jest, // Add Jest globals
+      globals: { ...globals.jest, jQuery: "readonly" }, // Add Jest and jQuery globals
     },
     plugins: [pluginJest],
     rules: pluginJest.configs.recommended.rules,

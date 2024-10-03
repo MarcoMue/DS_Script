@@ -3,4 +3,5 @@ export default {
     "^.+\\.jsx?$": "babel-jest",
   },
   testEnvironment: "node",
+  setupFiles: ["fake-indexeddb/auto"],
 };
