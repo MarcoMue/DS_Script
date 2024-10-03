@@ -1,5 +1,5 @@
-import Lib from "./storageAPI.js";
 import { JSDOM } from "jsdom";
+import * as Lib from "../src/storageAPI";
 
 describe("csvToArray", () => {
   let dom;

@@ -285,16 +285,16 @@ const Lib = {
 
       return new Promise((resolve, reject) => {
         DBOpenRequest.onsuccess = (event) => {
-          const db = event.target.result;
+          const db = DBOpenRequest.result;
           const transaction = db.transaction(dbTable, "readonly");
           const store = transaction.objectStore(dbTable);
           const dbQuery = store.getAll();
 
-          dbQuery.onsuccess = (event) => resolve(event.target.result);
-          dbQuery.onerror = (event) => reject(event.target.error);
+          dbQuery.onsuccess = (event) => resolve(DBOpenRequest.result);
+          dbQuery.onerror = (event) => reject(DBOpenRequest.error);
         };
 
-        DBOpenRequest.onerror = (event) => reject(event.target.error);
+        DBOpenRequest.onerror = (event) => reject(DBOpenRequest.error);
       });
     }
   },
@@ -342,18 +342,18 @@ const Lib = {
       const DBOpenRequest = indexedDB.open(dbName, dbVersion);
 
       DBOpenRequest.onerror = function (event) {
-        console.error("Database error:", event.target.errorCode);
-        reject(event.target.errorCode);
+        console.error("Database error:", DBOpenRequest.error);
+        reject(DBOpenRequest.error);
       };
 
       DBOpenRequest.onsuccess = function (event) {
-        const db = event.target.result;
+        const db = DBOpenRequest.result;
         const transaction = db.transaction([dbTable], "readonly");
         const objectStore = transaction.objectStore(dbTable);
         const getRequest = objectStore.get(villageId);
 
         getRequest.onerror = function (event) {
-          console.error("Get request error:", event.target.errorCode);
+          console.error("Get request error:", DBOpenRequest.error);
         };
 
         getRequest.onsuccess = function (event) {
@@ -537,10 +537,13 @@ const Lib = {
     let updateTimesKey = `${entity}_timestamps`;
 
     let lastUpdate = localStorage.getItem(lastUpdateKey);
-    lastUpdate = lastUpdate ? Number(lastUpdate) : null;
+    lastUpdate = lastUpdate ? lastUpdate : null;
 
     // TODO: debug change back from 2 to 15min
-    if (lastUpdate && new Date().getTime() - lastUpdate < 5 * 60 * 1000) {
+    if (
+      lastUpdate &&
+      new Date().getTime() - Number(lastUpdate) < 5 * 60 * 1000
+    ) {
       console.debug("Data is up-to-date. No need to update.");
       return false;
     }
