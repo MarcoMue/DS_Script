@@ -1,0 +1,26 @@
+javascript: (function () {
+  const timestamp = Date.now(); // Assuming timestamp is defined
+
+  // Dynamically import the ESM module
+  import(`https://localhost:8443/src/read_all_incs.js`)
+    .then((module) => {
+      // Use the imported module
+      console.log(module);
+      // Call functions or use exports from the module
+      // module.someFunction();
+    })
+    .catch((error) => {
+      console.error("Error loading the module:", error);
+    });
+})();
+
+javascript: (function () {
+  const timestamp = Date.now();
+  import(`https://localhost:8443/src/read_all_incs.js?${timestamp}`)
+    .then((module) => {
+      console.log(module);
+    })
+    .catch((error) => {
+      console.error("Error loading the module:", error);
+    });
+})();
