@@ -1,6 +1,6 @@
 // Check if the UI library is loaded
 if (typeof UI === "undefined") {
-  console.error("UI library is not loaded.");
+  console.warn("UI library is not loaded.");
 
   // Define a placeholder UI object
   var UI = {
@@ -11,14 +11,22 @@ if (typeof UI === "undefined") {
   };
 }
 
+// https://forum.die-staemme.de/index.php?threads/weltdaten-und-configs.183996/
 const Lib = {
-  // https://forum.die-staemme.de/index.php?threads/weltdaten-und-configs.183996/
   /**
-   * @typedef {Object} Village
    * @property {number} id - The ID of the village.
    * @property {string} coord - The coordinates of the village.
    */
   Village: class {
+    /**
+     * @param {number} id
+     * @param {string} name
+     * @param {number} x
+     * @param {number} y
+     * @param {number} player_id
+     * @param {number} points
+     * @param {number} bonus_id
+     */
     constructor(id, name, x, y, player_id, points, bonus_id) {
       this.id = id;
       this.name = name;
@@ -101,6 +109,17 @@ const Lib = {
       this.outgoing = outgoing;
       this.incoming = incoming;
     }
+  },
+  WorkbenchCommand: class {
+    // commandId: i.toString(),
+    // originVillageId: parseInt(planParts[0]),
+    // targetVillageId: parseInt(planParts[1]),
+    // slowestUnit: planParts[2],
+    // arrivalTimestamp: parseInt(planParts[3]),
+    // type: parseInt(planParts[4]),
+    // drawIn: parseBool(planParts[5]),
+    // sent: parseBool(planParts[6]),
+    // units: units,
   },
   config: {
     basePath: "https://de228.die-staemme.de",
@@ -705,12 +724,4 @@ const Lib = {
   },
 };
 
-// [
-//   "202",
-//   "011+Expansion",
-//   "482",
-//   "504",
-//   "831449",
-//   "9995",
-//   "0"
-// ]
+export default Lib;
